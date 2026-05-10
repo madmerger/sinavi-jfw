@@ -37,8 +37,9 @@
       <property name="severity"
         value="${checkstyle.eclipse.severity}"
         default="error"/>
-      <property name="scope" value="public"/>
-      <property name="allowUndeclaredRTE" value="true"/>
+      <!-- Checkstyle 10 で 'scope' プロパティは 'accessModifiers' に名称変更 -->
+      <property name="accessModifiers" value="public"/>
+      <!-- Checkstyle 10 で 'allowUndeclaredRTE' プロパティは削除されたため除去 -->
     </module>
 
     <!-- CJ-DP1 1.2.1 -->

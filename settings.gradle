@@ -11,7 +11,12 @@ include 'jfw-rest-plugin-springmvc'
 include 'jfw-validation-core'
 include 'jfw-amqp-core'
 include 'jfw-csv-core'
-include 'jfw-excel-core'
+// jfw-excel-core: 一時的に除外。元の依存 jp.sf.amateras.xlsbeans:xlsbeans:1.2.1 が
+// ホストされていた http://amateras.sourceforge.jp/mvn が消滅しており、Maven Central
+// 含めどこからも取得できない。後継 com.github.takezoe:xlsbeans:1.2.7 はパッケージ名と
+// API が変わっており、ソースコード移行が必要なため Phase 1 のスコープ外。
+// TODO(Phase 2/3): xlsbeans 1.2.7 へのソース移行 or 別ライブラリへの置換後に再有効化する。
+// include 'jfw-excel-core'
 
 include 'jfw-data-mongodb-test'
 
@@ -28,5 +33,5 @@ project(':jfw-mybatis-core').projectDir = new File(settingsDir, './jdbc/jfw-myba
 project(':jfw-test').projectDir = new File(settingsDir, './test/jfw-test')
 project(':jfw-amqp-core').projectDir = new File(settingsDir, './async/jfw-amqp-core')
 project(':jfw-csv-core').projectDir = new File(settingsDir, './csv/jfw-csv-core')
-project(':jfw-excel-core').projectDir = new File(settingsDir, './excel/jfw-excel-core')
+// project(':jfw-excel-core').projectDir = new File(settingsDir, './excel/jfw-excel-core')
 project(':jfw-data-mongodb-test').projectDir = new File(settingsDir, './test/jfw-data-mongodb-test')

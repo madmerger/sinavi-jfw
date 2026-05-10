@@ -1,48 +1,36 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.7.0'
-        classpath 'org.ajoberstar:gradle-git:0.6.4'
-    }
+plugins {
+    id 'com.github.spotbugs' version '6.0.13' apply false
+    id 'com.github.hierynomus.license' version '0.16.1' apply false
 }
 
 allprojects {
-    apply plugin : 'java'
-    apply plugin : 'eclipse'
-    apply plugin : 'checkstyle'
-    apply plugin : 'findbugs'
-    apply plugin : 'jacoco'
-    apply plugin : 'idea'
-    apply plugin : 'license'
-    apply plugin : 'signing'
-    apply plugin : 'maven'
-    apply plugin : 'project-report'
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'eclipse'
+    apply plugin: 'checkstyle'
+    apply plugin: 'com.github.spotbugs'
+    apply plugin: 'jacoco'
+    apply plugin: 'idea'
+    apply plugin: 'com.github.hierynomus.license'
+    apply plugin: 'project-report'
 
     repositories {
         mavenCentral()
-        maven {
-            url 'http://repo.springsource.org/plugins-release'
-        }
-        maven {
-            url 'http://amateras.sourceforge.jp/mvn'
-        }
-        maven {
-            url 'http://repo.spring.io/snapshot'
-        }
+        maven { url 'https://repo.spring.io/plugins-release' }
+        maven { url 'https://repo.spring.io/snapshot' }
+        maven { url 'https://repo.spring.io/milestone' }
     }
 
     eclipse {
         classpath {
-            downloadSources=true
+            downloadSources = true
         }
     }
 
     [javadoc]*.options*.encoding = 'UTF-8'
     [compileJava, compileTestJava].each {
-        it.sourceCompatibility = 1.6
-        it.targetCompatibility = 1.6
+        it.sourceCompatibility = JavaVersion.VERSION_17
+        it.targetCompatibility = JavaVersion.VERSION_17
         it.options.encoding = 'UTF-8'
     }
 
@@ -53,16 +41,17 @@ allprojects {
         skipExistingHeaders true
         strictCheck true
         useDefaultMappings false
-        mapping('java',"SLASHSTAR_STYLE")
+        mapping('java', 'SLASHSTAR_STYLE')
     }
 
-    compileJava.dependsOn("licenseTest")
-    compileTestJava.dependsOn("licenseTest")
+    compileJava.dependsOn('licenseTest')
+    compileTestJava.dependsOn('licenseTest')
 
     configurations {
-        provided
-        compile.extendsFrom provided
-        all*.exclude group: "commons-logging", module: "commons-logging"
+        all*.exclude group: 'commons-logging', module: 'commons-logging'
+        // Checkstyle 10 系が Guava と google-collections の両方を引き込み、
+        // 同一 capability で競合するため、deprecated な google-collections を除外する。
+        all*.exclude group: 'com.google.collections', module: 'google-collections'
     }
 
     ext {
@@ -89,45 +78,54 @@ allprojects {
         logbackVersion = '1.1.1'
         guavaVersion = '16.0.1'
         openCsvVersion = '2.3'
-        
+
         junitVersion = '4.11'
         mockitoVersion = '1.9.5'
         h2Version = '1.3.173'
-        
+
         servletApiVersion = '3.0.1'
         cglibVersion = '3.1'
         asmVersion = '3.3.1'
         aspectjVersion = '1.7.3'
         jspApiVersion = '2.2'
         jstlVersion = '1.2'
-        
-        checkstyleVersion = '5.6'
-        findbugsVersion = '2.0.3'
+
+        checkstyleVersion = '10.14.0'
+        spotbugsToolVersion = '4.8.3'
     }
 
     dependencies {
-        compile "org.slf4j:slf4j-api:${slf4jVersion}"
-        compile "ch.qos.logback:logback-classic:${logbackVersion}"
-        compile "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
-        compile "com.google.guava:guava:${guavaVersion}"
-        compile "commons-lang:commons-lang:${commonsLangVersion}"
-        testCompile "junit:junit:${junitVersion}"
-        testCompile "org.mockito:mockito-core:${mockitoVersion}"
-        checkstyle "com.puppycrawl.tools:checkstyle:${checkstyleVersion}"
-        findbugs "com.google.code.findbugs:findbugs:${findbugsVersion}"
-        runtime "cglib:cglib-nodep:${cglibVersion}"
-        runtime "asm:asm:${asmVersion}"
-        runtime "org.aspectj:aspectjweaver:${aspectjVersion}"
-        provided "javax.servlet:javax.servlet-api:${servletApiVersion}"
+        api "org.slf4j:slf4j-api:${slf4jVersion}"
+        api "ch.qos.logback:logback-classic:${logbackVersion}"
+        api "org.slf4j:jcl-over-slf4j:${slf4jVersion}"
+        api "com.google.guava:guava:${guavaVersion}"
+        api "commons-lang:commons-lang:${commonsLangVersion}"
+        testImplementation "junit:junit:${junitVersion}"
+        testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+        runtimeOnly "cglib:cglib-nodep:${cglibVersion}"
+        runtimeOnly "asm:asm:${asmVersion}"
+        // aspectjweaver はソースコードで org.aspectj.lang.* をコンパイル時に参照するため
+        // 旧 Gradle の `runtime` (compile classpath にも乗っていた) と同等の挙動にするには
+        // implementation/api 扱いが必要。Gradle 8 の `runtimeOnly` は runtime only。
+        api "org.aspectj:aspectjweaver:${aspectjVersion}"
+        compileOnly "javax.servlet:javax.servlet-api:${servletApiVersion}"
+        // javax.annotation: JDK 11 以降 javax.annotation パッケージが JDK から削除されたため、
+        // ソースで javax.annotation.Resource を参照するテストコードのコンパイルに必要。
+        compileOnly "javax.annotation:javax.annotation-api:1.3.2"
+        // 旧 `provided` (compile.extendsFrom provided) はテストコンパイル時にも有効だった。
+        // Gradle 8 の compileOnly は test compile classpath には伝搬しないため、
+        // 同等の挙動を維持するために testCompileOnly を明示する。
+        testCompileOnly "javax.servlet:javax.servlet-api:${servletApiVersion}"
+        testCompileOnly "javax.annotation:javax.annotation-api:1.3.2"
     }
 
     test {
         testLogging {
-            events "failed"
-            exceptionFormat "full"
+            events 'failed'
+            exceptionFormat 'full'
             debug {
-                events "started", "skipped", "failed"
-                exceptionFormat "full"
+                events 'started', 'skipped', 'failed'
+                exceptionFormat 'full'
             }
         }
         exclude '**/*$*'
@@ -136,147 +134,77 @@ allprojects {
     checkstyle {
         configFile = file("${rootDir}/config/checkstyle/ctc-checks.xml")
         ignoreFailures = true
-        toolVersion = '5.6'
+        toolVersion = checkstyleVersion
     }
 
-    findbugs {
+    spotbugs {
         ignoreFailures = true
-        ext.excludes = { exclude compileTestJava.destinationDir }
+        toolVersion = spotbugsToolVersion
     }
 
     jacoco {
-        toolVersion = '0.6.4.201312101107'
+        toolVersion = '0.8.11'
     }
 
     jacocoTestReport {
         reports {
-            xml.enabled false
-            csv.enabled false
-            html.destination "${buildDir}/jacocoHtml"
+            xml.required = false
+            csv.required = false
+            html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
         }
     }
 
     task resourceCopy(type: Copy) {
-        from relativePath(processResources.destinationDir)
-        into relativePath(compileTestJava.destinationDir)
+        from processResources
+        into compileTestJava.destinationDirectory
         include '**/*.xml'
         include '*.xml'
         include '*.properties'
     }
 
-    test.dependsOn("resourceCopy")
-
+    test.dependsOn('resourceCopy')
 }
 
-configure(rootProject) {
-    task wrapper(type: Wrapper) {
-        description = "Generates gradlew[.bat] scripts"
-        gradleVersion = "1.11"
-    }
-
-}
-
-configure(subprojects) {subproject ->
-    apply plugin : 'github-pages'
+configure(subprojects) { subproject ->
     group = 'jp.co.ctc-g.jfw'
     defaultTasks 'clean', 'packages'
     jar {
         doFirst {
-            manifest.attributes["Created-By"] =  "${System.getProperty("java.version")}"
-            manifest.attributes["Implementation-Vendor"] = 'ITOCHU Techno-Solutions Corporation.'
-            manifest.attributes["Implementation-Title"] = subproject.name
-            manifest.attributes["Implementation-Version"] = subproject.version
+            manifest.attributes['Created-By'] = "${System.getProperty('java.version')}"
+            manifest.attributes['Implementation-Vendor'] = 'ITOCHU Techno-Solutions Corporation.'
+            manifest.attributes['Implementation-Title'] = subproject.name
+            manifest.attributes['Implementation-Version'] = subproject.version
         }
     }
     javadoc {
         doFirst {
-            description = "Generates project-level javadoc for use in -javadoc jar"
+            description = 'Generates project-level javadoc for use in -javadoc jar'
             options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
             options.author = true
             options.overview = "${rootDir}/config/javadoc/html/overview.html"
             options.charSet = 'UTF-8'
-            options.docTitle  = "${subproject.name} ${subproject.version}"
-            options.windowTitle  = "${subproject.name} ${subproject.version}"
+            options.docTitle = "${subproject.name} ${subproject.version}"
+            options.windowTitle = "${subproject.name} ${subproject.version}"
             options.header = "<h1>${subproject.name}</h1>"
-            options.bottom = "<i>Copyright &#169; 2011-2014 ITOCHU Techno-Solutions Corporation.</i>"
-            options.destinationDirectory = file("${project.docsDir}/javadoc/${subproject.name}/${subproject.version}/api")
+            options.bottom = '<i>Copyright &#169; 2011-2014 ITOCHU Techno-Solutions Corporation.</i>'
+            options.destinationDirectory = file("${layout.buildDirectory.get().asFile}/docs/javadoc/${subproject.name}/${subproject.version}/api")
+            // Java 17 の javadoc は HTML 厳格チェックを行うため、レガシーコメント (HTML4) で
+            // エラーになる。ソースコードを変更しないため doclint を無効化する。
+            options.addStringOption('Xdoclint:none', '-quiet')
         }
     }
-    signing {
-        required { 
-            gradle.taskGraph.hasTask("uploadArchives")
-        }
-        sign configurations.archives
-    }
-    configurations {
-        deployerJars
-    }
-    dependencies {
-        deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
-    }
-    uploadArchives {
-        dependsOn signArchives
-        repositories.mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-            configuration = configurations.deployerJars
-            repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-            snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-            pom.project {
-                group 'jp.co.ctc-g.jfw'
-                packaging 'jar'
-                inceptionYear '2014'
-                url 'https://github.com/ctc-g/sinavi-jfw'
-                organization {
-                    name 'ITOCHU Techno-Solutions Corporation.'
-                    url 'http://www.ctc-g.co.jp'
-                }
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
-                    }
-                }
-                scm {
-                    connection 'scm:git:git://github.com/ctc-g/sinavi-jfw'
-                    developerConnection 'scm:git:git://github.com/ctc-g/sinavi-jfw'
-                    url 'https://github.com/ctc-g/sinavi-jfw'
-                }
-                developers {
-                    developer {
-                        id 'sinavi-jfw'
-                        name 'SINAVI J-Framework'
-                        email 'sinavi-jframework@ctc-g.co.jp'
-                    }
-                }
-            }
-        }
-    }
-    githubPages {
-        repoUri = 'https://github.com/ctc-g/sinavi-jfw.git'
-        pages {
-            from(javadoc.outputs.files) {
-                into "docs/projects"
-            }
-        }
-        workingPath = "build/ghpages"
-    }
-    task sourcesJar(type: Jar, dependsOn:classes) {
-        classifier = "sources"
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        archiveClassifier = 'sources'
         from sourceSets.main.allJava.srcDirs
-        include "**/*.java"
+        include '**/*.java'
     }
-    task javadocJar(type: Jar, dependsOn:javadoc) {
-        classifier = "javadoc"
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        archiveClassifier = 'javadoc'
         from javadoc.destinationDir
     }
     task codeChecks(dependsOn: [
         'checkstyleMain',
-        'findbugsMain',
+        'spotbugsMain',
     ])
     task packages(dependsOn: [
         'codeChecks',
@@ -290,352 +218,240 @@ configure(subprojects) {subproject ->
     }
 }
 
-project("jfw-util-core") {
+project('jfw-util-core') {
     description = 'SINAVI J-Framework Utility'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile "commons-collections:commons-collections:${commonsCollectionsVersion}"
-        compile "org.springframework:spring-beans:${springVersion}"
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
+        api "commons-collections:commons-collections:${commonsCollectionsVersion}"
+        api "org.springframework:spring-beans:${springVersion}"
     }
 }
 
-project("jfw-resource-core") {
+project('jfw-resource-core') {
     description = 'SINAVI J-Framework Resource'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile project(':jfw-util-core')
-        compile "commons-collections:commons-collections:${commonsCollectionsVersion}"
-        compile "org.springframework:spring-core:${springVersion}",
+        api project(':jfw-util-core')
+        api "commons-collections:commons-collections:${commonsCollectionsVersion}"
+        api "org.springframework:spring-core:${springVersion}",
                 "org.springframework:spring-context:${springVersion}"
-        testCompile "org.springframework:spring-test:${springVersion}"
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
+        testImplementation "org.springframework:spring-test:${springVersion}"
     }
 }
 
-project("jfw-exception-core") {
+project('jfw-exception-core') {
     description = 'SINAVI J-Framework Exception'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile project(':jfw-util-core')
-        compile project(':jfw-resource-core')
-        compile "commons-collections:commons-collections:${commonsCollectionsVersion}"
-        compile "org.springframework:spring-core:${springVersion}"
-        testCompile "org.springframework:spring-test:${springVersion}"
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
+        api project(':jfw-util-core')
+        api project(':jfw-resource-core')
+        api "commons-collections:commons-collections:${commonsCollectionsVersion}"
+        api "org.springframework:spring-core:${springVersion}"
+        testImplementation "org.springframework:spring-test:${springVersion}"
     }
 }
 
-project("jfw-web-util-core") {
+project('jfw-web-util-core') {
     description = 'SINAVI J-Framework Web Utility'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile project(':jfw-util-core')
-        compile project(':jfw-exception-core')
-        compile "commons-collections:commons-collections:${commonsCollectionsVersion}"
-        compile "org.springframework:spring-core:${springVersion}",
+        api project(':jfw-util-core')
+        api project(':jfw-exception-core')
+        api "commons-collections:commons-collections:${commonsCollectionsVersion}"
+        api "org.springframework:spring-core:${springVersion}",
                 "org.springframework:spring-context:${springVersion}"
-        testCompile "org.springframework:spring-test:${springVersion}"
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
+        testImplementation "org.springframework:spring-test:${springVersion}"
     }
 }
 
-project("jfw-test") {
+project('jfw-test') {
     description = 'SINAVI J-Framework Test Utility'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile project(':jfw-util-core')
-        compile "commons-io:commons-io:${commonsIoVersion}"
-        compile "commons-fileupload:commons-fileupload:${commonsFileuploadVersion}"
-        compile "junit:junit:${junitVersion}"
-        compile "org.mockito:mockito-core:${mockitoVersion}"
-        compile "org.springframework:spring-core:${springVersion}",
+        api project(':jfw-util-core')
+        api "commons-io:commons-io:${commonsIoVersion}"
+        api "commons-fileupload:commons-fileupload:${commonsFileuploadVersion}"
+        api "junit:junit:${junitVersion}"
+        api "org.mockito:mockito-core:${mockitoVersion}"
+        api "org.springframework:spring-core:${springVersion}",
                 "org.springframework:spring-context:${springVersion}",
                 "org.springframework:spring-beans:${springVersion}",
                 "org.springframework:spring-test:${springVersion}"
     }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
-    }
 }
 
-project("jfw-data-mongodb-test") {
+project('jfw-data-mongodb-test') {
     description = 'SINAVI J-Framework MongoDB Test Utility'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile project(':jfw-test')
-        compile "commons-io:commons-io:${commonsIoVersion}"
-        compile "commons-fileupload:commons-fileupload:${commonsFileuploadVersion}"
-        compile "junit:junit:${junitVersion}"
-        compile "org.mockito:mockito-core:${mockitoVersion}"
-        compile "org.springframework.data:spring-data-mongodb:${springMongoVersion}"
-        compile "org.codehaus.jackson:jackson-core-asl:${jacksonVersion}",
+        api project(':jfw-test')
+        api "commons-io:commons-io:${commonsIoVersion}"
+        api "commons-fileupload:commons-fileupload:${commonsFileuploadVersion}"
+        api "junit:junit:${junitVersion}"
+        api "org.mockito:mockito-core:${mockitoVersion}"
+        api "org.springframework.data:spring-data-mongodb:${springMongoVersion}"
+        api "org.codehaus.jackson:jackson-core-asl:${jacksonVersion}",
                 "org.codehaus.jackson:jackson-mapper-asl:${jacksonVersion}",
                 "org.codehaus.jackson:jackson-xc:${jacksonVersion}",
                 "org.codehaus.jackson:jackson-jaxrs:${jacksonVersion}"
     }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
-    }
 }
 
-project("jfw-web-core") {
+project('jfw-web-core') {
     description = 'SINAVI J-Framework Web'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile project(':jfw-exception-core')
-        compile project(':jfw-web-util-core')
-        compile "javax.validation:validation-api:${beanValidationVersion}"
-        compile "commons-dbcp:commons-dbcp:${commonsDbcpVersion}"
-        compile "commons-fileupload:commons-fileupload:${commonsFileuploadVersion}"
-        compile "commons-io:commons-io:${commonsIoVersion}"
-        compile "commons-collections:commons-collections:${commonsCollectionsVersion}"
-        compile "commons-codec:commons-codec:${commonsCodecVersion}"
-        compile "org.springframework:spring-core:${springVersion}",
+        api project(':jfw-exception-core')
+        api project(':jfw-web-util-core')
+        api "javax.validation:validation-api:${beanValidationVersion}"
+        api "commons-dbcp:commons-dbcp:${commonsDbcpVersion}"
+        api "commons-fileupload:commons-fileupload:${commonsFileuploadVersion}"
+        api "commons-io:commons-io:${commonsIoVersion}"
+        api "commons-collections:commons-collections:${commonsCollectionsVersion}"
+        api "commons-codec:commons-codec:${commonsCodecVersion}"
+        api "org.springframework:spring-core:${springVersion}",
                 "org.springframework:spring-context:${springVersion}",
                 "org.springframework:spring-beans:${springVersion}",
                 "org.springframework:spring-expression:${springVersion}",
                 "org.springframework:spring-aop:${springVersion}",
                 "org.springframework:spring-web:${springVersion}",
                 "org.springframework:spring-webmvc:${springVersion}"
-        compile "commons-validator:commons-validator:${commonsValidatorVersion}"
-        testCompile project(':jfw-test')
-        testCompile "javax.el:javax.el-api:${elVersion}"
-        provided "javax.servlet.jsp:jsp-api:${jspApiVersion}"
-        provided "javax.servlet:jstl:${jstlVersion}"
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
+        api "commons-validator:commons-validator:${commonsValidatorVersion}"
+        testImplementation project(':jfw-test')
+        testImplementation "javax.el:javax.el-api:${elVersion}"
+        compileOnly "javax.servlet.jsp:jsp-api:${jspApiVersion}"
+        compileOnly "javax.servlet:jstl:${jstlVersion}"
+        // 旧 `provided` はテストコンパイル時にも有効だったため testCompileOnly にも追加
+        testCompileOnly "javax.servlet.jsp:jsp-api:${jspApiVersion}"
+        testCompileOnly "javax.servlet:jstl:${jstlVersion}"
     }
 }
 
-project("jfw-mybatis-core") {
+project('jfw-mybatis-core') {
     description = 'SINAVI J-Framework MyBatis'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile project(':jfw-web-util-core')
-        compile "org.mybatis:mybatis:${mybatisVersion}"
-        compile "org.mybatis:mybatis-spring:${mybatisSpringVersion}"
-        compile "org.springframework:spring-core:${springVersion}",
+        api project(':jfw-web-util-core')
+        api "org.mybatis:mybatis:${mybatisVersion}"
+        api "org.mybatis:mybatis-spring:${mybatisSpringVersion}"
+        api "org.springframework:spring-core:${springVersion}",
                 "org.springframework:spring-context:${springVersion}",
                 "org.springframework:spring-beans:${springVersion}"
-        testCompile project(':jfw-test')
-        testCompile "org.springframework:spring-test:${springVersion}"
-        testCompile "org.springframework:spring-jdbc:${springVersion}"
-        testCompile "commons-dbcp:commons-dbcp:${commonsDbcpVersion}"
-        testCompile "com.h2database:h2:${h2Version}"
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
+        testImplementation project(':jfw-test')
+        testImplementation "org.springframework:spring-test:${springVersion}"
+        testImplementation "org.springframework:spring-jdbc:${springVersion}"
+        testImplementation "commons-dbcp:commons-dbcp:${commonsDbcpVersion}"
+        testImplementation "com.h2database:h2:${h2Version}"
     }
 }
 
-project("jfw-rest-core") {
+project('jfw-rest-core') {
     description = 'SINAVI J-Framework REST Client for JAX-RS'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile "javax.ws.rs:javax.ws.rs-api:${jaxRsVersion}"
-        compile "org.codehaus.jackson:jackson-core-asl:${jacksonVersion}",
+        api "javax.ws.rs:javax.ws.rs-api:${jaxRsVersion}"
+        api "org.codehaus.jackson:jackson-core-asl:${jacksonVersion}",
                 "org.codehaus.jackson:jackson-mapper-asl:${jacksonVersion}"
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
     }
 }
 
-project("jfw-rest-plugin-jersey") {
+project('jfw-rest-plugin-jersey') {
     description = 'SINAVI J-Framework REST Client for JAX-RS (Jersey)'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile project(':jfw-util-core')
-        compile project(':jfw-exception-core')
-        compile project(':jfw-rest-core')
-        compile "org.glassfish.jersey.containers:jersey-container-servlet:${jerseyVersion}",
+        api project(':jfw-util-core')
+        api project(':jfw-exception-core')
+        api project(':jfw-rest-core')
+        api "org.glassfish.jersey.containers:jersey-container-servlet:${jerseyVersion}",
                 "org.glassfish.jersey.core:jersey-client:${jerseyVersion}",
                 "org.glassfish.jersey.connectors:jersey-grizzly-connector:${jerseyVersion}",
                 "org.glassfish.jersey.connectors:jersey-apache-connector:${jerseyVersion}",
                 "org.glassfish.jersey.ext:jersey-bean-validation:${jerseyVersion}",
                 "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}"
-        testCompile "org.glassfish.jersey.test-framework:jersey-test-framework-core:${jerseyVersion}",
+        testImplementation "org.glassfish.jersey.test-framework:jersey-test-framework-core:${jerseyVersion}",
                 "org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-simple:${jerseyVersion}",
                 "org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-external:${jerseyVersion}",
                 "org.glassfish.jersey.test-framework.providers:jersey-test-framework-provider-default-client:${jerseyVersion}"
-        testCompile project(':jfw-validation-core')
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
+        testImplementation project(':jfw-validation-core')
     }
 }
 
-project("jfw-rest-plugin-springmvc") {
+project('jfw-rest-plugin-springmvc') {
     description = 'SINAVI J-Framework REST Plugin for SpringMVC'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile project(':jfw-rest-core')
-        compile project(':jfw-exception-core')
-        compile "org.springframework:spring-context:${springVersion}",
+        api project(':jfw-rest-core')
+        api project(':jfw-exception-core')
+        api "org.springframework:spring-context:${springVersion}",
                 "org.springframework:spring-test:${springVersion}",
                 "org.springframework:spring-web:${springVersion}",
                 "org.springframework:spring-webmvc:${springVersion}"
-        compile 'org.apache.httpcomponents:httpclient:4.3'
-        testCompile "org.springframework:spring-test:${springVersion}"
-        testCompile("org.eclipse.jetty:jetty-servlet:8.1.5.v20120716") {
-            exclude group: "org.eclipse.jetty.orbit", module: "javax.servlet"
+        api 'org.apache.httpcomponents:httpclient:4.3'
+        testImplementation "org.springframework:spring-test:${springVersion}"
+        testImplementation("org.eclipse.jetty:jetty-servlet:8.1.5.v20120716") {
+            exclude group: 'org.eclipse.jetty.orbit', module: 'javax.servlet'
         }
-        testCompile("org.eclipse.jetty:jetty-server:8.1.5.v20120716") {
-            exclude group: "org.eclipse.jetty.orbit", module: "javax.servlet"
-        }
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
+        testImplementation("org.eclipse.jetty:jetty-server:8.1.5.v20120716") {
+            exclude group: 'org.eclipse.jetty.orbit', module: 'javax.servlet'
         }
     }
 }
 
-project("jfw-validation-core") {
+project('jfw-validation-core') {
     description = 'SINAVI J-Framework Bean Validation'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile (project(':jfw-util-core'))
-        compile "javax.validation:validation-api:${beanValidationVersion}"
-        compile "org.hibernate:hibernate-validator:${hibernateValidatorVersion}"
-        compile "javax.el:javax.el-api:${elVersion}"
-        compile "org.glassfish.web:javax.el:${elVersion}"
-        compile "commons-validator:commons-validator:${commonsValidatorVersion}"
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
+        api project(':jfw-util-core')
+        api "javax.validation:validation-api:${beanValidationVersion}"
+        api "org.hibernate:hibernate-validator:${hibernateValidatorVersion}"
+        api "javax.el:javax.el-api:${elVersion}"
+        api "org.glassfish.web:javax.el:${elVersion}"
+        api "commons-validator:commons-validator:${commonsValidatorVersion}"
     }
 }
 
-project("jfw-amqp-core") {
+project('jfw-amqp-core') {
     description = 'SINAVI J-Framework AMQP'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile project(':jfw-util-core')
-        compile project(':jfw-exception-core')
-        compile "org.springframework.amqp:spring-amqp:${springAmqpVersion}",
+        api project(':jfw-util-core')
+        api project(':jfw-exception-core')
+        api "org.springframework.amqp:spring-amqp:${springAmqpVersion}",
                 "org.springframework.amqp:spring-rabbit:${springAmqpVersion}"
-        compile "org.springframework.retry:spring-retry:${springRetryVersion}"
-        testCompile "org.springframework:spring-test:${springVersion}"
-        testCompile "org.springframework:spring-tx:${springVersion}"
-        runtime "org.codehaus.jackson:jackson-core-asl:${jacksonVersion}",
+        api "org.springframework.retry:spring-retry:${springRetryVersion}"
+        testImplementation "org.springframework:spring-test:${springVersion}"
+        testImplementation "org.springframework:spring-tx:${springVersion}"
+        runtimeOnly "org.codehaus.jackson:jackson-core-asl:${jacksonVersion}",
                 "org.codehaus.jackson:jackson-mapper-asl:${jacksonVersion}"
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
     }
 }
 
-project("jfw-csv-core") {
+project('jfw-csv-core') {
     description = 'SINAVI J-Framework CSV'
     defaultTasks 'clean', 'packages'
     dependencies {
-        compile project(':jfw-util-core')
-        compile project(':jfw-exception-core')
-        compile project(':jfw-validation-core')
-        compile "net.sf.opencsv:opencsv:${openCsvVersion}"
-        compile 'net.sourceforge.collections:collections-generic:4.01'
-        compile "org.mybatis:mybatis:${mybatisVersion}"
-        testCompile project(':jfw-test')
-        testCompile "org.mybatis:mybatis-spring:${mybatisSpringVersion}"
-        testCompile "org.springframework:spring-jdbc:${springVersion}"
-        testCompile "com.h2database:h2:${h2Version}"
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
+        api project(':jfw-util-core')
+        api project(':jfw-exception-core')
+        api project(':jfw-validation-core')
+        api "net.sf.opencsv:opencsv:${openCsvVersion}"
+        api 'net.sourceforge.collections:collections-generic:4.01'
+        api "org.mybatis:mybatis:${mybatisVersion}"
+        testImplementation project(':jfw-test')
+        testImplementation "org.mybatis:mybatis-spring:${mybatisSpringVersion}"
+        testImplementation "org.springframework:spring-jdbc:${springVersion}"
+        testImplementation "com.h2database:h2:${h2Version}"
     }
 }
 
-project("jfw-excel-core") {
-    description = 'SINAVI J-Framework Excel'
-    defaultTasks 'clean', 'packages'
-    dependencies { 
-        compile 'jp.sf.amateras.xlsbeans:xlsbeans:1.2.1'
-    }
-    uploadArchives {
-        repositories.mavenDeployer {
-            pom.project {
-                name project.description
-                description project.description
-            }
-        }
-    }
-}
+// jfw-excel-core: 元の依存 jp.sf.amateras.xlsbeans:xlsbeans:1.2.1 がホスト元の
+// http://amateras.sourceforge.jp/mvn 消滅により取得不可能なため Phase 1 では除外。
+// settings.gradle の include をコメントアウトしているため、本ブロックも適用されない
+// (project(...) 評価が失敗するため、構成自体を削除している)。
+// TODO(Phase 2/3): com.github.takezoe:xlsbeans:1.2.7 などへの移行後に復活させる。
+// project('jfw-excel-core') {
+//     description = 'SINAVI J-Framework Excel'
+//     defaultTasks 'clean', 'packages'
+//     dependencies {
+//         api 'jp.sf.amateras.xlsbeans:xlsbeans:1.2.1'
+//     }
+// }
