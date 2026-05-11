@@ -112,11 +112,12 @@ allprojects {
         // javax.annotation: JDK 11 以降 javax.annotation パッケージが JDK から削除されたため、
         // ソースで javax.annotation.Resource を参照するテストコードのコンパイルに必要。
         compileOnly "javax.annotation:javax.annotation-api:1.3.2"
-        // 旧 `provided` (compile.extendsFrom provided) はテストコンパイル時にも有効だった。
-        // Gradle 8 の compileOnly は test compile classpath には伝搬しないため、
-        // 同等の挙動を維持するために testCompileOnly を明示する。
-        testCompileOnly "javax.servlet:javax.servlet-api:${servletApiVersion}"
-        testCompileOnly "javax.annotation:javax.annotation-api:1.3.2"
+        // 旧 `provided` (compile.extendsFrom provided) は test compile / test runtime の
+        // 両方に伝搬していた。Gradle 8 の compileOnly / testCompileOnly は test runtime
+        // classpath には伝搬しないため、testRuntime も含めた同等の挙動を維持するために
+        // testImplementation を明示する。
+        testImplementation "javax.servlet:javax.servlet-api:${servletApiVersion}"
+        testImplementation "javax.annotation:javax.annotation-api:1.3.2"
     }
 
     test {
@@ -321,9 +322,10 @@ project('jfw-web-core') {
         testImplementation "javax.el:javax.el-api:${elVersion}"
         compileOnly "javax.servlet.jsp:jsp-api:${jspApiVersion}"
         compileOnly "javax.servlet:jstl:${jstlVersion}"
-        // 旧 `provided` はテストコンパイル時にも有効だったため testCompileOnly にも追加
-        testCompileOnly "javax.servlet.jsp:jsp-api:${jspApiVersion}"
-        testCompileOnly "javax.servlet:jstl:${jstlVersion}"
+        // 旧 `provided` は test compile / test runtime の両方に伝搬していたため
+        // testImplementation で同等の挙動を維持
+        testImplementation "javax.servlet.jsp:jsp-api:${jspApiVersion}"
+        testImplementation "javax.servlet:jstl:${jstlVersion}"
     }
 }
 
