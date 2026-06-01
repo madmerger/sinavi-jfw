@@ -424,7 +424,6 @@ project("jfw-rest-plugin-springmvc") {
         api project(':jfw-rest-core')
         api project(':jfw-exception-core')
         implementation "org.springframework:spring-context:${springVersion}",
-                "org.springframework:spring-test:${springVersion}",
                 "org.springframework:spring-web:${springVersion}",
                 "org.springframework:spring-webmvc:${springVersion}"
         implementation 'org.apache.httpcomponents:httpclient:4.3'
