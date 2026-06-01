@@ -360,8 +360,8 @@ project("jfw-web-core") {
                 "org.springframework:spring-context:${springVersion}",
                 "org.springframework:spring-beans:${springVersion}",
                 "org.springframework:spring-expression:${springVersion}",
-                "org.springframework:spring-aop:${springVersion}",
-                "org.springframework:spring-web:${springVersion}",
+                "org.springframework:spring-aop:${springVersion}"
+        api "org.springframework:spring-web:${springVersion}",
                 "org.springframework:spring-webmvc:${springVersion}"
         implementation "org.aspectj:aspectjweaver:${aspectjVersion}"
         implementation "commons-validator:commons-validator:${commonsValidatorVersion}"
@@ -376,7 +376,7 @@ project("jfw-mybatis-core") {
     description = 'SINAVI J-Framework MyBatis'
     dependencies {
         api project(':jfw-web-util-core')
-        implementation "org.mybatis:mybatis:${mybatisVersion}"
+        api "org.mybatis:mybatis:${mybatisVersion}"
         implementation "org.mybatis:mybatis-spring:${mybatisSpringVersion}"
         implementation "org.springframework:spring-core:${springVersion}",
                 "org.springframework:spring-context:${springVersion}",
@@ -423,7 +423,7 @@ project("jfw-rest-plugin-springmvc") {
     dependencies {
         api project(':jfw-rest-core')
         api project(':jfw-exception-core')
-        implementation "org.springframework:spring-context:${springVersion}",
+        api "org.springframework:spring-context:${springVersion}",
                 "org.springframework:spring-web:${springVersion}",
                 "org.springframework:spring-webmvc:${springVersion}"
         implementation 'org.apache.httpcomponents:httpclient:4.3'
