@@ -197,7 +197,7 @@ configure(subprojects) { subproject ->
             options.windowTitle = "${subproject.name} ${subproject.version}"
             options.header = "<h1>${subproject.name}</h1>"
             options.bottom = "<i>Copyright &#169; 2011-2026 ITOCHU Techno-Solutions Corporation.</i>"
-            options.destinationDirectory = file("${buildDir}/docs/javadoc/${subproject.name}/${subproject.version}/api")
+            options.destinationDirectory = layout.buildDirectory.dir("docs/javadoc/${subproject.name}/${subproject.version}/api").get().asFile
         }
     }
 
