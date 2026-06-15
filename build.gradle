@@ -23,11 +23,12 @@ allprojects {
     repositories {
         mavenCentral()
         maven {
-            url 'https://repo.springsource.org/plugins-release'
+            url 'https://repo.spring.io/plugins-release'
         }
-        maven {
-            url 'https://amateras.sourceforge.jp/mvn'
-        }
+        // NOTE: amateras.sourceforge.jp は閉鎖済み。xlsbeans が必要な場合はローカルリポジトリを使用
+        // maven {
+        //     url 'https://amateras.sourceforge.jp/mvn'
+        // }
         maven {
             url 'https://repo.spring.io/snapshot'
         }
@@ -81,7 +82,7 @@ allprojects {
         commonsFileuploadVersion = '1.3.3'
         commonsValidatorVersion = '1.4.0'
         commonsDbcpVersion = '1.4'
-        commonsIoVersion = '2.0.1'
+        commonsIoVersion = '2.2'
         commonsCollectionsVersion = '3.2.2'
         commonsLangVersion = '2.6'
         commonsCodecVersion = '1.5'
