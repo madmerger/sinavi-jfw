@@ -23,13 +23,13 @@ allprojects {
     repositories {
         mavenCentral()
         maven {
-            url 'http://repo.springsource.org/plugins-release'
+            url 'https://repo.springsource.org/plugins-release'
         }
         maven {
-            url 'http://amateras.sourceforge.jp/mvn'
+            url 'https://amateras.sourceforge.jp/mvn'
         }
         maven {
-            url 'http://repo.spring.io/snapshot'
+            url 'https://repo.spring.io/snapshot'
         }
     }
 
@@ -78,11 +78,11 @@ allprojects {
         beanValidationVersion = '1.1.0.Final'
         hibernateValidatorVersion = '5.1.0.Final'
         elVersion = '2.2.4'
-        commonsFileuploadVersion = '1.3.1'
+        commonsFileuploadVersion = '1.3.3'
         commonsValidatorVersion = '1.4.0'
         commonsDbcpVersion = '1.4'
         commonsIoVersion = '2.0.1'
-        commonsCollectionsVersion = '3.2.1'
+        commonsCollectionsVersion = '3.2.2'
         commonsLangVersion = '2.6'
         commonsCodecVersion = '1.5'
         slf4jVersion = '1.7.6'
