@@ -23,6 +23,12 @@ allprojects {
         maven {
             url 'https://repo.spring.io/snapshot'
         }
+        maven {
+            // Amateras repo (formerly amateras.sourceforge.jp/mvn).
+            // Required for jp.sf.amateras.xlsbeans:xlsbeans used by jfw-excel-core.
+            // OSDN (successor to SourceForge.jp) may be intermittently unavailable.
+            url 'https://amateras.osdn.jp/mvn/'
+        }
     }
 
     eclipse {
