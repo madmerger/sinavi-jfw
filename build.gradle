@@ -25,10 +25,11 @@ allprojects {
         maven {
             url 'https://repo.spring.io/plugins-release'
         }
-        // NOTE: amateras.sourceforge.jp は閉鎖済み。xlsbeans が必要な場合はローカルリポジトリを使用
-        // maven {
-        //     url 'https://amateras.sourceforge.jp/mvn'
-        // }
+        // NOTE: amateras.sourceforge.jp は閉鎖済み。xlsbeans (jfw-excel-core) の解決には
+        // ローカルリポジトリまたはミラーの設定が必要です。
+        maven {
+            url 'https://amateras.sourceforge.jp/mvn'
+        }
         maven {
             url 'https://repo.spring.io/snapshot'
         }
