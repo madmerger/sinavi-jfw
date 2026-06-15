@@ -37,8 +37,6 @@
       <property name="severity"
         value="${checkstyle.eclipse.severity}"
         default="error"/>
-      <property name="scope" value="public"/>
-      <property name="allowUndeclaredRTE" value="true"/>
     </module>
 
     <!-- CJ-DP1 1.2.1 -->
@@ -201,19 +199,9 @@
         default="error"/>
     </module>
 
-    <!-- CJ-DP1 1.7.2 -->
-    <module name="SuperClone">
-      <property name="severity"
-        value="${checkstyle.eclipse.severity}"
-        default="error"/>
-    </module>
+    <!-- CJ-DP1 1.7.2 SuperClone removed in Checkstyle 6.2 -->
 
-    <!-- CJ-DP1 1.7.3 -->
-    <module name="SuperFinalize">
-      <property name="severity"
-        value="${checkstyle.eclipse.severity}"
-        default="error"/>
-    </module>
+    <!-- CJ-DP1 1.7.3 SuperFinalize removed in Checkstyle 6.2 -->
 
     <!-- CJ-DP1 1.8.1 -->
     <module name="FinalClass">
