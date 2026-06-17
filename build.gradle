@@ -315,6 +315,7 @@ project("jfw-test") {
         implementation "commons-io:commons-io:${commonsIoVersion}"
         implementation "commons-fileupload:commons-fileupload:${commonsFileuploadVersion}"
         implementation "org.junit.jupiter:junit-jupiter:${junit5Version}"
+        implementation "junit:junit:4.13.2"
         implementation "org.mockito:mockito-core:${mockitoVersion}"
         implementation "com.google.guava:guava:${guavaVersion}"
         implementation "com.h2database:h2:${h2Version}"

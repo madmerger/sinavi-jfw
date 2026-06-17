@@ -87,7 +87,7 @@ public class CSVToBeanMapping<T> {
             try {
                 PropertyDescriptor prop = new PropertyDescriptor(propertyName, mapper.getType());
                 Class<?> propertyType = prop.getPropertyType();
-                String value = line[col] != null ? line[col].trim() : line[col];
+                String value = checkForTrim(line[col], prop);
                 if (Strings.isEmpty(value)) {
                     continue;
                 }
@@ -107,6 +107,14 @@ public class CSVToBeanMapping<T> {
         }
         if (!errors.isEmpty()) throw new BindException(R.getString("E-CSV#0010"), errors);
         return bean;
+    }
+
+    private String checkForTrim(String s, PropertyDescriptor prop) {
+        return trimmableProperty(prop) ? s.trim() : s;
+    }
+
+    private boolean trimmableProperty(PropertyDescriptor prop) {
+        return !prop.getPropertyType().getName().contains("String");
     }
 
     /**

@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * <p>
@@ -71,7 +71,7 @@ public class ErrorMessage implements Serializable {
     /**
      * UUID
      */
-    @JsonSerialize(include = JsonSerialize.Inclusion.NON_DEFAULT)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String id;
 
     /**
@@ -82,7 +82,7 @@ public class ErrorMessage implements Serializable {
     /**
      * エラーコード
      */
-    @JsonSerialize(include = JsonSerialize.Inclusion.NON_DEFAULT)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private String code;
 
     /**
@@ -93,7 +93,7 @@ public class ErrorMessage implements Serializable {
     /**
      * バリデーションメッセージ
      */
-    @JsonSerialize(include = JsonSerialize.Inclusion.NON_DEFAULT)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private List<ValidationMessage> validationMessages;
 
     /**
