@@ -41,7 +41,7 @@ public class ProxyClientHttpRequestFactoryTest {
     class コンフィグレーションテスト {
 
         @Autowired
-        @Qualifier("proxyFactory")
+        @Qualifier("proxy")
         private ProxyClientHttpRequestFactory factory;
 
         @Test

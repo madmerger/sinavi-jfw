@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
  *   public void testFind() {
  *     Foo foo = service.find(1);
  *     assertNotNull(foo, "id=1のFooドメインが存在");
- *     assertEquals(1, foo.getId(, "idは1"));
+ *     assertEquals(1, foo.getId(), "idは1");
  *     assertEquals("nameは'bar'", "bar", foo.getName());
  *   }
  *   
