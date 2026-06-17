@@ -17,20 +17,21 @@
 package jp.co.ctc_g.jse.core.util.web.beans;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigInteger;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.resource.MessageSourceLocator;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 public class HalfwidthNumberWithCommaEditorTest {
     
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() {
         ReloadableResourceBundleMessageSource source = new ReloadableResourceBundleMessageSource();
         source.setBasenames("classpath:/jp/co/ctc_g/jse/core/FrameworkResources");
@@ -202,9 +203,11 @@ public class HalfwidthNumberWithCommaEditorTest {
         }
     }
     
-    @Test(expected = InternalException.class)
+    @Test
     public void 型指定が不正のときはエラーが発生する() {
-        new HalfwidthNumberWithCommaEditor(null, false);
-        fail();
+        assertThrows(InternalException.class, () -> {
+            new HalfwidthNumberWithCommaEditor(null, false);
+            fail();
+        });
     }
 }

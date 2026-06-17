@@ -17,14 +17,15 @@
 package jp.co.ctc_g.jfw.core.util.porter;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import jp.co.ctc_g.jfw.core.util.typeconverter.TypeConverter;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BeanPorterTest {
 
@@ -95,7 +96,7 @@ public class BeanPorterTest {
         b.setStringField("10000"); // 移送先はInteger
         AnotherTypedBeanPorterBean a =
                 new BeanPorter(b).create(AnotherTypedBeanPorterBean.class);
-        assertEquals("stringFieldは10000のIntegerになっている", Integer.valueOf(10000), a.getStringField());
+        assertEquals(Integer.valueOf(10000), a.getStringField(), "stringFieldは10000のIntegerになっている");
     }
 
     @Test
@@ -111,7 +112,7 @@ public class BeanPorterTest {
                     }
                 })
                 .create(AnotherTypedBeanPorterBean.class);
-        assertEquals("stringFieldは10000のIntegerになっている", Integer.valueOf(10000), a.getStringField());
+        assertEquals(Integer.valueOf(10000), a.getStringField(), "stringFieldは10000のIntegerになっている");
     }
     
     @Test

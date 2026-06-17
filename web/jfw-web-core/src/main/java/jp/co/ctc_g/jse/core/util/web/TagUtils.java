@@ -16,16 +16,16 @@
 
 package jp.co.ctc_g.jse.core.util.web;
 
-import java.io.UnsupportedEncodingException;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.PageContext;
 
 import org.springframework.web.servlet.support.RequestContext;
 import org.springframework.web.servlet.support.RequestDataValueProcessor;
@@ -150,24 +150,20 @@ public final class TagUtils {
             } else {
                 qs.append("&");
             }
-            try {
-                if (value.length == 1) {
+            if (value.length == 1) {
+                qs.append(UriUtils.encodeQueryParam(key, encoding));
+                if (params.get(key) != null) {
+                    qs.append("=");
+                    qs.append(UriUtils.encodeQueryParam(value[0], encoding));
+                }
+            } else {
+                for (String v : value) {
                     qs.append(UriUtils.encodeQueryParam(key, encoding));
-                    if (params.get(key) != null) {
+                    if (v != null) {
                         qs.append("=");
-                        qs.append(UriUtils.encodeQueryParam(value[0], encoding));
-                    }
-                } else {
-                    for (String v : value) {
-                        qs.append(UriUtils.encodeQueryParam(key, encoding));
-                        if (v != null) {
-                            qs.append("=");
-                            qs.append(UriUtils.encodeQueryParam(v, encoding));
-                        }
+                        qs.append(UriUtils.encodeQueryParam(v, encoding));
                     }
                 }
-            } catch (UnsupportedEncodingException ex) {
-                throw new JspException(ex);
             }
         }
         return qs.toString();
@@ -192,11 +188,7 @@ public final class TagUtils {
             String template = URL_TEMPLATE_DELIMITER_PREFIX + key + URL_TEMPLATE_DELIMITER_SUFFIX;
             String[] value = params.get(key);
             if ((value.length == 1) && uri.contains(template)) {
-                try {
-                    uri = uri.replace(template, Matcher.quoteReplacement(UriUtils.encodePath(value[0], encoding)));
-                } catch (UnsupportedEncodingException ex) {
-                    throw new JspException(ex);
-                }
+                uri = uri.replace(template, Matcher.quoteReplacement(UriUtils.encodePath(value[0], encoding)));
             }
         }
         return uri;

@@ -16,8 +16,9 @@
 
 package jp.co.ctc_g.jfw.core.util.porter;
 
-import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -25,7 +26,7 @@ import java.util.Map;
 
 import jp.co.ctc_g.jfw.core.util.Maps;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class MapToBeanPorterTest {
 

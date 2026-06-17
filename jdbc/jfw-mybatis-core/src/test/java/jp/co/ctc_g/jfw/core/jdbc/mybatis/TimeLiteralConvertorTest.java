@@ -17,21 +17,22 @@
 package jp.co.ctc_g.jfw.core.jdbc.mybatis;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.sql.Time;
 import java.util.Calendar;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class TimeLiteralConvertorTest {
 
     private TimeLiteralConvertor target;
 
-    @Before
+    @BeforeEach
     public void instantiate() {
         target = new TimeLiteralConvertor();
     }
@@ -43,8 +44,10 @@ public class TimeLiteralConvertorTest {
         assertThat(target.convert(new Time(cal.getTimeInMillis())), is("'12:00:00'"));
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void 引数がNULLであることを表明() throws Exception {
-        target.convert(null);
+        assertThrows(InternalException.class, () -> {
+            target.convert(null);
+        });
     }
 }

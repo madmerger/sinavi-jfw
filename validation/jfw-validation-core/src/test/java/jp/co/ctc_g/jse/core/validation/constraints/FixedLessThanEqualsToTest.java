@@ -21,6 +21,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -30,33 +31,38 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.UnexpectedTypeException;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.UnexpectedTypeException;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 
 import jp.co.ctc_g.jse.test.util.Validations;
 
 import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.experimental.theories.DataPoints;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
-import org.junit.rules.ExpectedException;
+import org.junit.experimental.theories.DataPoint;
 import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+import org.junit.experimental.theories.DataPoints;
 
-@RunWith(Enclosed.class)
+import org.junit.experimental.theories.Theory;
+// ExpectedException removed - use assertThrows;
+// RunWith removed - use @ExtendWith or @Nested;
+
+// @Nested classes used instead of Enclosed
 public class FixedLessThanEqualsToTest {
 
     protected static Validator VALIDATOR;
 
+    
     @RunWith(Theories.class)
     public static class CharSequenceFixedLessThanEqualsToTest {
 
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -106,11 +112,7 @@ public class FixedLessThanEqualsToTest {
     }
 
     public static class NumberFixedLessThanEqualsToTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -378,25 +380,22 @@ public class FixedLessThanEqualsToTest {
         @Test
         public void invalidPattern() {
 
-            thrown.expect(ValidationException.class);
-            thrown.expectMessage(containsString("HV000032"));
-            class FixedLessThanEqualsToTargetBean {
-
-                @FixedLessThanEqualsTo("foo")
-                public BigDecimal value;
-            }
-            FixedLessThanEqualsToTargetBean target = new FixedLessThanEqualsToTargetBean();
-            VALIDATOR.validate(target);
+            ValidationException ex = assertThrows(ValidationException.class, () -> {
+                class FixedLessThanEqualsToTargetBean {
+    
+                    @FixedLessThanEqualsTo("foo")
+                    public BigDecimal value;
+                }
+                FixedLessThanEqualsToTargetBean target = new FixedLessThanEqualsToTargetBean();
+                VALIDATOR.validate(target);
+            });
+            assertThat(ex.getMessage(), containsString("HV000032"));
         }
     }
 
     
     public static class ObjectFixedLessThanEqualsToTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -405,22 +404,24 @@ public class FixedLessThanEqualsToTest {
         @Test
         public void shouldThrowUnexpectedTypeException() {
 
-            thrown.expect(UnexpectedTypeException.class);
-            thrown.expectMessage(containsString("HV000030"));
-            class FixedLessThanEqualsToTargetBean {
-
-                @FixedLessThanEqualsTo("0.5")
-                public Object value;
-            }
-            FixedLessThanEqualsToTargetBean target = new FixedLessThanEqualsToTargetBean();
-            VALIDATOR.validate(target);
+            UnexpectedTypeException ex = assertThrows(UnexpectedTypeException.class, () -> {
+                class FixedLessThanEqualsToTargetBean {
+    
+                    @FixedLessThanEqualsTo("0.5")
+                    public Object value;
+                }
+                FixedLessThanEqualsToTargetBean target = new FixedLessThanEqualsToTargetBean();
+                VALIDATOR.validate(target);
+            });
+            assertThat(ex.getMessage(), containsString("HV000030"));
         }
     }
 
+    
     @RunWith(Theories.class)
     public static class MessageTest {
 
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();

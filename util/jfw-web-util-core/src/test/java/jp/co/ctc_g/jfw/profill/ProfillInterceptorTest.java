@@ -18,15 +18,16 @@ package jp.co.ctc_g.jfw.profill;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,14 +35,16 @@ public class ProfillInterceptorTest {
 
     private ProfillInterceptor interceptor;
     
-    @Before
+    @BeforeEach
     public void instantiate() {
         interceptor = new ProfillInterceptor();
     }
     
-    @Test(expected = InternalException.class)
+    @Test
     public void BeanFactoryが設定されていない場合はafterPrpertiesSetを実行できない() throws Exception {
-        interceptor.afterPropertiesSet();
+        assertThrows(InternalException.class, () -> {
+            interceptor.afterPropertiesSet();
+        });
     }
     
     @Test

@@ -18,12 +18,12 @@ package jp.co.ctc_g.jse.core.rest.jersey.exception.mapper;
 
 import java.util.ResourceBundle;
 
-import javax.annotation.Priority;
-import javax.ws.rs.Priorities;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
+import jakarta.annotation.Priority;
+import jakarta.ws.rs.Priorities;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 import jp.co.ctc_g.jfw.core.exception.ApplicationRecoverableException;
 import jp.co.ctc_g.jfw.core.internal.InternalMessages;

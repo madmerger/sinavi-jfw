@@ -16,7 +16,9 @@
 
 package jp.co.ctc_g.jfw.core.util;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,8 +27,8 @@ import java.util.Map;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Test;
-import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.jupiter.api.Test;
+
 
 public class ArgsTest {
 
@@ -92,13 +94,13 @@ public class ArgsTest {
 
     @Test
     public void 静的calledByの深さ指定ミスFalse返却テスト() {
-        boolean called = ArgsCallee.calledByStatic(BlockJUnit4ClassRunner.class, 1);
+        boolean called = ArgsCallee.calledByStatic(org.junit.jupiter.api.Test.class, 1);
         assertFalse(called);
     }
 
     @Test
     public void 動的calledByの深さ指定ミスFalse返却テスト() {
-        boolean called = new ArgsCallee().calledByVirtual(BlockJUnit4ClassRunner.class, 1);
+        boolean called = new ArgsCallee().calledByVirtual(org.junit.jupiter.api.Test.class, 1);
         assertFalse(called);
     }
 
@@ -130,9 +132,11 @@ public class ArgsTest {
         assertTrue(true);
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void checkNotNullで例外を発生させてみるテスト() {
-        Args.checkNotNull(null);
+        assertThrows(InternalException.class, () -> {
+            Args.checkNotNull(null);
+        });
     }
 
     @Test
@@ -145,44 +149,60 @@ public class ArgsTest {
         assertTrue(true);
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void checkNotEmptyで例外を発生させてみるテスト1() {
-        Args.checkNotEmpty("");
+        assertThrows(InternalException.class, () -> {
+            Args.checkNotEmpty("");
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void checkNotEmptyで例外を発生させてみるテスト2() {
-        Args.checkNotEmpty(new Object[0]);
+        assertThrows(InternalException.class, () -> {
+            Args.checkNotEmpty(new Object[0]);
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void checkNotEmptyで例外を発生させてみるテスト3() {
-        Args.checkNotEmpty(new ArrayList<String>());
+        assertThrows(InternalException.class, () -> {
+            Args.checkNotEmpty(new ArrayList<String>());
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void checkNotEmptyで例外を発生させてみるテスト4() {
-        Args.checkNotEmpty(new HashMap<String, String>());
+        assertThrows(InternalException.class, () -> {
+            Args.checkNotEmpty(new HashMap<String, String>());
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void checkNotEmptyで例外を発生させてみるテスト5() {
-        Args.checkNotEmpty((String)null);
+        assertThrows(InternalException.class, () -> {
+            Args.checkNotEmpty((String)null);
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void checkNotEmptyで例外を発生させてみるテスト6() {
-        Args.checkNotEmpty((Object[])null);
+        assertThrows(InternalException.class, () -> {
+            Args.checkNotEmpty((Object[])null);
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void checkNotEmptyで例外を発生させてみるテスト7() {
-        Args.checkNotEmpty((Collection<?>)null);
+        assertThrows(InternalException.class, () -> {
+            Args.checkNotEmpty((Collection<?>)null);
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void checkNotEmptyで例外を発生させてみるテスト8() {
-        Args.checkNotEmpty((Map<?, ?>)null);
+        assertThrows(InternalException.class, () -> {
+            Args.checkNotEmpty((Map<?, ?>)null);
+        });
     }
 
     @Test

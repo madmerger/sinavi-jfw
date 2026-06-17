@@ -16,13 +16,14 @@
 
 package jp.co.ctc_g.jse.vid;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jse.vid.InvalidViewTransitionException;
 import jp.co.ctc_g.jse.vid.ViewId;
 import jp.co.ctc_g.jse.vid.ViewIdConstraint;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.stereotype.Controller;
@@ -34,7 +35,7 @@ public class ViewIdConstraintHandlerInterceptorTest {
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;
 
-    @Before
+    @BeforeEach
     public void setup() {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
@@ -58,33 +59,39 @@ public class ViewIdConstraintHandlerInterceptorTest {
         interceptor.preHandle(request, response, handler);
     }
 
-    @Test(expected = InvalidViewTransitionException.class)
+    @Test
     public void 画面遷移が拒否される() throws Exception {
-        HandlerMethod handler = new HandlerMethod(TestController.class, TestController.class.getMethod("handler4"));
-        ViewId viewId1 = ViewIdGen.gen("view1");
-        ViewId.is(viewId1, request);
-        ViewId viewId2 = ViewIdGen.gen("view2");
-        ViewId.is(viewId2, request);
-        ViewId viewId3 = ViewIdGen.gen("view3");
-        ViewId.is(viewId3, request);
-        ViewIdConstraintHandlerInterceptor interceptor = new ViewIdConstraintHandlerInterceptor();
-        interceptor.preHandle(request, response, handler);
+        assertThrows(InvalidViewTransitionException.class, () -> {
+            HandlerMethod handler = new HandlerMethod(TestController.class, TestController.class.getMethod("handler4"));
+            ViewId viewId1 = ViewIdGen.gen("view1");
+            ViewId.is(viewId1, request);
+            ViewId viewId2 = ViewIdGen.gen("view2");
+            ViewId.is(viewId2, request);
+            ViewId viewId3 = ViewIdGen.gen("view3");
+            ViewId.is(viewId3, request);
+            ViewIdConstraintHandlerInterceptor interceptor = new ViewIdConstraintHandlerInterceptor();
+            interceptor.preHandle(request, response, handler);
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void 画面IDが設定されていない画面からの遷移で画面ID制約がチェックできない() throws Exception {
-        HandlerMethod handler = new HandlerMethod(TestController.class, TestController.class.getMethod("handler2"));
-
-        ViewIdConstraintHandlerInterceptor interceptor = new ViewIdConstraintHandlerInterceptor();
-        interceptor.preHandle(request, response, handler);
+        assertThrows(InternalException.class, () -> {
+            HandlerMethod handler = new HandlerMethod(TestController.class, TestController.class.getMethod("handler2"));
+    
+            ViewIdConstraintHandlerInterceptor interceptor = new ViewIdConstraintHandlerInterceptor();
+            interceptor.preHandle(request, response, handler);
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void 不正なスコープが指定され内部エラーが発生() throws Exception {
-        HandlerMethod handler = new HandlerMethod(TestController.class, TestController.class.getMethod("handler3"));
-
-        ViewIdConstraintHandlerInterceptor interceptor = new ViewIdConstraintHandlerInterceptor();
-        interceptor.preHandle(request, response, handler);
+        assertThrows(InternalException.class, () -> {
+            HandlerMethod handler = new HandlerMethod(TestController.class, TestController.class.getMethod("handler3"));
+    
+            ViewIdConstraintHandlerInterceptor interceptor = new ViewIdConstraintHandlerInterceptor();
+            interceptor.preHandle(request, response, handler);
+        });
     }
 
     static class ViewIdGen extends ViewId {

@@ -25,9 +25,9 @@ import java.net.ConnectException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+// RunWith removed - use @ExtendWith or @Nested;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.amqp.AmqpConnectException;
@@ -36,11 +36,12 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import com.rabbitmq.client.ConnectionFactory;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = RetryTestConsumerContextConfig.class)
 @ActiveProfiles("development")
 public class RabbitTemplateRetryTest {
@@ -52,7 +53,7 @@ public class RabbitTemplateRetryTest {
 
     private ConnectionFactory connectionFactory = mock(ConnectionFactory.class);
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         retry = new CountDownLatch(10);
         template.setConnectionFactory(new CachingConnectionFactory(connectionFactory));

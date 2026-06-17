@@ -17,7 +17,7 @@
 package jp.co.ctc_g.jfw.xlsbeans;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.lang.reflect.Field;
 
@@ -28,7 +28,7 @@ import jp.co.ctc_g.jse.core.excel.JxXLSBeans;
 import net.java.amateras.xlsbeans.annotation.IterateTables;
 import net.java.amateras.xlsbeans.processor.FieldProcessorFactory;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class JxXLSBeansTest {
 

@@ -21,6 +21,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,29 +29,34 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.UnexpectedTypeException;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.UnexpectedTypeException;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 
 import jp.co.ctc_g.jse.test.util.Validations;
 
 import org.junit.Assume;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.experimental.theories.DataPoints;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
-import org.junit.rules.ExpectedException;
+import org.junit.experimental.theories.DataPoint;
 import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+import org.junit.experimental.theories.DataPoints;
 
-@RunWith(Enclosed.class)
+import org.junit.experimental.theories.Theory;
+// ExpectedException removed - use assertThrows;
+// RunWith removed - use @ExtendWith or @Nested;
+
+// @Nested classes used instead of Enclosed
 public class MaxByteLengthTest {
 
     protected static Validator VALIDATOR;
 
+    
     @RunWith(Theories.class)
     public static class CharSequenceMaxByteLengthTest {
 
@@ -73,11 +79,7 @@ public class MaxByteLengthTest {
         public static final String[] SJIS_INVALIDS = {
             "エスジスダメダメ", "ｴｽｼﾞｽﾀﾞﾒﾀﾞﾒﾀﾞﾒﾀﾞﾒ", "INVALID SHIFT_JIS!", "1234567890123456", "！”＃＄％｛｝？＠", "!\"#$%'()=~|@{}+?"
         };
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -150,26 +152,23 @@ public class MaxByteLengthTest {
         @Test
         public void invalidParameter() {
 
-            thrown.expect(ValidationException.class);
-            thrown.expectMessage(containsString("HV000028"));
-            class MaxByteLengthTargetBean {
-
-                @MaxByteLength(value = 15, encoding = "INVALID")
-                public String value;
-            }
-            MaxByteLengthTargetBean target = new MaxByteLengthTargetBean();
-            target.value = "foo";
-            VALIDATOR.validate(target);
+            ValidationException ex = assertThrows(ValidationException.class, () -> {
+                class MaxByteLengthTargetBean {
+    
+                    @MaxByteLength(value = 15, encoding = "INVALID")
+                    public String value;
+                }
+                MaxByteLengthTargetBean target = new MaxByteLengthTargetBean();
+                target.value = "foo";
+                VALIDATOR.validate(target);
+            });
+            assertThat(ex.getMessage(), containsString("HV000028"));
         }
 
     }
 
     public static class ObjectMaxByteLengthTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -178,18 +177,20 @@ public class MaxByteLengthTest {
         @Test
         public void shouldThrowUnexpectedTypeException() {
 
-            thrown.expect(UnexpectedTypeException.class);
-            thrown.expectMessage(containsString("HV000030"));
-            class MaxByteLengthTargetBean {
-
-                @MaxByteLength(100)
-                public Object value;
-            }
-            MaxByteLengthTargetBean target = new MaxByteLengthTargetBean();
-            VALIDATOR.validate(target);
+            UnexpectedTypeException ex = assertThrows(UnexpectedTypeException.class, () -> {
+                class MaxByteLengthTargetBean {
+    
+                    @MaxByteLength(100)
+                    public Object value;
+                }
+                MaxByteLengthTargetBean target = new MaxByteLengthTargetBean();
+                VALIDATOR.validate(target);
+            });
+            assertThat(ex.getMessage(), containsString("HV000030"));
         }
     }
 
+    
     @RunWith(Theories.class)
     public static class MessageTest {
 
@@ -198,7 +199,7 @@ public class MaxByteLengthTest {
             "あいうえおか", "abcdefghijklnmop", "1234567890123456", "アイウエオカ", "ｱｲｳｴｵｶ", "!\"#$%'()=~|@{}+/", "①㈱㈲〒～亜"
         };
 
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();

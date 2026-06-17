@@ -16,14 +16,16 @@
 
 package jp.co.ctc_g.jfw.core.util;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ClassesTest {
 

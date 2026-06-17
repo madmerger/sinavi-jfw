@@ -19,6 +19,7 @@ package jp.co.ctc_g.jse.core.validation.constraints;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -27,25 +28,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 
 import jp.co.ctc_g.jse.test.util.Validations;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+// ExpectedException removed - use assertThrows;
 
 public class GreaterThanEqualsToTest {
 
     private static Validator VALIDATOR;
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void setup() {
 
         VALIDATOR = Validations.getValidator();
@@ -202,19 +199,21 @@ public class GreaterThanEqualsToTest {
     @Test
     public void no_such_method_exception_test() {
 
-        thrown.expect(ValidationException.class);
-        thrown.expectMessage(containsString("HV000028"));
-        GreaterThanEqualsToErrorBean target = new GreaterThanEqualsToErrorBean();
-        VALIDATOR.validate(target);
+        ValidationException ex = assertThrows(ValidationException.class, () -> {
+            GreaterThanEqualsToErrorBean target = new GreaterThanEqualsToErrorBean();
+            VALIDATOR.validate(target);
+        });
+        assertThat(ex.getMessage(), containsString("HV000028"));
     }
 
     @Test
     public void invocation_target_exception_test() {
 
-        thrown.expect(ValidationException.class);
-        thrown.expectMessage(containsString("HV000028"));
-        GreaterThanEqualsToInvocationTargetExceptionBean target = new GreaterThanEqualsToInvocationTargetExceptionBean();
-        VALIDATOR.validate(target);
+        ValidationException ex = assertThrows(ValidationException.class, () -> {
+            GreaterThanEqualsToInvocationTargetExceptionBean target = new GreaterThanEqualsToInvocationTargetExceptionBean();
+            VALIDATOR.validate(target);
+        });
+        assertThat(ex.getMessage(), containsString("HV000028"));
     }
 
     @Test

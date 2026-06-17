@@ -18,21 +18,21 @@ package jp.co.ctc_g.jse.core.token;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import jp.co.ctc_g.jse.core.framework.Controllers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 public class TokenManagerTest {
 
     private MockHttpServletRequest request;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         request = new MockHttpServletRequest();
     }

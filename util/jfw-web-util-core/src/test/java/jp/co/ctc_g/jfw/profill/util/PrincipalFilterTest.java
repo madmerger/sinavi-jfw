@@ -19,12 +19,12 @@ package jp.co.ctc_g.jfw.profill.util;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.security.Principal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockFilterConfig;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -42,7 +42,7 @@ public class PrincipalFilterTest {
 
     private PrincipalStub principal;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         request = new MockHttpServletRequest();
@@ -57,7 +57,7 @@ public class PrincipalFilterTest {
         request.setUserPrincipal(principal);
         chain = new MockFilterChain() {
 
-            public void doFilter(javax.servlet.ServletRequest req, javax.servlet.ServletResponse res) {
+            public void doFilter(jakarta.servlet.ServletRequest req, jakarta.servlet.ServletResponse res) {
 
                 Principal p = PrincipalKeeper.getPrincipal();
                 assertThat(p, notNullValue());

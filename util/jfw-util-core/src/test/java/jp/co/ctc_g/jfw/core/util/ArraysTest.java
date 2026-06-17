@@ -16,12 +16,14 @@
 
 package jp.co.ctc_g.jfw.core.util;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ArraysTest {
     
@@ -31,9 +33,9 @@ public class ArraysTest {
         final int[] datum = {0, elements.length};
         Arrays.each(elements, new EachCall<String>() {
             public void each(String element, int index, int total) {
-                Assert.assertEquals(elements[index], element);
-                Assert.assertEquals(datum[0]++, index);
-                Assert.assertEquals(datum[1], total);
+                assertEquals(elements[index], element);
+                assertEquals(datum[0]++, index);
+                assertEquals(datum[1], total);
             }
         });
     }
@@ -44,14 +46,14 @@ public class ArraysTest {
         final int[] datum = {0, elements.length};
         String[] results = Arrays.collect(elements, new CollectCall<String>() {
             public String collect(String element, int index, int total) {
-                Assert.assertEquals(elements[index], element);
-                Assert.assertEquals(datum[0]++, index);
-                Assert.assertEquals(datum[1], total);
+                assertEquals(elements[index], element);
+                assertEquals(datum[0]++, index);
+                assertEquals(datum[1], total);
                 return index % 2 == 0 ? element : null;
             }
         });
-        Assert.assertArrayEquals(new String[] {"a", "c", "e"}, results);
-        Assert.assertArrayEquals(new String[] {"a", "b", "c", "d", "e"}, elements);
+        assertArrayEquals(new String[] {"a", "c", "e"}, results);
+        assertArrayEquals(new String[] {"a", "b", "c", "d", "e"}, elements);
     }
     
     @Test
@@ -83,19 +85,19 @@ public class ArraysTest {
         Groupee[] groupA = results.get("A");
         Groupee[] groupB = results.get("B");
         Groupee[] groupC = results.get("C");
-        Assert.assertArrayEquals(Arrays.gen(elements[0], elements[1]), groupA);
-        Assert.assertEquals(2, groupA.length);
-        Assert.assertArrayEquals(Arrays.gen(elements[2], elements[3], elements[4]), groupB);
-        Assert.assertEquals(3, groupB.length);
-        Assert.assertArrayEquals(Arrays.gen(elements[5]), groupC);
-        Assert.assertEquals(1, groupC.length);
+        assertArrayEquals(Arrays.gen(elements[0], elements[1]), groupA);
+        assertEquals(2, groupA.length);
+        assertArrayEquals(Arrays.gen(elements[2], elements[3], elements[4]), groupB);
+        assertEquals(3, groupB.length);
+        assertArrayEquals(Arrays.gen(elements[5]), groupC);
+        assertEquals(1, groupC.length);
     }
     
     @Test
     public void 単純genテスト() {
         String[] elements = {"a", "b", "c", "d", "e"};
         String[] results = Arrays.gen("a", "b", "c", "d", "e");
-        Assert.assertArrayEquals(elements, results);
+        assertArrayEquals(elements, results);
     }
     
     @Test
@@ -106,7 +108,7 @@ public class ArraysTest {
                 return elements[index];
             }
         });
-        Assert.assertArrayEquals(elements, results);
+        assertArrayEquals(elements, results);
     }
     
     @Test

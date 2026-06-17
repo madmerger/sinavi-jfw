@@ -19,8 +19,8 @@ package jp.co.ctc_g.jse.core.validation.constraints.feature.lessthan;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ResourceBundle;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.internal.InternalMessages;

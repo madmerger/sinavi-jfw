@@ -15,10 +15,11 @@
  */
 
 package jp.co.ctc_g.jse.core.validation.constraints;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsNull.notNullValue;
+import static org.hamcrest.CoreMatchers.notNullValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,28 +27,33 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 
 import jp.co.ctc_g.jse.test.util.Validations;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.experimental.theories.DataPoints;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
+import org.junit.experimental.theories.DataPoint;
 import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+import org.junit.experimental.theories.DataPoints;
 
-@RunWith(Enclosed.class)
+import org.junit.experimental.theories.Theory;
+// RunWith removed - use @ExtendWith or @Nested;
+
+// @Nested classes used instead of Enclosed
 public class RequiredsTest {
 
     protected static Validator VALIDATOR;
 
+    
     @RunWith(Theories.class)
     public static class CharSequenceArrayRequiredsTest {
 
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -101,10 +107,11 @@ public class RequiredsTest {
         }
     }
 
+    
     @RunWith(Theories.class)
     public static class CharSequenceCollectionRequiredsTest {
 
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -154,10 +161,11 @@ public class RequiredsTest {
         }
     }
 
+    
     @RunWith(Theories.class)
     public static class ObjectArrayRequiredsTest {
 
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -229,7 +237,7 @@ public class RequiredsTest {
 
     public static class ObjectCollectionRequiredsTest {
 
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -278,10 +286,11 @@ public class RequiredsTest {
         }
     }
 
+    
     @RunWith(Theories.class)
     public static class MessageTest {
 
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();

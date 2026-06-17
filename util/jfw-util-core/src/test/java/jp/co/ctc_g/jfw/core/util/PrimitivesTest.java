@@ -19,9 +19,9 @@ package jp.co.ctc_g.jfw.core.util;
 import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PrimitivesTest {
 

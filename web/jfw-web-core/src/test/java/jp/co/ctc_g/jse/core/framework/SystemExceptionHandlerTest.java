@@ -17,13 +17,13 @@
 package jp.co.ctc_g.jse.core.framework;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import jp.co.ctc_g.jfw.core.exception.SystemException;
 import jp.co.ctc_g.jse.core.framework.SystemExceptionHandler;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.Ordered;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -40,7 +40,7 @@ public class SystemExceptionHandlerTest {
     private MockHttpServletResponse response;
     private HandlerMethod handler;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception{
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();

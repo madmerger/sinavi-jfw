@@ -17,13 +17,14 @@
 package jp.co.ctc_g.jfw.core.util;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Method;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ReflectsTest {
 
@@ -72,13 +73,15 @@ public class ReflectsTest {
         assertThat(obj2, is(instanceOf(ReflectsTestObject.class)));
     }
     
-    @Test(expected = InternalException.class)
+    @Test
     public void make異常系() {
-        try{
-            Reflects.make(ReflectsTestObject.class, "", "");
-        }catch (InternalException e) {
-            assertThat(e.getCode(), is("E-UTIL#0026"));
-            throw e;
-        }
+        assertThrows(InternalException.class, () -> {
+            try{
+                Reflects.make(ReflectsTestObject.class, "", "");
+            }catch (InternalException e) {
+                assertThat(e.getCode(), is("E-UTIL#0026"));
+                throw e;
+            }
+        });
     }
 }

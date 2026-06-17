@@ -18,8 +18,8 @@ package jp.co.ctc_g.jse.core.validation.constraints.feature.minbytelength;
 
 import java.io.UnsupportedEncodingException;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import jp.co.ctc_g.jse.core.validation.constraints.MinByteLength;
 import jp.co.ctc_g.jse.core.validation.util.Validators;

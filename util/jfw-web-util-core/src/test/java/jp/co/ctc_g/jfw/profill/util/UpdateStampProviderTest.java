@@ -18,7 +18,7 @@ package jp.co.ctc_g.jfw.profill.util;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
@@ -28,14 +28,14 @@ import java.util.Date;
 import jp.co.ctc_g.jfw.core.util.Beans;
 import jp.co.ctc_g.jfw.profill.MatchedProperty;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class UpdateStampProviderTest {
 
     private UpdateStampProvider provider;
     
-    @Before
+    @BeforeEach
     public void instantiate() {
         provider = new UpdateStampProvider();
     }

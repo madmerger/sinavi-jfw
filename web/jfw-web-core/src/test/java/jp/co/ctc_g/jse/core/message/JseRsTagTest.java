@@ -17,14 +17,15 @@
 package jp.co.ctc_g.jse.core.message;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.resource.MessageSourceLocator;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -39,7 +40,7 @@ public class JseRsTagTest {
 
     private MockHttpServletRequest req;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() {
 
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
@@ -50,7 +51,7 @@ public class JseRsTagTest {
         MessageSourceLocator.set(messageSource);
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         MockServletContext sc = new MockServletContext();
@@ -60,13 +61,15 @@ public class JseRsTagTest {
         context = new MockPageContext(sc, req, res);
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void キーが設定されていない場合は例外が発生するかどうか() throws Exception {
-
-        JseRsTag tag = new JseRsTag();
-        tag.setPageContext(context);
-        tag.doEndTag();
-        assertThat(res.getContentAsString(), is(""));
+        assertThrows(InternalException.class, () -> {
+    
+            JseRsTag tag = new JseRsTag();
+            tag.setPageContext(context);
+            tag.doEndTag();
+            assertThat(res.getContentAsString(), is(""));
+        });
     }
 
     @Test

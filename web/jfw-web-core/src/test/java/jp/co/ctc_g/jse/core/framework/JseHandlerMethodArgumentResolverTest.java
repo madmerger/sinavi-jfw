@@ -18,14 +18,14 @@ package jp.co.ctc_g.jse.core.framework;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.net.BindException;
 
 import jp.co.ctc_g.jse.core.message.MessageContext;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.MethodParameter;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
@@ -46,7 +46,7 @@ public class JseHandlerMethodArgumentResolverTest {
     private NativeWebRequest webRequest;
     private WebDataBinderFactory factory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         MockServletContext sc = new MockServletContext();

@@ -20,21 +20,22 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Arrays;
 
-import javax.servlet.jsp.JspContext;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.tagext.JspFragment;
+import jakarta.servlet.jsp.JspContext;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.tagext.JspFragment;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.util.PartialList;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockPageContext;
@@ -54,7 +55,7 @@ public class PageNavigationTagTest {
 
     private RequestContext rcon;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         MockServletContext sc = new MockServletContext();
@@ -438,22 +439,24 @@ public class PageNavigationTagTest {
         assertThat(Arrays.asList(split), hasItem("<a href=\"/list?pageNumber=11\">-&gt;&gt;</a>"));
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void ActionもURLも設定されていない場合は例外が発生する() throws Exception {
-
-        PartialList<String> display = new PartialList<String>();
-        for (int i = 0; i < 100; i++) {
-            display.add(Integer.toString(i));
-        }
-        display.setElementCount(100);
-        display.setPartCount(10);
-        display.setElementCountPerPart(10);
-        display.setPartIndex(1);
-        PageNavigationTag tag = new PageNavigationTag();
-        tag.setPageContext(context);
-        tag.setPartial(display);
-        tag.doStartTag();
-        tag.doEndTag();
+        assertThrows(InternalException.class, () -> {
+    
+            PartialList<String> display = new PartialList<String>();
+            for (int i = 0; i < 100; i++) {
+                display.add(Integer.toString(i));
+            }
+            display.setElementCount(100);
+            display.setPartCount(10);
+            display.setElementCountPerPart(10);
+            display.setPartIndex(1);
+            PageNavigationTag tag = new PageNavigationTag();
+            tag.setPageContext(context);
+            tag.setPartial(display);
+            tag.doStartTag();
+            tag.doEndTag();
+        });
     }
 
     @Test

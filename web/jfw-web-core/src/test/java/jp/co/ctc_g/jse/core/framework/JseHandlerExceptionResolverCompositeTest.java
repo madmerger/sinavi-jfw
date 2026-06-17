@@ -17,18 +17,18 @@
 package jp.co.ctc_g.jse.core.framework;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import jp.co.ctc_g.jfw.core.util.Lists;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.Ordered;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -43,7 +43,7 @@ public class JseHandlerExceptionResolverCompositeTest {
     private MockHttpServletResponse response;
     private MockHttpServletRequest request;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockServletContext sc = new MockServletContext();
         request = new MockHttpServletRequest(sc);

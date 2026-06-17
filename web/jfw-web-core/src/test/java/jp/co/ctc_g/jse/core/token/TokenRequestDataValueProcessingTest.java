@@ -17,22 +17,23 @@
 package jp.co.ctc_g.jse.core.token;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 
 import jp.co.ctc_g.jse.core.framework.Controllers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 
 public class TokenRequestDataValueProcessingTest {
 
     private MockHttpServletRequest request;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         request = new MockHttpServletRequest();
     }

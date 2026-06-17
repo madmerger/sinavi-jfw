@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.util.Args;
@@ -32,7 +32,7 @@ import jp.co.ctc_g.jfw.core.util.Maps;
 import jp.co.ctc_g.jfw.core.util.Reflects;
 import jp.co.ctc_g.jfw.core.util.Strings;
 import jp.co.ctc_g.jse.core.csv.CSVConfigs.CSVConfig;
-import au.com.bytecode.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
 
 /**
  * <p>
@@ -278,10 +278,10 @@ public class BeanMappingCSVReaders<T> extends CSVReaders {
     }
 
     private void create() {
-        this.strategy = new ColumnPositionMappingStrategy<T>();
+        this.strategy = new ColumnPositionMappingStrategy<>();
         this.strategy.setType(type);
         this.strategy.setColumnMapping(mapping);
-        this.parser = new CSVToBeanMapping<T>();
+        this.parser = new CSVToBeanMapping<>();
     }
 
 }

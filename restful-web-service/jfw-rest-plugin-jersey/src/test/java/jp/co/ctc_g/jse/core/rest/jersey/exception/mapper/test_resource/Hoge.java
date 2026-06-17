@@ -18,7 +18,7 @@ package jp.co.ctc_g.jse.core.rest.jersey.exception.mapper.test_resource;
 
 import java.util.List;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 import jp.co.ctc_g.jse.core.validation.constraints.Required;
 import jp.co.ctc_g.jse.core.validation.constraints.Requireds;

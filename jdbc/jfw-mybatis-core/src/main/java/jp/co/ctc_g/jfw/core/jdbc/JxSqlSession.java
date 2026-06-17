@@ -20,6 +20,8 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.cursor.Cursor;
+
 import jp.co.ctc_g.jfw.core.util.Args;
 import jp.co.ctc_g.jfw.core.util.typeconverter.TypeConverters;
 import jp.co.ctc_g.jfw.paginate.Paginatable;
@@ -391,5 +393,23 @@ public class JxSqlSession implements SqlSession {
      */
     public List<BatchResult> flushStatements() {
         return delegate.flushStatements();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T> Cursor<T> selectCursor(String statement) {
+        return delegate.selectCursor(statement);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T> Cursor<T> selectCursor(String statement, Object parameter) {
+        return delegate.selectCursor(statement, parameter);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public <T> Cursor<T> selectCursor(String statement, Object parameter, RowBounds rowBounds) {
+        return delegate.selectCursor(statement, parameter, rowBounds);
     }
 }

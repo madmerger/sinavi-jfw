@@ -50,7 +50,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 /**
  * <p>
@@ -120,7 +120,7 @@ import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMeth
  *    <td>400</td>
  *   </tr>
  *   <tr>
- *    <td>{@link NoSuchRequestHandlingMethodException}</td>
+ *    <td>{@link NoHandlerFoundException}</td>
  *    <td>対象のURLで起動するメソッドが存在しないときにスローされます。</td>
  *    <td>WARN</td>
  *    <td>404</td>
@@ -226,16 +226,15 @@ public abstract class AbstractRestExceptionHandler implements RestExceptionHandl
     public AbstractRestExceptionHandler() {}
 
     /**
-     * {@link NoSuchRequestHandlingMethodException}をハンドリングします。
-     * @param e {@link NoSuchRequestHandlingMethodException}
+     * {@link NoHandlerFoundException}をハンドリングします。
+     * @param e {@link NoHandlerFoundException}
      * @return {@link ErrorMessage}
      *         HTTPステータス 404 でレスポンスを返却します。
      */
-    @ExceptionHandler(NoSuchRequestHandlingMethodException.class)
+    @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseBody
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    @Override
-    public ErrorMessage handle(NoSuchRequestHandlingMethodException e) {
+    public ErrorMessage handle(NoHandlerFoundException e) {
         if (L.isDebugEnabled()) {
             L.debug(R.getString("D-SPRINGMVC-REST-HANDLER#0001"), e);
         }
@@ -482,10 +481,10 @@ public abstract class AbstractRestExceptionHandler implements RestExceptionHandl
         if (L.isDebugEnabled()) {
             L.debug(R.getString("D-SPRINGMVC-REST-HANDLER#0014"), e);
         }
-        HttpStatus status = e.getStatusCode();
+        HttpStatus status = HttpStatus.valueOf(e.getStatusCode().value());
         ErrorMessage error = createServerErrorMessage(status);
         warn(error, e);
-        return new ResponseEntity<ErrorMessage>(error, headers, status);
+        return new ResponseEntity<>(error, headers, status);
     }
 
     /**

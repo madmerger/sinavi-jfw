@@ -15,8 +15,9 @@
  */
 
 package jp.co.ctc_g.jse.core.rest.springmvc.client.interceptor;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -24,10 +25,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+// RunWith removed - use @ExtendWith or @Nested;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpRequest;
@@ -35,7 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 
-@RunWith(Enclosed.class)
+// @Nested classes used instead of Enclosed
 public class RequestLoggingInterceptorTest {
 
     public static class RequestTest {
@@ -44,7 +45,7 @@ public class RequestLoggingInterceptorTest {
         private HttpRequest request;
         private HttpHeaders headers;
 
-        @Before
+        @BeforeEach
         public void setup() throws URISyntaxException {
             intercepter = new RequestLoggingInterceptor();
             request = mock(HttpRequest.class);
@@ -100,7 +101,7 @@ public class RequestLoggingInterceptorTest {
         private ClientHttpResponse response;
         HttpHeaders headers;
 
-        @Before
+        @BeforeEach
         public void setup() throws URISyntaxException, IOException {
             interceptor = new RequestLoggingInterceptor();
             response = mock(ClientHttpResponse.class);

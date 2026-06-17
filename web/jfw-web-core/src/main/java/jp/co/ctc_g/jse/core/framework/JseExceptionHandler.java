@@ -16,7 +16,7 @@
 
 package jp.co.ctc_g.jse.core.framework;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 import org.springframework.core.Ordered;

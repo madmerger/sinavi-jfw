@@ -17,20 +17,20 @@
 package jp.co.ctc_g.jfw.core.exception;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Date;
 
 import jp.co.ctc_g.jfw.core.resource.MessageSourceLocator;
 import jp.co.ctc_g.jfw.core.util.Maps;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 public class ApplicationRecoverableExceptionTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:/jp/co/ctc_g/jfw/core/exception/error");

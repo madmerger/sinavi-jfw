@@ -26,14 +26,14 @@ import jp.co.ctc_g.jse.core.rest.springmvc.client.handler.RestClientResponseErro
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.hamcrest.CoreMatchers;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+// hamcrest removed;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+// ExpectedException removed - use assertThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,27 +42,26 @@ import org.springframework.util.FileCopyUtils;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.GenericServlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.GenericServlet;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import org.hamcrest.CoreMatchers;
 
 public class RestClientTemplateTest {
 
     protected RestClientTemplate template;
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     private static Server jettyServer;
 
     private static String helloWorld = "H\u00e9llo W\u00f6rld";
@@ -71,7 +70,7 @@ public class RestClientTemplateTest {
 
     private static MediaType contentType;
 
-    @BeforeClass
+    @BeforeAll
     public static void jetty起動() throws Exception {
         int port = SocketTestUtils.findAvailableTcpPort();
         jettyServer = new Server(port);
@@ -91,13 +90,13 @@ public class RestClientTemplateTest {
         jettyServer.start();
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         RestTemplate t = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
         template = new RestClientTemplate(t);
     }
 
-    @AfterClass
+    @AfterAll
     public static void jetty停止() throws Exception {
         if (jettyServer != null) {
             jettyServer.stop();
@@ -108,7 +107,7 @@ public class RestClientTemplateTest {
     public void インスタンスを設定できる() throws Exception {
         RestClientTemplate rct = new RestClientTemplate();
         rct.setDelegate(new RestTemplate());
-        Assert.assertThat(rct.getDelegate(), CoreMatchers.isA(RestOperations.class));
+        assertThat(rct.getDelegate(), CoreMatchers.isA(RestOperations.class));
     }
 
     @Test
@@ -186,20 +185,22 @@ public class RestClientTemplateTest {
 
     @Test
     public void URLが見つからないときに404が返ってくる() {
-        thrown.expect(NotFoundException.class);
-        RestTemplate rt = new RestTemplate();
-        rt.setErrorHandler(new RestClientResponseErrorHandler());
-        template.setDelegate(rt);
-        template.get(Target.target(baseUrl + "/status/notfound"), String.class);
+        assertThrows(NotFoundException.class, () -> {
+            RestTemplate rt = new RestTemplate();
+            rt.setErrorHandler(new RestClientResponseErrorHandler());
+            template.setDelegate(rt);
+            template.get(Target.target(baseUrl + "/status/notfound"), String.class);
+        });
     }
 
     @Test
     public void IntenalServerエラーの500が返ってくる() {
-        thrown.expect(InternalServerErrorException.class);
-        RestTemplate rt = new RestTemplate();
-        rt.setErrorHandler(new RestClientResponseErrorHandler());
-        template.setDelegate(rt);
-        template.get(Target.target(baseUrl + "/status/server"), String.class);
+        assertThrows(InternalServerErrorException.class, () -> {
+            RestTemplate rt = new RestTemplate();
+            rt.setErrorHandler(new RestClientResponseErrorHandler());
+            template.setDelegate(rt);
+            template.get(Target.target(baseUrl + "/status/server"), String.class);
+        });
     }
 
     @SuppressWarnings("serial")
@@ -259,10 +260,10 @@ public class RestClientTemplateTest {
 
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-            assertTrue("Invalid request content-length", request.getContentLength() > 0);
-            assertNotNull("No content-type", request.getContentType());
+            assertTrue(request.getContentLength() > 0, "Invalid request content-length");
+            assertNotNull(request.getContentType(), "No content-type");
             String body = FileCopyUtils.copyToString(request.getReader());
-            assertEquals("Invalid request body", s, body);
+            assertEquals(s, body, "Invalid request body");
             response.setStatus(HttpServletResponse.SC_CREATED);
             response.setHeader("Location", location);
             response.setContentLength(buf.length);
@@ -291,10 +292,10 @@ public class RestClientTemplateTest {
 
         @Override
         protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-            assertTrue("Invalid request content-length", request.getContentLength() > 0);
-            assertNotNull("No content-type", request.getContentType());
+            assertTrue(request.getContentLength() > 0, "Invalid request content-length");
+            assertNotNull(request.getContentType(), "No content-type");
             String body = FileCopyUtils.copyToString(request.getReader());
-            assertEquals("Invalid request body", s, body);
+            assertEquals(s, body, "Invalid request body");
             response.setStatus(HttpServletResponse.SC_OK);
             response.setHeader("Location", location);
             response.setContentLength(buf.length);
@@ -325,7 +326,7 @@ public class RestClientTemplateTest {
         @Override
         protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
             String body = FileCopyUtils.copyToString(request.getReader());
-            assertEquals("Invalid request body", s, body);
+            assertEquals(s, body, "Invalid request body");
             response.setStatus(HttpServletResponse.SC_OK);
             response.setHeader("Location", location);
             response.setContentLength(buf.length);

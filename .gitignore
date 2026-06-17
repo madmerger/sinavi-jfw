@@ -6,3 +6,7 @@
 .project
 build
 bin
+out
+
+# Credential files
+gradle.properties.local

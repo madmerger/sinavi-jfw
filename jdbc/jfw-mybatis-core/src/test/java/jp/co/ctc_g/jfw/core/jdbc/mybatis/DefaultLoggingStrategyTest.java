@@ -17,14 +17,14 @@
 package jp.co.ctc_g.jfw.core.jdbc.mybatis;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DefaultLoggingStrategyTest {
 
@@ -34,13 +34,13 @@ public class DefaultLoggingStrategyTest {
 
     private PrintStream original;
 
-    @Before
+    @BeforeEach
     public void setup() {
         original = System.out;
         System.setOut(new PrintStream(buffer));
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         buffer.reset();
         System.setOut(original);

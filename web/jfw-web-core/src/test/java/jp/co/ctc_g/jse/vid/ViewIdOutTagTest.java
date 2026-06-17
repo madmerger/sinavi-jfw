@@ -18,11 +18,12 @@ package jp.co.ctc_g.jse.vid;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockPageContext;
@@ -36,7 +37,7 @@ public class ViewIdOutTagTest {
 
     private MockHttpServletRequest req;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         MockServletContext sc = new MockServletContext();
@@ -55,11 +56,13 @@ public class ViewIdOutTagTest {
         assertThat(tag.getScope(), is(nullValue()));
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void Requestスコープを指定したときに例外が発生するかどうか() throws Exception {
-
-        ViewIdOutTag tag = new ViewIdOutTag();
-        tag.setScope("request");
+        assertThrows(InternalException.class, () -> {
+    
+            ViewIdOutTag tag = new ViewIdOutTag();
+            tag.setScope("request");
+        });
     }
 
     @Test

@@ -16,47 +16,46 @@
 
 package jp.co.ctc_g.jse.core.rest.springmvc.client;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import org.hamcrest.CoreMatchers;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+// hamcrest removed;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+// ExpectedException removed - use assertThrows;
 
 public class TargetTest {
 
     public static final String URI_TEMPLATE = "http://127.0.0.1/test";
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     protected EntityTestBean target;
 
-    @Before
+    @BeforeEach
     public void setup() {
         target = new EntityTestBean("test");
     }
 
     @Test
     public void URIにNULL値が指定されたときは例外が発生する() {
-        thrown.expect(InternalException.class);
-        thrown.expectMessage("URLは必須です。");
-        Target.target(null);
+        InternalException ex = assertThrows(InternalException.class, () -> Target.target(null));
+        assertThat(ex.getMessage(), is("URLは必須です。"));
     }
 
     @Test
     public void URIがNULLかつマップ変数が指定されていたときは例外が発生する() {
-        thrown.expect(InternalException.class);
-        thrown.expectMessage("URLは必須です。");
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("id", 1);
-        Target.target(null, map);
+        InternalException ex = assertThrows(InternalException.class, () -> {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("id", 1);
+            Target.target(null, map);
+        });
+        assertThat(ex.getMessage(), is("URLは必須です。"));
     }
 
     @Test

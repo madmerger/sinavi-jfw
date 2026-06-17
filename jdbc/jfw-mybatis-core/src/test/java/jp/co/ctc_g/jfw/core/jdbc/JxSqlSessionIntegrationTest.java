@@ -15,24 +15,26 @@
  */
 
 package jp.co.ctc_g.jfw.core.jdbc;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
 import jp.co.ctc_g.jfw.core.util.PartialList;
 import jp.co.ctc_g.jfw.paginate.Paginates;
 import jp.co.ctc_g.jfw.test.unit.DatabaseInitialize;
-import jp.co.ctc_g.jfw.test.unit.J2Unit4ClassRunner;
+
 
 import org.apache.ibatis.session.RowBounds;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+// RunWith removed - use @ExtendWith or @Nested;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-@RunWith(J2Unit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/jp/co/ctc_g/jfw/core/jdbc/JxSqlSessionIntegrationTestContext.xml")
 public class JxSqlSessionIntegrationTest {
 

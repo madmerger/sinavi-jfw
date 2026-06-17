@@ -16,45 +16,20 @@
 
 package jp.co.ctc_g.jse.test.unit;
 
-import jp.co.ctc_g.jfw.test.unit.J2Unit4ClassRunner;
-
-import org.junit.runners.model.InitializationError;
-
 /**
  * <p>
- * このクラスは、J-Frameworkのテスト関連の機能を利用するために必要なテストランナーです。
- * 以下の場合、このクラスをランナーとして指定する必要があります。
+ * このクラスは、J-FrameworkのMongoDB関連テスト機能のためのクラスです。
+ * JUnit 5では{@code @ExtendWith(SpringExtension.class)}を利用してください。
  * </p>
- * <ul>
- *  <li>テストケースにインジェクション等、DIコンテナの機能を利用する場合</li>
- *  <li>{@link MongoInitialize}によるMongoDB内データ操作をする場合</li>
- * </ul>
- * <p>
- *  また、このクラスは{@link org.springframework.test.context.junit4.SpringJUnit4ClassRunner}を継承しているため、
- *  {@link org.springframework.test.context.junit4.SpringJUnit4ClassRunner}が提供する機能は全て有効です。
- *  例えば、{@link org.springframework.test.context.ContextConfiguration}でアプリケーションコンテキストファイルを指定することができます。
- * </p>
- * @see J2Unit4ClassRunner
  * @author ITOCHU Techno-Solutions Corporation.
+ * @deprecated JUnit 5では{@code @ExtendWith(SpringExtension.class)}を使用してください。
  */
-public class SpringMongoJUnit4ClassRunner extends J2Unit4ClassRunner {
+@Deprecated
+public class SpringMongoJUnit4ClassRunner {
 
     /**
-     * 指定されたクラスオブジェクトを利用して、このクラスのインスタンスを生成します。
-     * @param clazz テスト対象クラス
-     * @throws InitializationError 特になし
+     * デフォルトコンストラクタです。
      */
-    public SpringMongoJUnit4ClassRunner(Class<?> clazz) throws InitializationError {
-        super(clazz);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void registerTestExecutionListeners() {
-        super.registerTestExecutionListeners();
-        getTestContextManager().registerTestExecutionListeners(new TestMongoKeeper());
-    }
+    public SpringMongoJUnit4ClassRunner() {}
 
 }

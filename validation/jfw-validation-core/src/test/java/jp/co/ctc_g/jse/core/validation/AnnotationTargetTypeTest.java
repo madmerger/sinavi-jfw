@@ -23,6 +23,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -37,37 +38,41 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintViolation;
-import javax.validation.Payload;
-import javax.validation.UnexpectedTypeException;
-import javax.validation.Validator;
-import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ExecutableValidator;
-import javax.validation.executable.ValidateOnExecution;
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Payload;
+import jakarta.validation.UnexpectedTypeException;
+import jakarta.validation.Validator;
+import jakarta.validation.executable.ExecutableType;
+import jakarta.validation.executable.ExecutableValidator;
+import jakarta.validation.executable.ValidateOnExecution;
 
 import jp.co.ctc_g.jse.core.validation.constraints.Number;
 import jp.co.ctc_g.jse.core.validation.constraints.NumericFormat;
 import jp.co.ctc_g.jse.core.validation.constraints.NumericFormat.FormatType;
 import jp.co.ctc_g.jse.test.bean.AnnotationTargetTypeBean;
 
-import org.hibernate.validator.internal.util.ReflectionHelper;
+
 import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.experimental.theories.DataPoints;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.experimental.theories.Theories;
 import org.junit.experimental.theories.Theory;
-import org.junit.rules.ExpectedException;
+import org.junit.experimental.theories.DataPoint;
 import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+import org.junit.experimental.theories.DataPoints;
 
-@RunWith(Enclosed.class)
+import org.junit.experimental.theories.Theory;
+// ExpectedException removed - use assertThrows;
+// RunWith removed - use @ExtendWith or @Nested;
+
+// @Nested classes used instead of Enclosed
 public class AnnotationTargetTypeTest {
     
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         Locale.setDefault(new Locale("ja", "JP"));
     }
@@ -75,6 +80,7 @@ public class AnnotationTargetTypeTest {
     protected static Validator VALIDATOR;
     protected static ExecutableValidator EXECUTABLE_VALIDATOR;
 
+    
     @RunWith(Theories.class)
     public static class ConstructorTypeTest {
 
@@ -101,21 +107,18 @@ public class AnnotationTargetTypeTest {
                 "1", "１"
             }
         };
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
             EXECUTABLE_VALIDATOR = getExecutableValitaror();
         }
 
         @Test
         public void shouldThrowUnexpectedTypeException() throws NoSuchMethodException, SecurityException {
-            thrown.expect(UnexpectedTypeException.class);
-            thrown.expectMessage(containsString("HV000030"));
-            Constructor<AnnotationTargetTypeBean> constructor = AnnotationTargetTypeBean.class.getConstructor();
-            EXECUTABLE_VALIDATOR.validateConstructorReturnValue(constructor, new AnnotationTargetTypeBean());
+            UnexpectedTypeException ex = assertThrows(UnexpectedTypeException.class, () -> {
+                Constructor<AnnotationTargetTypeBean> constructor = AnnotationTargetTypeBean.class.getConstructor();
+                EXECUTABLE_VALIDATOR.validateConstructorReturnValue(constructor, new AnnotationTargetTypeBean());
+            });
+            assertThat(ex.getMessage(), containsString("HV000030"));
         }
 
         @Theory
@@ -141,6 +144,7 @@ public class AnnotationTargetTypeTest {
         }
     }
 
+    
     @RunWith(Theories.class)
     public static class MethodTypeTest {
 
@@ -168,7 +172,7 @@ public class AnnotationTargetTypeTest {
             }
         };
 
-        @Before
+        @BeforeEach
         public void setup() {
             EXECUTABLE_VALIDATOR = getExecutableValitaror();
         }
@@ -177,7 +181,7 @@ public class AnnotationTargetTypeTest {
         public void validParameterValue(String valid) throws NoSuchMethodException, SecurityException {
             Assume.assumeThat(Arrays.asList(VALIDS), hasItem(valid));
             AnnotationTargetTypeBean target = new AnnotationTargetTypeBean();
-            Method method = ReflectionHelper.getDeclaredMethod(AnnotationTargetTypeBean.class, "setValue", String.class);
+            Method method = AnnotationTargetTypeBean.class.getDeclaredMethod("setValue", String.class);
             Set<ConstraintViolation<AnnotationTargetTypeBean>> errors = EXECUTABLE_VALIDATOR.validateParameters(target, method, new String[] {
                 valid
             });
@@ -189,7 +193,7 @@ public class AnnotationTargetTypeTest {
         public void invalidParameterValue(String invalid) throws NoSuchMethodException, SecurityException {
             Assume.assumeThat(Arrays.asList(INVALIDS), hasItem(invalid));
             AnnotationTargetTypeBean target = new AnnotationTargetTypeBean();
-            Method method = ReflectionHelper.getDeclaredMethod(AnnotationTargetTypeBean.class, "setValue", String.class);
+            Method method = AnnotationTargetTypeBean.class.getDeclaredMethod("setValue", String.class);
             Set<ConstraintViolation<AnnotationTargetTypeBean>> errors = EXECUTABLE_VALIDATOR.validateParameters(target, method, new String[] {
                 invalid
             });
@@ -202,13 +206,14 @@ public class AnnotationTargetTypeTest {
         public void validReturnValue(String valid) throws NoSuchMethodException, SecurityException {
             Assume.assumeThat(Arrays.asList(VALIDS), hasItem(valid));
             AnnotationTargetTypeBean target = new AnnotationTargetTypeBean();
-            Method method = ReflectionHelper.getMethod(AnnotationTargetTypeBean.class, "getValue");
+            Method method = AnnotationTargetTypeBean.class.getMethod("getValue");
             Set<ConstraintViolation<AnnotationTargetTypeBean>> errors = EXECUTABLE_VALIDATOR.validateReturnValue(target, method, valid);
             assertThat(errors, notNullValue());
             assertThat(errors.size(), is(0));
         }
     }
 
+    
     @RunWith(Theories.class)
     public static class AnnotationTypeValidatorTest {
 
@@ -224,7 +229,7 @@ public class AnnotationTargetTypeTest {
             "100000.00", "100,000.00"
         };
 
-        @Before
+        @BeforeEach
         public void setup() {
             VALIDATOR = getValidator();
         }

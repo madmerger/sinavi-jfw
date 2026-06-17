@@ -17,13 +17,14 @@
 package jp.co.ctc_g.jse.core.util.web.beans;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigInteger;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HalfAndFullwidthNumberEditorTest {
     
@@ -159,9 +160,7 @@ public class HalfAndFullwidthNumberEditorTest {
             editor.setAsText("９２２３３７２０３６８５４７７５８０８");
             fail();
         } catch (PropertyEditingException ex) {
-            assertThat(
-                ex.getMessage(),
-                is("数値形式(^[-－]?([0０]|[1-9１-９][0-9０-９]*)$)で入力してください。"));
+            assertThat(ex.getMessage(), is("数値形式(^[-－]?([0０]|[1-9１-９][0-9０-９]*)$)で入力してください。"));
         }
     }
 
@@ -231,9 +230,11 @@ public class HalfAndFullwidthNumberEditorTest {
         }
     }
     
-    @Test(expected = InternalException.class)
+    @Test
     public void 型指定が不正のときはエラーが発生する() {
-        new HalfAndFullwidthNumberEditor(null, false);
-        fail();
+        assertThrows(InternalException.class, () -> {
+            new HalfAndFullwidthNumberEditor(null, false);
+            fail();
+        });
     }
 }

@@ -19,7 +19,7 @@ package jp.co.ctc_g.jse.core.framework;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.beans.PropertyEditor;
 import java.math.BigDecimal;
@@ -28,7 +28,7 @@ import java.math.BigInteger;
 import jp.co.ctc_g.jse.core.util.web.beans.HalfwidthDecimalEditor;
 import jp.co.ctc_g.jse.core.util.web.beans.HalfwidthNumberEditor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.web.servlet.mvc.method.annotation.ExtendedServletRequestDataBinder;
 

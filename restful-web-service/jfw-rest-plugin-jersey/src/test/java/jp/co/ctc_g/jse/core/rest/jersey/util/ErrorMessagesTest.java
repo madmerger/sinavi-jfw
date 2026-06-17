@@ -16,25 +16,23 @@
 
 package jp.co.ctc_g.jse.core.rest.jersey.util;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import org.hamcrest.CoreMatchers;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Locale;
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jse.core.rest.entity.ErrorMessage;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+// hamcrest removed;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+// ExpectedException removed - use assertThrows;
 
 public class ErrorMessagesTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-    
     @Test
     public void ランダムなIDが設定される() {
         ErrorMessage error = ErrorMessages.create().id().get();
@@ -98,9 +96,8 @@ public class ErrorMessagesTest {
     
     @Test
     public void エラーコード設定前にメッセージ解決しようとするとエラーが発生する() {
-        thrown.expect(InternalException.class);
-        thrown.expectMessage("エラーメッセージの解決する前にエラーコードが設定されていません。");
-        ErrorMessages.create().resolve();
+        InternalException ex = assertThrows(InternalException.class, () -> ErrorMessages.create().resolve());
+        assertThat(ex.getMessage(), CoreMatchers.is("エラーメッセージの解決する前にエラーコードが設定されていません。"));
     }
     
     @Test

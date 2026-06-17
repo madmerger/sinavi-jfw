@@ -16,8 +16,8 @@
 
 package jp.co.ctc_g.jse.core.rest.springmvc.server.filter;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
 
 public class GZipResponseStreamTest {
@@ -26,7 +26,7 @@ public class GZipResponseStreamTest {
 
     private GZipResponseStream res;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         response = new MockHttpServletResponse();
         res = new GZipResponseStream(response);

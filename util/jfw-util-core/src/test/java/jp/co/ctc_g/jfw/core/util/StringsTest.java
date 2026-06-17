@@ -17,17 +17,18 @@
 package jp.co.ctc_g.jfw.core.util;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collections;
 import java.util.Map;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class StringsTest {
 
@@ -158,7 +159,7 @@ public class StringsTest {
         Arrays.each(seeds, new EachCall<String>() {
             public void each(String element, int index, int total) {
                 String s = Strings.substitute(element, replace);
-                assertEquals("loop:" + index, expected[index], s);
+                assertEquals(expected[index], s, "loop:" + index);
             }
         });
     }
@@ -180,7 +181,7 @@ public class StringsTest {
         Arrays.each(seeds, new EachCall<String>() {
             public void each(String element, int index, int total) {
                 String s = Strings.substitute(element, replace);
-                assertEquals("loop:" + index, expected[index], s);
+                assertEquals(expected[index], s, "loop:" + index);
             }
         });
     }
@@ -202,7 +203,7 @@ public class StringsTest {
         Arrays.each(seeds, new EachCall<String>() {
             public void each(String element, int index, int total) {
                 String s = Strings.substitute(element, replace);
-                assertEquals("loop:" + index, expected[index], s);
+                assertEquals(expected[index], s, "loop:" + index);
             }
         });
     }
@@ -259,7 +260,7 @@ public class StringsTest {
         Arrays.each(seeds, new EachCall<String>() {
            public void each(String e, int i, int t) {
                String s = Strings.trim(e);
-               assertEquals("loop: " + i, expects[i], s);
+               assertEquals(expects[i], s, "loop: " + i);
            }
         });
     }
@@ -280,7 +281,7 @@ public class StringsTest {
         Arrays.each(seeds, new EachCall<String>() {
             public void each(String e, int i, int t) {
                 String[] values = Strings.split(",", e);
-                assertArrayEquals("loop: " + i, expected[i], values);
+                assertArrayEquals(expected[i], values, "loop: " + i);
             }
         });
     }
@@ -300,7 +301,7 @@ public class StringsTest {
         Arrays.each(seeds, new EachCall<String>() {
             public void each(String e, int i, int t) {
                 String[] values = Strings.split("de", e);
-                assertArrayEquals("loop: " + i, expected[i], values);
+                assertArrayEquals(expected[i], values, "loop: " + i);
             }
         });
     }

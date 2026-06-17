@@ -19,17 +19,18 @@ package jp.co.ctc_g.jfw.core.util;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class DatesTest {
 
@@ -363,10 +364,12 @@ public class DatesTest {
         assertThat(Dates.toRealMonth(11), is(12));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void 存在しない月を指定した場合に例外が発生するかどうか() throws Exception {
-
-        Dates.toRealMonth(12);
+        assertThrows(IllegalArgumentException.class, () -> {
+    
+            Dates.toRealMonth(12);
+        });
     }
 
     @Test

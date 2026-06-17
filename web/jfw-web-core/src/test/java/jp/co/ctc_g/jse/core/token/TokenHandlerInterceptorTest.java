@@ -19,15 +19,16 @@ package jp.co.ctc_g.jse.core.token;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Field;
 
 import jp.co.ctc_g.jse.core.framework.Controllers;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
@@ -41,7 +42,7 @@ public class TokenHandlerInterceptorTest {
     private HandlerMethod tokenResetAfterCheck;
     private HandlerMethod nothing;
     
-    @Before
+    @BeforeEach
     public void setup() throws Exception{
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
@@ -107,20 +108,22 @@ public class TokenHandlerInterceptorTest {
         assertThat(manager.getToken(request, Controllers.SCOPE_SESSION), is(notNullValue()));
     }
 
-    @Test(expected = InvalidTokenException.class)
+    @Test
     public void Tokenチェックに失敗する() throws Exception {
-        TokenManager manager = new TokenManager();
-        manager.afterPropertiesSet();
-
-        TokenHandlerInterceptor tokenHandler = new TokenHandlerInterceptor();
-        Field managerField = tokenHandler.getClass().getDeclaredField("manager");
-        managerField.setAccessible(true);
-        managerField.set(tokenHandler, manager);
-        tokenHandler.preHandle(request, response, tokenSaveHanlder);
-        String requestedToken = manager.getToken(request, Controllers.SCOPE_SESSION);
-        request.setParameter(TokenManager.SESSION_TOKEN_PARAMETER_NAME, requestedToken);
-        tokenHandler.preHandle(request, response, tokenSaveHanlder);
-        tokenHandler.preHandle(request, response, tokenCheckHanlder);
+        assertThrows(InvalidTokenException.class, () -> {
+            TokenManager manager = new TokenManager();
+            manager.afterPropertiesSet();
+    
+            TokenHandlerInterceptor tokenHandler = new TokenHandlerInterceptor();
+            Field managerField = tokenHandler.getClass().getDeclaredField("manager");
+            managerField.setAccessible(true);
+            managerField.set(tokenHandler, manager);
+            tokenHandler.preHandle(request, response, tokenSaveHanlder);
+            String requestedToken = manager.getToken(request, Controllers.SCOPE_SESSION);
+            request.setParameter(TokenManager.SESSION_TOKEN_PARAMETER_NAME, requestedToken);
+            tokenHandler.preHandle(request, response, tokenSaveHanlder);
+            tokenHandler.preHandle(request, response, tokenCheckHanlder);
+        });
     }
 
     @Test

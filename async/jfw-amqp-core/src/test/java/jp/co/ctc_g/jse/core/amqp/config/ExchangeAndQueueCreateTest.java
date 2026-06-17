@@ -25,19 +25,20 @@ import java.util.Properties;
 import jp.co.ctc_g.jse.core.amqp.TestQueueCleaner;
 import jp.co.ctc_g.jse.core.amqp.config.exception.DefaultProperties;
 
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+// RunWith removed - use @ExtendWith or @Nested;
 import org.springframework.amqp.rabbit.connection.Connection;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DefaultProperties.class)
 @ActiveProfiles("development")
 public class ExchangeAndQueueCreateTest {
@@ -49,14 +50,14 @@ public class ExchangeAndQueueCreateTest {
     @Autowired
     private ExceptionQueueContextConfig config;
 
-    @Before
+    @BeforeEach
     public void ping() {
         // Ping的にコネクションのみはることでExchange/Queueを作成
         Connection con = connection.createConnection();
         con.createChannel(false);
     }
 
-    @AfterClass
+    @AfterAll
     public static void cleaner() {
         TestQueueCleaner.cleaner();
     }

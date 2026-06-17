@@ -16,7 +16,9 @@
 
 package jp.co.ctc_g.jse.vid;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.util.Strings;
 import jp.co.ctc_g.jse.vid.victim.InvalidPermitConstraintVictim;
@@ -25,7 +27,7 @@ import jp.co.ctc_g.jse.vid.victim.PermitAndRejectConstraintVictim;
 import jp.co.ctc_g.jse.vid.victim.PermitConstraintVictim;
 import jp.co.ctc_g.jse.vid.victim.RejectConstraintVictim;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ViewTransitionKeeperTest {
 
@@ -53,18 +55,22 @@ public class ViewTransitionKeeperTest {
         k.check(vid);
     }
 
-    @Test(expected = InvalidViewTransitionException.class)
+    @Test
     public void 許可指定生成テスト正常系3() throws InvalidViewTransitionException {
-        ViewTransitionKeeper k = new ViewTransitionKeeper(PermitConstraintVictim.class);
-        ViewId vid = new ViewId(Strings.reverse(PermitConstraintVictim.PERMIT));
-        k.check(vid);
-        fail();
+        assertThrows(InvalidViewTransitionException.class, () -> {
+            ViewTransitionKeeper k = new ViewTransitionKeeper(PermitConstraintVictim.class);
+            ViewId vid = new ViewId(Strings.reverse(PermitConstraintVictim.PERMIT));
+            k.check(vid);
+            fail();
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void 許可指定テスト異常系1() {
-        new ViewTransitionKeeper(InvalidPermitConstraintVictim.class);
-        fail();
+        assertThrows(InternalException.class, () -> {
+            new ViewTransitionKeeper(InvalidPermitConstraintVictim.class);
+            fail();
+        });
     }
 
     @Test
@@ -83,12 +89,14 @@ public class ViewTransitionKeeperTest {
         k.check(vid);
     }
 
-    @Test(expected = InvalidViewTransitionException.class)
+    @Test
     public void 拒否指定生成テスト正常系3() throws InvalidViewTransitionException {
-        ViewTransitionKeeper k = new ViewTransitionKeeper(RejectConstraintVictim.class);
-        ViewId vid = new ViewId(RejectConstraintVictim.REJECT);
-        k.check(vid);
-        fail();
+        assertThrows(InvalidViewTransitionException.class, () -> {
+            ViewTransitionKeeper k = new ViewTransitionKeeper(RejectConstraintVictim.class);
+            ViewId vid = new ViewId(RejectConstraintVictim.REJECT);
+            k.check(vid);
+            fail();
+        });
     }
 
     @Test
@@ -106,19 +114,23 @@ public class ViewTransitionKeeperTest {
         k.check(vid);
     }
 
-    @Test(expected = InvalidViewTransitionException.class)
+    @Test
     public void 許可と拒否指定生成テスト正常系3() throws InvalidViewTransitionException {
-        ViewTransitionKeeper k = new ViewTransitionKeeper(PermitAndRejectConstraintVictim.class);
-        ViewId vid = new ViewId("ABCDEF");
-        k.check(vid);
+        assertThrows(InvalidViewTransitionException.class, () -> {
+            ViewTransitionKeeper k = new ViewTransitionKeeper(PermitAndRejectConstraintVictim.class);
+            ViewId vid = new ViewId("ABCDEF");
+            k.check(vid);
+        });
     }
 
-    @Test(expected = InvalidViewTransitionException.class)
+    @Test
     public void 許可と拒否指定生成テスト正常系4() throws InvalidViewTransitionException {
-        ViewTransitionKeeper k = new ViewTransitionKeeper(PermitAndRejectConstraintVictim.class);
-        ViewId vid = new ViewId(Strings.reverse(PermitAndRejectConstraintVictim.PERMIT));
-        k.check(vid);
-        fail();
+        assertThrows(InvalidViewTransitionException.class, () -> {
+            ViewTransitionKeeper k = new ViewTransitionKeeper(PermitAndRejectConstraintVictim.class);
+            ViewId vid = new ViewId(Strings.reverse(PermitAndRejectConstraintVictim.PERMIT));
+            k.check(vid);
+            fail();
+        });
     }
 
     @Test
@@ -139,25 +151,29 @@ public class ViewTransitionKeeperTest {
         }
     }
 
-    @Test(expected = InvalidViewTransitionException.class)
+    @Test
     public void 許可複数指定生成テスト正常系3() throws InvalidViewTransitionException {
-        ViewTransitionKeeper k = new ViewTransitionKeeper(MultiPermitConstraintVictim.class);
-        String[] ids = MultiPermitConstraintVictim.PERMIT.split("\\|");
-        for (String id : ids) {
-            id = Strings.reverse(id);
-            ViewId vid = new ViewId(id);
-            k.check(vid);
-        }
-        fail();
+        assertThrows(InvalidViewTransitionException.class, () -> {
+            ViewTransitionKeeper k = new ViewTransitionKeeper(MultiPermitConstraintVictim.class);
+            String[] ids = MultiPermitConstraintVictim.PERMIT.split("\\|");
+            for (String id : ids) {
+                id = Strings.reverse(id);
+                ViewId vid = new ViewId(id);
+                k.check(vid);
+            }
+            fail();
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void 不正オブジェクト時check状態異常系1() throws InvalidViewTransitionException {
-        ViewTransitionKeeper k = new ViewTransitionKeeper(PermitConstraintVictim.class);
-        ViewId vid = new ViewId(PermitConstraintVictim.PERMIT);
-        // permitPatternとrejectPatternが共にnullになる
-        k.allowPattern = null;
-        k.check(vid);
+        assertThrows(InternalException.class, () -> {
+            ViewTransitionKeeper k = new ViewTransitionKeeper(PermitConstraintVictim.class);
+            ViewId vid = new ViewId(PermitConstraintVictim.PERMIT);
+            // permitPatternとrejectPatternが共にnullになる
+            k.allowPattern = null;
+            k.check(vid);
+        });
     }
 
     private String p(String pattern) {

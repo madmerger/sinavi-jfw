@@ -17,13 +17,14 @@
 package jp.co.ctc_g.jse.core.util.web.beans;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HalfAndFullwidthDecimalEditorTest {
         
@@ -90,23 +91,29 @@ public class HalfAndFullwidthDecimalEditorTest {
         }
     }
     
-    @Test(expected = InternalException.class)
+    @Test
     public void 型指定が不正のときはエラーが発生する() {
-        new HalfAndFullwidthDecimalEditor(null, false);
-        fail();
+        assertThrows(InternalException.class, () -> {
+            new HalfAndFullwidthDecimalEditor(null, false);
+            fail();
+        });
     }
     
-    @Test(expected = RuntimeException.class)
+    @Test
     public void Float型への変換はサポートしていない() {
-        HalfAndFullwidthDecimalEditor editor = new HalfAndFullwidthDecimalEditor(Float.class, false);
-        editor.setAsText("０．０");
-        editor.getAsText();
+        assertThrows(RuntimeException.class, () -> {
+            HalfAndFullwidthDecimalEditor editor = new HalfAndFullwidthDecimalEditor(Float.class, false);
+            editor.setAsText("０．０");
+            editor.getAsText();
+        });
     }
     
-    @Test(expected = RuntimeException.class)
+    @Test
     public void Double型への変換はサポートしてない() {
-        HalfAndFullwidthDecimalEditor editor = new HalfAndFullwidthDecimalEditor(Double.class, false);
-        editor.setAsText("０．０");
-        editor.getAsText();
+        assertThrows(RuntimeException.class, () -> {
+            HalfAndFullwidthDecimalEditor editor = new HalfAndFullwidthDecimalEditor(Double.class, false);
+            editor.setAsText("０．０");
+            editor.getAsText();
+        });
     }
 }

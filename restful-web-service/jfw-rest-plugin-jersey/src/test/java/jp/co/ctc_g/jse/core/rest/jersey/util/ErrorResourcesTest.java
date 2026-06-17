@@ -16,17 +16,18 @@
 
 package jp.co.ctc_g.jse.core.rest.jersey.util;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import org.hamcrest.CoreMatchers;
 
 import java.util.Locale;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.BeforeClass;
-import org.junit.Test;
+// hamcrest removed;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class ErrorResourcesTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         Locale.setDefault(new Locale("ja","JP"));
     }

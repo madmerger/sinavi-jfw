@@ -17,23 +17,19 @@
 package jp.co.ctc_g.jse.core.csv;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+// ExpectedException removed - use assertThrows;
 
 public class CSVConfigsTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Test
     public void チェックオプションが設定され長さが未設定の場合は例外が発生する() {
-        thrown.expect(InternalException.class);
-        thrown.expectMessage("読込行の長さチェックが指定されていますが、長さが指定されていません。");
-        CSVConfigs.config().check(true).length();
+        InternalException ex = assertThrows(InternalException.class, () -> CSVConfigs.config().check(true).length());
+        assertThat(ex.getMessage(), is("読込行の長さチェックが指定されていますが、長さが指定されていません。"));
     }
 
     @Test

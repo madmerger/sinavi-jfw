@@ -17,7 +17,7 @@
 package jp.co.ctc_g.jfw.xlsbeans;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.InputStream;
 
@@ -25,20 +25,20 @@ import jp.co.ctc_g.jfw.xlsbeans.bean.IterateTableTestBean;
 import jp.co.ctc_g.jse.core.excel.JxXLSBeans;
 import net.java.amateras.xlsbeans.xssfconverter.WorkbookFinder;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class JxVerticalRecordsForIterateTableProcessorTest {
 
     protected InputStream in = null;
 
-    @Before
+    @BeforeEach
     public void setup() {
         in = JxVerticalRecordsProcessorTest.class.getResourceAsStream("iterate-table.xls");
     }
 
-    @After
+    @AfterEach
     public void teardown() throws Exception {
         in.close();
     }

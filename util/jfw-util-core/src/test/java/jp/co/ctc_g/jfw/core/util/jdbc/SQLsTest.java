@@ -16,9 +16,11 @@
 
 package jp.co.ctc_g.jfw.core.util.jdbc;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class SQLsTest {
 
@@ -161,7 +163,7 @@ public class SQLsTest {
                 "AAA\\_"
         };
         for (int i = 0; i < expected.length; i++) {
-            assertEquals("index = " + i, expected[i], SQLs.escape(datum[i]));
+            assertEquals(expected[i], SQLs.escape(datum[i]), "index = " + i);
         }
     }
 

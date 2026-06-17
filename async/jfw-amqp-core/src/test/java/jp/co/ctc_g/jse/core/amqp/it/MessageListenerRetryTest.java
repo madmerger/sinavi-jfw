@@ -28,10 +28,10 @@ import jp.co.ctc_g.jse.core.amqp.exception.AmqpApplicationUnrecoverableException
 import jp.co.ctc_g.jse.core.amqp.exception.AmqpSystemException;
 
 import org.aopalliance.aop.Advice;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+// RunWith removed - use @ExtendWith or @Nested;
 import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -43,10 +43,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.ErrorHandler;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = RetryTestConsumerContextConfig.class)
 @ActiveProfiles("development")
 public class MessageListenerRetryTest {
@@ -65,7 +66,7 @@ public class MessageListenerRetryTest {
     private SimpleMessageListenerContainer recoverableContainer;
     private SimpleMessageListenerContainer unrecoverableContainer;
     
-    @Before
+    @BeforeEach
     public void setup() {
         init();
         container = container();
@@ -80,7 +81,7 @@ public class MessageListenerRetryTest {
         unretry = new CountDownLatch(1);
     }
     
-    @AfterClass
+    @AfterAll
     public static void cleaner() {
         TestQueueCleaner.retryCleaner();
     }

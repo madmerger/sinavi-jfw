@@ -17,7 +17,8 @@
 package jp.co.ctc_g.jse.core.util.web.beans;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -26,7 +27,7 @@ import java.text.NumberFormat;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 public class NumberEditorTest {
@@ -222,81 +223,95 @@ public class NumberEditorTest {
         }
     }
 
-    @Test(expected = PropertyEditingException.class)
+    @Test
     public void null値が許可されない() {
-        NumberFormat format = new DecimalFormat("###,##0.000");
-        String pattern = "^[-]?([0-9]{0,3}([,][0-9]{3})*[.][0-9]+)$";
-        NumberEditor editor = new NumberEditor(BigDecimal.class, format, pattern, false);
-        editor.setAsText(null);
-        fail();
+        assertThrows(PropertyEditingException.class, () -> {
+            NumberFormat format = new DecimalFormat("###,##0.000");
+            String pattern = "^[-]?([0-9]{0,3}([,][0-9]{3})*[.][0-9]+)$";
+            NumberEditor editor = new NumberEditor(BigDecimal.class, format, pattern, false);
+            editor.setAsText(null);
+            fail();
+        });
     }
 
-    @Test(expected = PropertyEditingException.class)
+    @Test
     public void 空文字が許可されない() {
-        NumberFormat format = new DecimalFormat("###,##0.000");
-        String pattern = "^[-]?([0-9]{0,3}([,][0-9]{3})*[.][0-9]+)$";
-        NumberEditor editor = new NumberEditor(BigDecimal.class, format, pattern, false);
-        editor.setAsText("");
-        fail();
+        assertThrows(PropertyEditingException.class, () -> {
+            NumberFormat format = new DecimalFormat("###,##0.000");
+            String pattern = "^[-]?([0-9]{0,3}([,][0-9]{3})*[.][0-9]+)$";
+            NumberEditor editor = new NumberEditor(BigDecimal.class, format, pattern, false);
+            editor.setAsText("");
+            fail();
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void 型指定が不正で初期化失敗() {
-        NumberFormat format = new DecimalFormat("###,##0.000");
-        String pattern = "^[-]?([0-9]{0,3}([,][0-9]{3})*[.][0-9]+)$";
-        new NumberEditor(null, format, pattern, false);
-        fail();
+        assertThrows(InternalException.class, () -> {
+            NumberFormat format = new DecimalFormat("###,##0.000");
+            String pattern = "^[-]?([0-9]{0,3}([,][0-9]{3})*[.][0-9]+)$";
+            new NumberEditor(null, format, pattern, false);
+            fail();
+        });
     }
     
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void 型指定が不正で入力値でエラーが発生する() {
-        
-        @SuppressWarnings("serial")
-        class NumberEx extends Number {
-            @Override
-            public int intValue() {
-                return 0;
-            }
-            @Override
-            public long longValue() {
-                return 0;
-            }
-            @Override
-            public float floatValue() {
-                return 0;
-            }
-            @Override
-            public double doubleValue() {
-                return 0;
-            }
-        };
-        
-        NumberFormat format = new DecimalFormat("###");
-        String pattern = "^[-－]?([0０]|[1-9１-９][0-9０-９]*)$";
-        NumberEditor editor = new NumberEditor(NumberEx.class, format, pattern, false);
-        editor.setAsText("9223372036854775808");
+        assertThrows(IllegalArgumentException.class, () -> {
+            
+            @SuppressWarnings("serial")
+            class NumberEx extends Number {
+                @Override
+                public int intValue() {
+                    return 0;
+                }
+                @Override
+                public long longValue() {
+                    return 0;
+                }
+                @Override
+                public float floatValue() {
+                    return 0;
+                }
+                @Override
+                public double doubleValue() {
+                    return 0;
+                }
+            };
+            
+            NumberFormat format = new DecimalFormat("###");
+            String pattern = "^[-－]?([0０]|[1-9１-９][0-9０-９]*)$";
+            NumberEditor editor = new NumberEditor(NumberEx.class, format, pattern, false);
+            editor.setAsText("9223372036854775808");
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void format指定が不正で初期化失敗() {
-        String pattern = "^[-]?([0-9]{0,3}([,][0-9]{3})*[.][0-9]+)$";
-        new NumberEditor(BigDecimal.class, null, pattern, false);
-        fail();
+        assertThrows(InternalException.class, () -> {
+            String pattern = "^[-]?([0-9]{0,3}([,][0-9]{3})*[.][0-9]+)$";
+            new NumberEditor(BigDecimal.class, null, pattern, false);
+            fail();
+        });
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void pattern指定が不正で初期化失敗() {
-        NumberFormat format = new DecimalFormat("###,##0.000");
-        new NumberEditor(BigDecimal.class, format, null, false);
-        fail();
+        assertThrows(InternalException.class, () -> {
+            NumberFormat format = new DecimalFormat("###,##0.000");
+            new NumberEditor(BigDecimal.class, format, null, false);
+            fail();
+        });
     }
 
-    @Test(expected = PropertyEditingException.class)
+    @Test
     public void 不正な入力値でエラーが発生する() {
-        NumberFormat format = new DecimalFormat("###,##0.000");
-        String pattern = "^[-]?([0-9]{0,3}([,][0-9]{3})*[.][0-9]+)$";
-        NumberEditor editor = new NumberEditor(BigDecimal.class, format, pattern, true);
-        editor.setAsText("１，０００．０００");
-        fail();
+        assertThrows(PropertyEditingException.class, () -> {
+            NumberFormat format = new DecimalFormat("###,##0.000");
+            String pattern = "^[-]?([0-9]{0,3}([,][0-9]{3})*[.][0-9]+)$";
+            NumberEditor editor = new NumberEditor(BigDecimal.class, format, pattern, true);
+            editor.setAsText("１，０００．０００");
+            fail();
+        });
     }
 }

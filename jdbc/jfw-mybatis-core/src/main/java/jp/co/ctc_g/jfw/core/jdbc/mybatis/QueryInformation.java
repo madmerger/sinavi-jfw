@@ -85,7 +85,7 @@ public class QueryInformation {
             this.parameterMappingList = boundSql.getParameterMappings();
             this.sqlCommandType = mappedStatement.getSqlCommandType();
             this.statementType = mappedStatement.getStatementType();
-            this.metaObject = parameterObject == null ? null : MetaObject.forObject(parameterObject, new DefaultObjectFactory(), new DefaultObjectWrapperFactory());
+            this.metaObject = parameterObject == null ? null : MetaObject.forObject(parameterObject, new DefaultObjectFactory(), new DefaultObjectWrapperFactory(), new org.apache.ibatis.reflection.DefaultReflectorFactory());
 
             switch (statementType) {
                 case STATEMENT:

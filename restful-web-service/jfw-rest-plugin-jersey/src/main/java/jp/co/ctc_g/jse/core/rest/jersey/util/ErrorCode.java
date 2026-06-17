@@ -16,7 +16,7 @@
 
 package jp.co.ctc_g.jse.core.rest.jersey.util;
 
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -16,7 +16,8 @@
 
 package jp.co.ctc_g.jse.vid;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -26,8 +27,9 @@ import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.util.Maps;
 
 import static org.hamcrest.CoreMatchers.is;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
 
@@ -35,7 +37,7 @@ public class ViewIdTest {
 
     private MockHttpServletRequest request;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         MockServletContext sc = new MockServletContext();
         request = new MockHttpServletRequest(sc);
@@ -48,10 +50,12 @@ public class ViewIdTest {
         assertEquals(ID, vid.getId());
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void 画面IDの指定が空文字の場合例外が発生する() {
-        final String ID = "";
-        new ViewId(ID);
+        assertThrows(InternalException.class, () -> {
+            final String ID = "";
+            new ViewId(ID);
+        });
     }
 
     @Test

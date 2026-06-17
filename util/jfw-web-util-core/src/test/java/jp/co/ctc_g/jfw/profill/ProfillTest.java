@@ -17,17 +17,18 @@
 package jp.co.ctc_g.jfw.profill;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ProfillTest {
 
     private Profill profill;
     
-    @Before
+    @BeforeEach
     public void instantiate() {
         profill = new Profill();
     }
@@ -73,21 +74,27 @@ public class ProfillTest {
     
     // 例外テスト ---------------------------------------------------------------------------
     
-    @Test(expected = InternalException.class)
+    @Test
     public void FillingProviderにnullを指定できない() {
-        profill.addFillingProvider(null);
+        assertThrows(InternalException.class, () -> {
+            profill.addFillingProvider(null);
+        });
     }
     
-    @Test(expected = CannotModifyProfillException.class)
+    @Test
     public void スレッドセーフモードにするとFillingProviderは追加できない() {
-        profill.makeSafeAgainstMultiThreadedAccess();
-        profill.addFillingProvider(new AnnotatedStringLiteralFillingProvider());
+        assertThrows(CannotModifyProfillException.class, () -> {
+            profill.makeSafeAgainstMultiThreadedAccess();
+            profill.addFillingProvider(new AnnotatedStringLiteralFillingProvider());
+        });
     }
     
-    @Test(expected = CannotModifyProfillException.class)
+    @Test
     public void スレッドセーフモードにするとtryToInstantiateIfNestedPropertyIsNullは追加できない() {
-        profill.makeSafeAgainstMultiThreadedAccess();
-        profill.setTryToInstantiateIfNestedPropertyIsNull(true);
+        assertThrows(CannotModifyProfillException.class, () -> {
+            profill.makeSafeAgainstMultiThreadedAccess();
+            profill.setTryToInstantiateIfNestedPropertyIsNull(true);
+        });
     }
     
     protected @interface Action {

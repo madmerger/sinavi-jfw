@@ -16,42 +16,27 @@
 
 package jp.co.ctc_g.jfw.test.unit;
 
-import org.junit.runners.model.InitializationError;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * <p>
- * このクラスは、J-Frameworkのテスト関連の機能を利用するために必要なテストランナーです。
- * 以下の場合、このクラスをランナーとして指定する必要があります。
+ * このクラスは、J-Frameworkのテスト関連の機能を利用するためのJUnit 5拡張クラスです。
+ * JUnit 5では{@code @ExtendWith(SpringExtension.class)}を利用してください。
  * </p>
- * <ul>
- *  <li>テストケースにインジェクション等、DIコンテナの機能を利用する場合</li>
- *  <li>{@link DatabaseInitialize}によるRDBMS内データ操作をする場合</li>
- * </ul>
  * <p>
- *  また、このクラスは{@link SpringJUnit4ClassRunner}を継承しているため、
- *  {@link SpringJUnit4ClassRunner}が提供する機能は全て有効です。
- *  例えば、{@link org.springframework.test.context.ContextConfiguration}でアプリケーションコンテキストファイルを指定することができます。
+ * このクラスは後方互換性のために残されていますが、
+ * 新規テストでは直接{@code @ExtendWith(SpringExtension.class)}の使用を推奨します。
  * </p>
  * @author ITOCHU Techno-Solutions Corporation.
+ * @deprecated JUnit 5では{@code @ExtendWith(SpringExtension.class)}を使用してください。
  */
-public class J2Unit4ClassRunner extends SpringJUnit4ClassRunner {
+@Deprecated
+public class J2Unit4ClassRunner {
 
     /**
-     * 指定されたクラスオブジェクトを利用して、このクラスのインスタンスを生成します。
-     * @param clazz テスト対象クラス
-     * @throws InitializationError 特になし
+     * デフォルトコンストラクタです。
      */
-    public J2Unit4ClassRunner(Class<?> clazz) throws InitializationError {
-        super(clazz);
-        registerTestExecutionListeners();
-    }
-
-    /**
-     * テストリスナーを登録します。
-     */
-    protected void registerTestExecutionListeners() {
-        getTestContextManager().registerTestExecutionListeners(new TestDatabaseKeeper());
-    }
+    public J2Unit4ClassRunner() {}
 
 }

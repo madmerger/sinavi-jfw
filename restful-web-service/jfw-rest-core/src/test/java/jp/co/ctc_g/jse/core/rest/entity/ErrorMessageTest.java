@@ -15,6 +15,7 @@
  */
 
 package jp.co.ctc_g.jse.core.rest.entity;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -24,13 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+// RunWith removed - use @ExtendWith or @Nested;
 
-@RunWith(Enclosed.class)
+// @Nested classes used instead of Enclosed
 public class ErrorMessageTest {
 
     public static class ErrorMessageConvertTest {
@@ -38,7 +39,7 @@ public class ErrorMessageTest {
         protected ObjectMapper mapper;
         protected ErrorMessage error;
 
-        @Before
+        @BeforeEach
         public void setup() {
             mapper = new ObjectMapper();
             error = new ErrorMessage();
@@ -90,7 +91,7 @@ public class ErrorMessageTest {
         protected ObjectMapper mapper;
         protected ErrorMessage error;
 
-        @Before
+        @BeforeEach
         public void setup() {
             mapper = new ObjectMapper();
             error = new ErrorMessage();

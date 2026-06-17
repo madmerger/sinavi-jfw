@@ -15,20 +15,22 @@
  */
 
 package jp.co.ctc_g.jse.core.util.web.beans;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assume.*;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
 
-@RunWith(Theories.class)
+import org.junit.experimental.theories.Theory;
+// RunWith removed - use @ExtendWith or @Nested;
+
+
 public class DateEditorTest {
 
     @DataPoints

@@ -18,14 +18,14 @@ package jp.co.ctc_g.jse.core.framework;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.beans.PropertyEditor;
 import java.util.Date;
 
 import jp.co.ctc_g.jse.core.util.web.beans.DateEditor;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.web.servlet.mvc.method.annotation.ExtendedServletRequestDataBinder;
 

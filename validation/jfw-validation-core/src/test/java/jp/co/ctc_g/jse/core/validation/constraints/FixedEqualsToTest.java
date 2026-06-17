@@ -20,6 +20,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -32,30 +33,26 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 
 import jp.co.ctc_g.jse.test.util.Validations;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+// ExpectedException removed - use assertThrows;
+// RunWith removed - use @ExtendWith or @Nested;
 
-@RunWith(Enclosed.class)
+// @Nested classes used instead of Enclosed
 public class FixedEqualsToTest {
 
     protected static Validator VALIDATOR;
 
     public static class CharSequenceFixedEqualsToTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -107,11 +104,7 @@ public class FixedEqualsToTest {
     }
 
     public static class DateFixedEqualsToTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -166,24 +159,21 @@ public class FixedEqualsToTest {
         @Test
         public void invalidParameter() {
 
-            thrown.expect(ValidationException.class);
-            thrown.expectMessage(containsString("HV000032"));
-            class FixedEqualsToTargetBean {
-
-                @FixedEqualsTo("foo")
-                public Date value;
-            }
-            FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
-            VALIDATOR.validate(target);
+            ValidationException ex = assertThrows(ValidationException.class, () -> {
+                class FixedEqualsToTargetBean {
+    
+                    @FixedEqualsTo("foo")
+                    public Date value;
+                }
+                FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
+                VALIDATOR.validate(target);
+            });
+            assertThat(ex.getMessage(), containsString("HV000032"));
         }
     }
 
     public static class IntegerFixedEqualsToTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -236,24 +226,21 @@ public class FixedEqualsToTest {
         @Test
         public void invalidParameter() {
 
-            thrown.expect(ValidationException.class);
-            thrown.expectMessage(containsString("HV000032"));
-            class FixedEqualsToTargetBean {
-
-                @FixedEqualsTo("foo")
-                public Integer value;
-            }
-            FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
-            VALIDATOR.validate(target);
+            ValidationException ex = assertThrows(ValidationException.class, () -> {
+                class FixedEqualsToTargetBean {
+    
+                    @FixedEqualsTo("foo")
+                    public Integer value;
+                }
+                FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
+                VALIDATOR.validate(target);
+            });
+            assertThat(ex.getMessage(), containsString("HV000032"));
         }
     }
 
     public static class LongFixedEqualsToTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -306,24 +293,21 @@ public class FixedEqualsToTest {
         @Test
         public void invalidParameter() {
 
-            thrown.expect(ValidationException.class);
-            thrown.expectMessage(containsString("HV000032"));
-            class FixedEqualsToTargetBean {
-
-                @FixedEqualsTo("foo")
-                public Long value;
-            }
-            FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
-            VALIDATOR.validate(target);
+            ValidationException ex = assertThrows(ValidationException.class, () -> {
+                class FixedEqualsToTargetBean {
+    
+                    @FixedEqualsTo("foo")
+                    public Long value;
+                }
+                FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
+                VALIDATOR.validate(target);
+            });
+            assertThat(ex.getMessage(), containsString("HV000032"));
         }
     }
 
     public static class BigIntegerFixedEqualsToTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -376,24 +360,21 @@ public class FixedEqualsToTest {
         @Test
         public void invalidParameter() {
 
-            thrown.expect(ValidationException.class);
-            thrown.expectMessage(containsString("HV000032"));
-            class FixedEqualsToTargetBean {
-
-                @FixedEqualsTo("foo")
-                public BigInteger value;
-            }
-            FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
-            VALIDATOR.validate(target);
+            ValidationException ex = assertThrows(ValidationException.class, () -> {
+                class FixedEqualsToTargetBean {
+    
+                    @FixedEqualsTo("foo")
+                    public BigInteger value;
+                }
+                FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
+                VALIDATOR.validate(target);
+            });
+            assertThat(ex.getMessage(), containsString("HV000032"));
         }
     }
 
     public static class BigDecimalFixedEqualsToTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -446,24 +427,21 @@ public class FixedEqualsToTest {
         @Test
         public void invalidParameter() {
 
-            thrown.expect(ValidationException.class);
-            thrown.expectMessage(containsString("HV000032"));
-            class FixedEqualsToTargetBean {
-
-                @FixedEqualsTo("foo")
-                public BigDecimal value;
-            }
-            FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
-            VALIDATOR.validate(target);
+            ValidationException ex = assertThrows(ValidationException.class, () -> {
+                class FixedEqualsToTargetBean {
+    
+                    @FixedEqualsTo("foo")
+                    public BigDecimal value;
+                }
+                FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
+                VALIDATOR.validate(target);
+            });
+            assertThat(ex.getMessage(), containsString("HV000032"));
         }
     }
 
     public static class DoubleFixedEqualsToTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -516,24 +494,21 @@ public class FixedEqualsToTest {
         @Test
         public void invalidParameter() {
 
-            thrown.expect(ValidationException.class);
-            thrown.expectMessage(containsString("HV000032"));
-            class FixedEqualsToTargetBean {
-
-                @FixedEqualsTo("foo")
-                public Double value;
-            }
-            FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
-            VALIDATOR.validate(target);
+            ValidationException ex = assertThrows(ValidationException.class, () -> {
+                class FixedEqualsToTargetBean {
+    
+                    @FixedEqualsTo("foo")
+                    public Double value;
+                }
+                FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
+                VALIDATOR.validate(target);
+            });
+            assertThat(ex.getMessage(), containsString("HV000032"));
         }
     }
 
     public static class FloatFixedEqualsToTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();
@@ -586,21 +561,22 @@ public class FixedEqualsToTest {
         @Test
         public void invalidParameter() {
 
-            thrown.expect(ValidationException.class);
-            thrown.expectMessage(containsString("HV000032"));
-            class FixedEqualsToTargetBean {
-
-                @FixedEqualsTo("foo")
-                public Float value;
-            }
-            FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
-            VALIDATOR.validate(target);
+            ValidationException ex = assertThrows(ValidationException.class, () -> {
+                class FixedEqualsToTargetBean {
+    
+                    @FixedEqualsTo("foo")
+                    public Float value;
+                }
+                FixedEqualsToTargetBean target = new FixedEqualsToTargetBean();
+                VALIDATOR.validate(target);
+            });
+            assertThat(ex.getMessage(), containsString("HV000032"));
         }
     }
 
     public static class MessageTest {
 
-        @Before
+        @BeforeEach
         public void setup() {
 
             VALIDATOR = Validations.getValidator();

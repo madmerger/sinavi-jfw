@@ -20,13 +20,12 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
@@ -77,13 +76,11 @@ public class RabbitMQInitializerTest {
 
     }
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
     private RabbitMQInitializer initializer;
     private AnnotationConfigApplicationContext context;
     private AmqpAdmin admin;
     
-    @Before
+    @BeforeEach
     public void setup() {
         context = new AnnotationConfigApplicationContext(RabbitMQInitializerTestContext.class);
         admin = context.getBean(AmqpAdmin.class);
@@ -109,10 +106,9 @@ public class RabbitMQInitializerTest {
     
     @Test
     public void AmqpAdminのインスタンスが設定されていない場合は例外が発生する() throws Exception {
-        thrown.expect(InternalException.class);
-        thrown.expectMessage(containsString("AmqpAdminのインスタンスが設定されていません。"));
         initializer.setAdmin(null);
-        initializer.afterPropertiesSet();
+        InternalException ex = assertThrows(InternalException.class, () -> initializer.afterPropertiesSet());
+        assertThat(ex.getMessage(), containsString("AmqpAdminのインスタンスが設定されていません。"));
     }
 
 }

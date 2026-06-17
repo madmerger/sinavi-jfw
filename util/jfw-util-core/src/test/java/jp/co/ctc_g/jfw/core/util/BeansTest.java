@@ -16,16 +16,16 @@
 
 package jp.co.ctc_g.jfw.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BeansTest {
 
@@ -872,7 +872,7 @@ public class BeansTest {
     @Test
     public void listPseudoPropertyNamesテスト() {
         String[] props = Beans.listPseudoPropertyNames(BeansBeanAlternative.class);
-        assertEquals("プロパティの数", 7, props.length);
+        assertEquals(7, props.length, "プロパティの数");
     }
     
     @Test

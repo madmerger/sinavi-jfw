@@ -17,14 +17,14 @@
 package jp.co.ctc_g.jse.core.framework;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.beans.PropertyChangeEvent;
 
 import jp.co.ctc_g.jse.core.util.web.beans.PropertyEditingException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.MethodInvocationException;
 import org.springframework.validation.BeanPropertyBindingResult;
 
@@ -32,7 +32,7 @@ public class JseBindingErrorProcessorTest {
 
     private JseBindingErrorProcessor processor;
 
-    @Before
+    @BeforeEach
     public void setup() {
         processor = new JseBindingErrorProcessor();
     }

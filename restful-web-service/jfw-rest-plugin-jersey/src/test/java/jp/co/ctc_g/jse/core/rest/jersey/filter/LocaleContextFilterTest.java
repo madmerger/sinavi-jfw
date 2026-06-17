@@ -18,31 +18,31 @@ package jp.co.ctc_g.jse.core.rest.jersey.filter;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.Response;
 
 import jp.co.ctc_g.jse.core.rest.jersey.i18n.LocaleContextKeeper;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class LocaleContextFilterTest extends JerseyTest {
     
     private AtomicInteger called;
     private Locale locale = null;
     
-    @Before
+    @BeforeEach
     public void setup() {
         called = new AtomicInteger(0);
         locale = null;

@@ -17,16 +17,16 @@
 package jp.co.ctc_g.jfw.core.jdbc;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class DefaultCountSqlResolverTest {
 
     protected DefaultCountSqlResolver resolver;
     
-    @Before
+    @BeforeEach
     public void instantiate() {
         resolver = new DefaultCountSqlResolver();
     }

@@ -67,12 +67,37 @@ public class BeanFactoryStub implements BeanFactory {
     }
 
     @Override
+    public boolean isTypeMatch(String name, org.springframework.core.ResolvableType typeToMatch) throws NoSuchBeanDefinitionException {
+        return false;
+    }
+
+    @Override
     public Class<?> getType(String name) throws NoSuchBeanDefinitionException {
         return null;
     }
 
     @Override
+    public Class<?> getType(String name, boolean allowFactoryBeanInit) throws NoSuchBeanDefinitionException {
+        return null;
+    }
+
+    @Override
     public String[] getAliases(String name) {
+        return null;
+    }
+
+    @Override
+    public <T> T getBean(Class<T> requiredType, Object... args) throws BeansException {
+        return null;
+    }
+
+    @Override
+    public <T> org.springframework.beans.factory.ObjectProvider<T> getBeanProvider(Class<T> requiredType) {
+        return null;
+    }
+
+    @Override
+    public <T> org.springframework.beans.factory.ObjectProvider<T> getBeanProvider(org.springframework.core.ResolvableType requiredType) {
         return null;
     }
 }

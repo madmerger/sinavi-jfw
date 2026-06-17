@@ -16,36 +16,36 @@
 
 package jp.co.ctc_g.jse.core.rest.springmvc.client;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import org.hamcrest.CoreMatchers;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.nio.charset.Charset;
 
-import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+// hamcrest removed;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+// ExpectedException removed - use assertThrows;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 
 public class EntityTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     protected EntityTestBean target;
 
-    @Before
+    @BeforeEach
     public void setup() {
         target = new EntityTestBean("z1111111");
     }
 
     @Test
     public void メディアタイプが設定されずにacceptを実行した場合は例外が発生する() {
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("メディアタイプは必須です。");
-        Entity.entity(target, null)
-                .accept();
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+            Entity.entity(target, null)
+                    .accept();
+        });
+        assertThat(ex.getMessage(), is("メディアタイプは必須です。"));
     }
 
     @Test

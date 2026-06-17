@@ -18,7 +18,7 @@ package jp.co.ctc_g.jse.core.amqp.retry;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,10 +28,10 @@ import java.util.Collections;
 import jp.co.ctc_g.jse.core.amqp.exception.AmqpApplicationRecoverableException;
 import jp.co.ctc_g.jse.core.amqp.exception.AmqpApplicationUnrecoverableException;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.springframework.amqp.rabbit.listener.ListenerExecutionFailedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 
 public class LoggingErrorHandlerTest {
 
@@ -39,13 +39,13 @@ public class LoggingErrorHandlerTest {
 
     private PrintStream original;
 
-    @Before
+    @BeforeEach
     public void readyBuffer() {
         original = System.out;
         System.setOut(new PrintStream(buffer));
     }
 
-    @After
+    @AfterEach
     public void resetBuffer() {
         buffer.reset();
         System.setOut(original);

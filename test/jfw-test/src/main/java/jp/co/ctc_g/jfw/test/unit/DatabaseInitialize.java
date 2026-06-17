@@ -16,6 +16,8 @@
 
 package jp.co.ctc_g.jfw.test.unit;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -50,8 +52,8 @@ import java.lang.annotation.Target;
  *     &#64;DatabaseInitialize
  *     public void testFind() {
  *         Foo foo = service.find(1);
- *         assertNotNull("id=1のFooドメインが存在", foo);
- *         assertEquals("idは1", 1, foo.getId());
+ *         assertNotNull(foo, "id=1のFooドメインが存在");
+ *         assertEquals(1, foo.getId(, "idは1"));
  *         assertEquals("nameは'bar'", "bar", foo.getName());
  *     }
  * }

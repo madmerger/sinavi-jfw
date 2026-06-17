@@ -18,20 +18,20 @@ package jp.co.ctc_g.jfw.core.exception;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Date;
 
 import jp.co.ctc_g.jfw.core.resource.MessageSourceLocator;
 import jp.co.ctc_g.jfw.core.util.Maps;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 public class SystemExceptionTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:/jp/co/ctc_g/jfw/core/exception/error");

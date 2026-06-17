@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ResourceBundle;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
@@ -29,11 +31,8 @@ import jp.co.ctc_g.jfw.core.util.Maps;
 import jp.co.ctc_g.jfw.core.util.Strings;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.io.Files;
 
 /**
  * <p>
@@ -41,31 +40,26 @@ import com.google.common.io.Files;
  * </p>
  * <p>
  * 読込対象のファイルはこのクラスのインスタンス生成時に指定されたクラスのクラスパスよりロードします。
- * つまり、テスト対象のクラスがjp/co/ctc_g/jfw/sample/FooServiceTestの場合は
- * jp/co/ctc_g/jfw/sampleにテスト用のファイルを配置されたものをロードします。
- * </p>
- * <p>
- * このクラスを利用した単純なテストの実施方法を以下に示します。
+ * JUnit 5では{@code @TempDir}と組み合わせて使用してください。
  * </p>
  * <pre class="brush:java">
  * public class FooServiceTest {
- *   &#64;Autowired
- *   protected FooService service;
- *   
- *   &#64;Rule
- *   public FileInitailize file = new FileInitailize(FooService.class);
- *   
+ *   &#64;TempDir
+ *   Path tempDir;
+ *
+ *   FileInitailize file = new FileInitailize(FooService.class);
+ *
  *   &#64;Test
  *   public void test() {
- *     File f = file.copy("test.csv", "temp.csv");
- *     String content = FileUtils.readFileToString(tmp, "MS932");
+ *     File f = file.copy("test.csv", tempDir, "temp.csv");
+ *     String content = Files.readString(f.toPath());
  *     assertThat(content, is(file.load("test.csv")));
  *   }
  * }
  * </pre>
  * @author ITOCHU Techno-Solutions Corporation.
  */
-public class FileInitailize extends TemporaryFolder {
+public class FileInitailize {
 
     private static final Logger L = LoggerFactory.getLogger(FileInitailize.class);
     private static final ResourceBundle R = InternalMessages.getBundle(FileInitailize.class);
@@ -73,6 +67,7 @@ public class FileInitailize extends TemporaryFolder {
     private static final String URL_ENCODE = "UTF-8";
     private Class<?> target;
     private String encode = DEFAULT_FILE_ENCODE;
+    private Path tempDir;
 
     /**
      * デフォルトコンストラクタです。
@@ -98,19 +93,11 @@ public class FileInitailize extends TemporaryFolder {
     }
 
     /**
-     * {@inheritDoc}
+     * 一時ディレクトリを設定します。
+     * @param tempDir 一時ディレクトリ
      */
-    @Override
-    protected void before() throws Throwable {
-        super.before();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void after() {
-        super.after();
+    public void setTempDir(Path tempDir) {
+        this.tempDir = tempDir;
     }
 
     /**
@@ -127,8 +114,11 @@ public class FileInitailize extends TemporaryFolder {
         try {
             is = target.getResourceAsStream(URLDecoder.decode(src, URL_ENCODE));
             String contents = IOUtils.toString(is, encode);
-            destFile = super.newFile(dest);
-            Files.write(contents, destFile, Charset.forName(encode));
+            if (tempDir == null) {
+                tempDir = Files.createTempDirectory("jfw-test");
+            }
+            destFile = tempDir.resolve(dest).toFile();
+            com.google.common.io.Files.write(contents, destFile, Charset.forName(encode));
         } catch (IOException e) {
             exception = new InternalException(FileInitailize.class, "E-TEST#0018");
         } finally {
@@ -170,6 +160,35 @@ public class FileInitailize extends TemporaryFolder {
             if (exception != null) throw exception;
         }
         return content;
+    }
+
+    /**
+     * 一時ディレクトリのルートを返します。
+     * @return 一時ディレクトリのルートファイル
+     */
+    public File getRoot() {
+        if (tempDir == null) {
+            try {
+                tempDir = Files.createTempDirectory("jfw-test");
+            } catch (IOException e) {
+                throw new InternalException(FileInitailize.class, "E-TEST#0018");
+            }
+        }
+        return tempDir.toFile();
+    }
+
+    /**
+     * 一時ディレクトリを削除します。
+     */
+    public void delete() {
+        if (tempDir != null) {
+            try {
+                org.apache.commons.io.FileUtils.deleteDirectory(tempDir.toFile());
+            } catch (IOException e) {
+                L.warn("Failed to delete temp directory: " + tempDir, e);
+            }
+            tempDir = null;
+        }
     }
 
 }

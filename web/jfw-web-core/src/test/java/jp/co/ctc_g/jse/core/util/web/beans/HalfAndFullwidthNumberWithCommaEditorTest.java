@@ -17,13 +17,14 @@
 package jp.co.ctc_g.jse.core.util.web.beans;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigInteger;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class HalfAndFullwidthNumberWithCommaEditorTest {
     
@@ -236,9 +237,11 @@ public class HalfAndFullwidthNumberWithCommaEditorTest {
         }
     }
     
-    @Test(expected = InternalException.class)
+    @Test
     public void 型指定が不正のときはエラーが発生する() {
-        new HalfAndFullwidthNumberWithCommaEditor(null, false);
-        fail();
+        assertThrows(InternalException.class, () -> {
+            new HalfAndFullwidthNumberWithCommaEditor(null, false);
+            fail();
+        });
     }
 }

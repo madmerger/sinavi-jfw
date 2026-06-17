@@ -18,7 +18,7 @@ package jp.co.ctc_g.jse.vid.adaptor;
 
 import java.io.IOException;
 
-import javax.servlet.jsp.JspWriter;
+import jakarta.servlet.jsp.JspWriter;
 
 public class JspWriterAdaptor extends JspWriter {
 

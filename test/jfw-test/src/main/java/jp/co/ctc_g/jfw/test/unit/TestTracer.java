@@ -16,26 +16,26 @@
 
 package jp.co.ctc_g.jfw.test.unit;
 
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import jp.co.ctc_g.jfw.core.internal.InternalMessages;
 import jp.co.ctc_g.jfw.core.util.Maps;
 import jp.co.ctc_g.jfw.core.util.Strings;
 
-import org.junit.internal.AssumptionViolatedException;
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * <p>
- * このクラスは、テストの開始と成功・失敗のログを出力します。
+ * このクラスは、テストの開始と成功・失敗のログを出力するJUnit 5拡張です。
  * </p>
- * @see TestWatcher
  * @author ITOCHU Techno-Solutions Corporation.
  */
-public class TestTracer extends TestWatcher {
+public class TestTracer implements BeforeTestExecutionCallback, AfterTestExecutionCallback {
 
     private static final Logger L = LoggerFactory.getLogger(TestTracer.class);
     private static final ResourceBundle R = InternalMessages.getBundle(TestTracer.class);
@@ -45,59 +45,32 @@ public class TestTracer extends TestWatcher {
      */
     public TestTracer() {}
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void succeeded(Description description) {
-        L.info(Strings.substitute(R.getString("I-TEST#0005"), 
-           Maps.hash("class", description.getTestClass().getSimpleName())
-               .map("method", description.getMethodName())
-               .map("package", description.getTestClass().getPackage().getName())));
+    public void beforeTestExecution(ExtensionContext context) {
+        L.info(Strings.substitute(R.getString("I-TEST#0003"),
+            Maps.hash("class", context.getRequiredTestClass().getSimpleName())
+                .map("method", context.getRequiredTestMethod().getName())
+                .map("package", context.getRequiredTestClass().getPackage().getName())));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected void failed(Throwable e, Description description) {
-        L.error(Strings.substitute(R.getString("E-TEST#0023"), 
-            Maps.hash("class", description.getTestClass().getSimpleName())
-                .map("method", description.getMethodName())
-                .map("package", description.getTestClass().getPackage().getName())), e);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void starting(Description description) {
-        L.info(Strings.substitute(R.getString("I-TEST#0003"), 
-          Maps.hash("class", description.getTestClass().getSimpleName())
-              .map("method", description.getMethodName())
-              .map("package", description.getTestClass().getPackage().getName())));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void skipped(AssumptionViolatedException e, Description description) {
-        L.debug(Strings.substitute(R.getString("D-TEST#0004"), 
-           Maps.hash("class", description.getTestClass().getSimpleName())
-               .map("method", description.getMethodName())
-               .map("package", description.getTestClass().getPackage().getName())));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void finished(Description description) {
-        L.info(Strings.substitute(R.getString("I-TEST#0004"), 
-          Maps.hash("class", description.getTestClass().getSimpleName())
-              .map("method", description.getMethodName())
-              .map("package", description.getTestClass().getPackage().getName())));
+    public void afterTestExecution(ExtensionContext context) {
+        Optional<Throwable> exception = context.getExecutionException();
+        if (exception.isPresent()) {
+            L.error(Strings.substitute(R.getString("E-TEST#0023"),
+                Maps.hash("class", context.getRequiredTestClass().getSimpleName())
+                    .map("method", context.getRequiredTestMethod().getName())
+                    .map("package", context.getRequiredTestClass().getPackage().getName())), exception.get());
+        } else {
+            L.info(Strings.substitute(R.getString("I-TEST#0005"),
+                Maps.hash("class", context.getRequiredTestClass().getSimpleName())
+                    .map("method", context.getRequiredTestMethod().getName())
+                    .map("package", context.getRequiredTestClass().getPackage().getName())));
+        }
+        L.info(Strings.substitute(R.getString("I-TEST#0004"),
+            Maps.hash("class", context.getRequiredTestClass().getSimpleName())
+                .map("method", context.getRequiredTestMethod().getName())
+                .map("package", context.getRequiredTestClass().getPackage().getName())));
     }
 
 }

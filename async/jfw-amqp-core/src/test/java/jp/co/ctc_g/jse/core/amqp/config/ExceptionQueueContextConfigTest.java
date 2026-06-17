@@ -19,6 +19,7 @@ package jp.co.ctc_g.jse.core.amqp.config;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import jp.co.ctc_g.jse.core.amqp.config.exception.DefaultProperties;
 import jp.co.ctc_g.jse.core.amqp.config.exception.OverrideProperties;
 import jp.co.ctc_g.jse.core.amqp.exception.AmqpApplicationRecoverableException;
@@ -27,11 +28,11 @@ import jp.co.ctc_g.jse.core.amqp.retry.ExceptionMessageExchanger;
 import jp.co.ctc_g.jse.core.amqp.retry.LoggingErrorHandler;
 
 import org.aopalliance.aop.Advice;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+// ExpectedException removed - use assertThrows;
+// RunWith removed - use @ExtendWith or @Nested;
 import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Queue;
@@ -44,12 +45,13 @@ import org.springframework.retry.RetryOperations;
 import org.springframework.retry.interceptor.StatefulRetryOperationsInterceptor;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(Enclosed.class)
+// @Nested classes used instead of Enclosed
 public class ExceptionQueueContextConfigTest {
 
-    @RunWith(SpringJUnit4ClassRunner.class)
+    @ExtendWith(SpringExtension.class)
     @ContextConfiguration(classes = DefaultProperties.class)
     public static class ExceptionQueueContextConfigLoadTest {
 
@@ -58,9 +60,6 @@ public class ExceptionQueueContextConfigTest {
 
         @Autowired
         private ExceptionQueueContextConfig config;
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
 
         @Test
         public void デフォルト値が設定されて指定のインスタンスがDIコンテナに登録される() {
@@ -119,13 +118,12 @@ public class ExceptionQueueContextConfigTest {
 
         @Test
         public void プロファイルが指定されていないときはRabbitAdminのインスタンスが生成されない() {
-            thrown.expect(NoSuchBeanDefinitionException.class);
-            context.getBean(AmqpAdmin.class);
+            assertThrows(NoSuchBeanDefinitionException.class, () -> context.getBean(AmqpAdmin.class));
         }
 
     }
 
-    @RunWith(SpringJUnit4ClassRunner.class)
+    @ExtendWith(SpringExtension.class)
     @ContextConfiguration(classes = DefaultProperties.class)
     @ActiveProfiles("development")
     public static class BeanCreateAmqpAdminTest {
@@ -139,7 +137,7 @@ public class ExceptionQueueContextConfigTest {
         }
     }
 
-    @RunWith(SpringJUnit4ClassRunner.class)
+    @ExtendWith(SpringExtension.class)
     @ContextConfiguration(classes = OverrideProperties.class)
     public static class ExceptionQueueContextConfigOverridePropertiesLoadTest {
 

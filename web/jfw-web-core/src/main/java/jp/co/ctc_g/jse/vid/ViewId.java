@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import jp.co.ctc_g.jfw.core.internal.Config;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
@@ -38,7 +38,7 @@ import jp.co.ctc_g.jfw.core.util.Maps;
 import jp.co.ctc_g.jfw.core.util.Strings;
 import jp.co.ctc_g.jse.core.internal.WebCoreInternals;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
  * <p>

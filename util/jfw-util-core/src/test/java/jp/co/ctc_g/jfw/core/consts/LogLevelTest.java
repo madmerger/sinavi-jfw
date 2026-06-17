@@ -17,10 +17,10 @@
 package jp.co.ctc_g.jfw.core.consts;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import jp.co.ctc_g.jfw.core.consts.LogLevel;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class LogLevelTest {
 

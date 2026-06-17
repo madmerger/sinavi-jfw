@@ -22,21 +22,22 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import jp.co.ctc_g.jse.core.amqp.config.amqp.DefaultProperties;
 import jp.co.ctc_g.jse.core.amqp.config.amqp.OverrideProperties;
 
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+// RunWith removed - use @ExtendWith or @Nested;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(Enclosed.class)
+// @Nested classes used instead of Enclosed
 public class AmqpContextConfigTest {
 
-    @RunWith(SpringJUnit4ClassRunner.class)
+    @ExtendWith(SpringExtension.class)
     @ContextConfiguration(classes = DefaultProperties.class)
     public static class AmqpContextConfigLoadTest {
 
@@ -59,7 +60,7 @@ public class AmqpContextConfigTest {
 
     }
     
-    @RunWith(SpringJUnit4ClassRunner.class)
+    @ExtendWith(SpringExtension.class)
     @ContextConfiguration(classes = OverrideProperties.class)
     public static class AmqpContextConfigOverridePropertiesLoadTest {
         @Autowired

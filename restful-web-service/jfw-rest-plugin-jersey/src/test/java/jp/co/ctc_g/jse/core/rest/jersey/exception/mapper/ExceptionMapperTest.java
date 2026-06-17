@@ -15,20 +15,22 @@
  */
 
 package jp.co.ctc_g.jse.core.rest.jersey.exception.mapper;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.hamcrest.CoreMatchers.hasItem;
-import static org.junit.Assert.assertThat;
+import org.hamcrest.CoreMatchers;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.Application;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 import jp.co.ctc_g.jse.core.rest.entity.ErrorMessage;
 import jp.co.ctc_g.jse.core.rest.entity.ValidationMessage;
@@ -38,21 +40,21 @@ import jp.co.ctc_g.jse.core.rest.jersey.filter.LocaleContextFilter;
 import jp.co.ctc_g.jse.core.rest.jersey.resolver.ValidationConfigurationContextResolver;
 
 import org.glassfish.jersey.client.ClientConfig;
-import org.glassfish.jersey.filter.LoggingFilter;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.test.JerseyTest;
-import org.hamcrest.CoreMatchers;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+// hamcrest removed;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+// RunWith removed - use @ExtendWith or @Nested;
 
-@RunWith(Enclosed.class)
+// @Nested classes used instead of Enclosed
 public class ExceptionMapperTest {
     
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         Locale.setDefault(new Locale("ja","JP"));
     }
@@ -624,7 +626,7 @@ public class ExceptionMapperTest {
     }
 
     public static void configClient(ClientConfig config) {
-        config.register(LoggingFilter.class)
+        config.register(LoggingFeature.class)
             .register(LocaleContextFilter.class)
             .register(ObjectMapperProviderTest.class)
             .register(JacksonFeature.class);

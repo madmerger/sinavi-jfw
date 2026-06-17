@@ -17,8 +17,9 @@
 package jp.co.ctc_g.jfw.core.util;
 
 import static org.hamcrest.CoreMatchers.isA;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,8 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class ListsTest {
 
@@ -40,7 +41,7 @@ public class ListsTest {
         elements.add("d");
         elements.add("e");
         List<String> results = Lists.gen("a", "b", "c", "d", "e");
-        Assert.assertEquals(elements, results);
+        assertEquals(elements, results);
     }
     
     @Test
@@ -56,7 +57,7 @@ public class ListsTest {
                 return elements.get(index);
             }
         });
-        Assert.assertEquals(elements, results);
+        assertEquals(elements, results);
     }
     
     @Test
@@ -72,8 +73,8 @@ public class ListsTest {
                 return index % 2 == 0 ? elements.get(index) : null;
             }
         });
-        Assert.assertEquals(Lists.gen("a", "c", "e"), results);
-        Assert.assertEquals(3, results.size());
+        assertEquals(Lists.gen("a", "c", "e"), results);
+        assertEquals(3, results.size());
     }
     
     @Test
@@ -82,9 +83,9 @@ public class ListsTest {
         final int[] datum = {0, elements.size()};
         Lists.each(elements, new EachCall<String>() {
             public void each(String element, int index, int total) {
-                Assert.assertEquals(elements.get(index), element);
-                Assert.assertEquals(datum[0]++, index);
-                Assert.assertEquals(datum[1], total);
+                assertEquals(elements.get(index), element);
+                assertEquals(datum[0]++, index);
+                assertEquals(datum[1], total);
             }
         });
     }
@@ -95,14 +96,14 @@ public class ListsTest {
         final int[] datum = {0, elements.size()};
         List<String> results = Lists.collect(elements, new CollectCall<String>() {
             public String collect(String element, int index, int total) {
-                Assert.assertEquals(elements.get(index), element);
-                Assert.assertEquals(datum[0]++, index);
-                Assert.assertEquals(datum[1], total);
+                assertEquals(elements.get(index), element);
+                assertEquals(datum[0]++, index);
+                assertEquals(datum[1], total);
                 return index % 2 == 0 ? element : null;
             }
         });
-        Assert.assertEquals(Lists.gen("a", "c", "e"), results);
-        Assert.assertEquals(Lists.gen("a", "b", "c", "d", "e"), elements);
+        assertEquals(Lists.gen("a", "c", "e"), results);
+        assertEquals(Lists.gen("a", "b", "c", "d", "e"), elements);
     }
     
     @Test
@@ -135,7 +136,7 @@ public class ListsTest {
         expected.put("A", Lists.gen(new Groupee("A", "a"), new Groupee("A", "b")));
         expected.put("B", Lists.gen(new Groupee("B", "c"), new Groupee("B", "d"), new Groupee("B", "e")));
         expected.put("C", Lists.gen(new Groupee("C", "f")));
-        Assert.assertEquals(expected, results);
+        assertEquals(expected, results);
     }
     
     @Test

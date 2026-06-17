@@ -17,8 +17,12 @@
 package jp.co.ctc_g.jse.core.validation.constraints;
 
 import static org.hamcrest.CoreMatchers.is;
+import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import org.hamcrest.CoreMatchers;
 import static org.hamcrest.MatcherAssert.assertThat;
+import org.hamcrest.CoreMatchers;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,24 +33,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ValidationException;
-import javax.validation.Validator;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ValidationException;
+import jakarta.validation.Validator;
 
 import jp.co.ctc_g.jse.test.util.Validations;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+// ExpectedException removed - use assertThrows;
 
 public class AfterTest {
 
     private static Validator VALIDATOR;
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @SuppressWarnings("unused")
     @After(from = "from", to = "to")
     class AfterNoSuchExceptionTestBean {
@@ -199,7 +199,7 @@ public class AfterTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         VALIDATOR = Validations.getValidator();
@@ -208,17 +208,19 @@ public class AfterTest {
     @Test
     public void no_such_property_exception_test() {
 
-        thrown.expect(ValidationException.class);
-        AfterNoSuchExceptionTestBean t = new AfterNoSuchExceptionTestBean();
-        VALIDATOR.validate(t);
+        assertThrows(ValidationException.class, () -> {
+            AfterNoSuchExceptionTestBean t = new AfterNoSuchExceptionTestBean();
+            VALIDATOR.validate(t);
+        });
     }
 
     @Test
     public void invocation_target_exception_test() {
 
-        thrown.expect(ValidationException.class);
-        AfterInvocationTargetExceptionTestBean t = new AfterInvocationTargetExceptionTestBean();
-        VALIDATOR.validate(t);
+        assertThrows(ValidationException.class, () -> {
+            AfterInvocationTargetExceptionTestBean t = new AfterInvocationTargetExceptionTestBean();
+            VALIDATOR.validate(t);
+        });
     }
 
     @Test

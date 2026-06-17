@@ -17,7 +17,8 @@
 package jp.co.ctc_g.jse.core.csv;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import java.io.File;
@@ -38,32 +39,27 @@ import jp.co.ctc_g.jfw.core.util.Dates;
 import jp.co.ctc_g.jfw.test.unit.FileInitailize;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+// ExpectedException removed - use assertThrows;
+// RunWith removed - use @ExtendWith or @Nested;
 import org.mockito.Mockito;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
-import au.com.bytecode.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
 
-@RunWith(Enclosed.class)
+// @Nested classes used instead of Enclosed
 public class CSVsTest {
 
     public static class CSVReadersTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Rule
         public FileInitailize file = new FileInitailize(CSVReadersTest.class);
 
         private CSVReaders readers;
 
-        @After
+        @AfterEach
         public void teardown() {
             if (readers != null) {
                 readers.close();
@@ -73,24 +69,23 @@ public class CSVsTest {
 
         @Test
         public void OPENしていなければ読み込みできない() {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("ストリームがオープンされていない状態での読込操作は許可されていません。");
-            CSVs.readers(new File("temp.csv")).next();
+            InternalException ex = assertThrows(InternalException.class, () -> CSVs.readers(new File("temp.csv")).next());
+            assertThat(ex.getMessage(), is("ストリームがオープンされていない状態での読込操作は許可されていません。"));
         }
 
         @Test
         public void ファイルが見つからなければ例外がスローされる() {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("指定されたファイルが見つかりません。");
-            CSVs.readers("temp.csv").open();
+            InternalException ex = assertThrows(InternalException.class, () -> CSVs.readers("temp.csv").open());
+            assertThat(ex.getMessage(), is("指定されたファイルが見つかりません。"));
         }
 
         @Test
         public void サポートされないファイルエンコードが指定された場合は例外がスローされる() throws Exception {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("指定されたエンコードがサポートされていません。");
-            File f = file.copy("CSVsTest-デフォルト設定で読み込める.csv", "temp.csv");
-            readers = CSVs.readers(f, CSVConfigs.config().encode("unsupported")).open();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                File f = file.copy("CSVsTest-デフォルト設定で読み込める.csv", "temp.csv");
+                readers = CSVs.readers(f, CSVConfigs.config().encode("unsupported")).open();
+            });
+            assertThat(ex.getMessage(), is("指定されたエンコードがサポートされていません。"));
         }
 
         @Test
@@ -149,11 +144,12 @@ public class CSVsTest {
 
         @Test
         public void 区切り文字がペアでない場合は例外が発生する() throws Exception {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("指定された長さと読込行の長さが一致しません。");
-            File f = file.copy("CSVsTest-区切り文字がペアでない場合.csv", "temp.csv");
-            readers = CSVs.readers(f, CSVConfigs.config().check(true).length(6)).open();
-            readers.next().get();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                File f = file.copy("CSVsTest-区切り文字がペアでない場合.csv", "temp.csv");
+                readers = CSVs.readers(f, CSVConfigs.config().check(true).length(6)).open();
+                readers.next().get();
+            });
+            assertThat(ex.getMessage(), is("指定された長さと読込行の長さが一致しません。"));
         }
 
         @Test
@@ -389,73 +385,73 @@ public class CSVsTest {
 
         @Test
         public void CSVReaderをクローズ中に例外が発生した場合は例外が変換される() throws Exception {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("ストリームをクローズ中にIO例外が発生しました。");
-            CSVReader m = mock(CSVReader.class);
-            doThrow(new IOException()).when(m).close();
-            CSVReaders reader = CSVs.readers("temp.csv");
-            reader.csv = m;
-            reader.close();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                CSVReader m = mock(CSVReader.class);
+                doThrow(new IOException()).when(m).close();
+                CSVReaders reader = CSVs.readers("temp.csv");
+                reader.csv = m;
+                reader.close();
+            });
+            assertThat(ex.getMessage(), is("ストリームをクローズ中にIO例外が発生しました。"));
         }
 
         @Test
         public void Readerをクローズ中に例外が発生した場合は例外が変換される() throws Exception {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("ストリームをクローズ中にIO例外が発生しました。");
-            Reader m = mock(Reader.class);
-            doThrow(new IOException()).when(m).close();
-            CSVReaders reader = CSVs.readers("temp.csv");
-            reader.reader = m;
-            reader.close();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                Reader m = mock(Reader.class);
+                doThrow(new IOException()).when(m).close();
+                CSVReaders reader = CSVs.readers("temp.csv");
+                reader.reader = m;
+                reader.close();
+            });
+            assertThat(ex.getMessage(), is("ストリームをクローズ中にIO例外が発生しました。"));
         }
 
         @Test
         public void InputStreamReaderをクローズ中に例外が発生した場合は例外が変換される() throws Exception {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("ストリームをクローズ中にIO例外が発生しました。");
-            InputStreamReader m = mock(InputStreamReader.class);
-            doThrow(new IOException()).when(m).close();
-            CSVReaders reader = CSVs.readers("temp.csv");
-            reader.iso = m;
-            reader.close();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                InputStreamReader m = mock(InputStreamReader.class);
+                doThrow(new IOException()).when(m).close();
+                CSVReaders reader = CSVs.readers("temp.csv");
+                reader.iso = m;
+                reader.close();
+            });
+            assertThat(ex.getMessage(), is("ストリームをクローズ中にIO例外が発生しました。"));
         }
 
         @Test
         public void FileInputStreamをクローズ中に例外が発生した場合は例外が変換される() throws Exception {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("ストリームをクローズ中にIO例外が発生しました。");
-            FileInputStream m = mock(FileInputStream.class);
-            doThrow(new IOException()).when(m).close();
-            CSVReaders reader = CSVs.readers("temp.csv");
-            reader.fis = m;
-            reader.close();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                FileInputStream m = mock(FileInputStream.class);
+                doThrow(new IOException()).when(m).close();
+                CSVReaders reader = CSVs.readers("temp.csv");
+                reader.fis = m;
+                reader.close();
+            });
+            assertThat(ex.getMessage(), is("ストリームをクローズ中にIO例外が発生しました。"));
         }
 
         @Test
         public void readNext実行中に例外が発生した場合は例外が変換される() throws Exception {
             File f = file.copy("CSVsTest-デフォルト設定で読み込める.csv", "temp.csv");
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("読込処理中にIO例外が発生しました。");
-            CSVReader m = mock(CSVReader.class);
-            doThrow(new IOException()).when(m).readNext();
-            CSVReaders reader = CSVs.readers(f);
-            reader.csv = m;
-            reader.next();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                CSVReader m = mock(CSVReader.class);
+                doThrow(new IOException()).when(m).readNext();
+                CSVReaders reader = CSVs.readers(f);
+                reader.csv = m;
+                reader.next();
+            });
+            assertThat(ex.getMessage(), is("読込処理中にIO例外が発生しました。"));
         }
 
     }
 
     public static class BeanMappingCSVReadersTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Rule
         public FileInitailize file = new FileInitailize(CSVReadersTest.class);
 
         private BeanMappingCSVReaders<AnnotationTestBean> readers;
 
-        @After
+        @AfterEach
         public void teardown() {
             if (readers != null) {
                 readers.close();
@@ -465,10 +461,11 @@ public class CSVsTest {
 
         @Test
         public void get操作が禁止されている() {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("BeanMappingCSVReaders#getメソッドの利用は許可されていません。");
-            readers = CSVs.readers(new File("temp.csv"), AnnotationTestBean.class);
-            readers.get();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                readers = CSVs.readers(new File("temp.csv"), AnnotationTestBean.class);
+                readers.get();
+            });
+            assertThat(ex.getMessage(), is("BeanMappingCSVReaders#getメソッドの利用は許可されていません。"));
         }
 
         @Test
@@ -626,51 +623,47 @@ public class CSVsTest {
         @Test
         @SuppressWarnings("unchecked")
         public void ヘッダ読込中にIO例外が発生した場合は例外が変換される() throws Exception {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("CSVのヘッダ読込中にIO例外が発生しました。");
-            File f = file.copy("CSVsTest-dummy.csv", "temp.csv");
-            readers = CSVs.readers(f, AnnotationTestBean.class);
-            readers.open();
-            readers.line = new String[] {
-                "test"
-            };
-            ColumnPositionMappingStrategy<AnnotationTestBean> mockStrategy = Mockito.mock(ColumnPositionMappingStrategy.class);
-            CSVToBeanMapping<AnnotationTestBean> parser = new CSVToBeanMapping<AnnotationTestBean>();
-            doThrow(new IOException()).when(mockStrategy).captureHeader(readers.csv);
-            readers.strategy = mockStrategy;
-            readers.parser = parser;
-            readers.parse();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                File f = file.copy("CSVsTest-dummy.csv", "temp.csv");
+                readers = CSVs.readers(f, AnnotationTestBean.class);
+                readers.open();
+                readers.line = new String[] {
+                    "test"
+                };
+                ColumnPositionMappingStrategy<AnnotationTestBean> mockStrategy = Mockito.mock(ColumnPositionMappingStrategy.class);
+                CSVToBeanMapping<AnnotationTestBean> parser = new CSVToBeanMapping<AnnotationTestBean>();
+                doThrow(new IOException()).when(mockStrategy).captureHeader(readers.csv);
+                readers.strategy = mockStrategy;
+                readers.parser = parser;
+                readers.parse();
+            });
+            assertThat(ex.getMessage(), is("CSVのヘッダ読込中にIO例外が発生しました。"));
         }
 
         @Test
         public void 変換対象のクラスを指定せずにmapping定義を作ろうとした場合は例外が発生する() {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("読込ヘッダの順番が定義されていません。");
-            new BeanMappingCSVReaders<Object>(new File("temp.csv")).resolve();
+            InternalException ex = assertThrows(InternalException.class, () -> new BeanMappingCSVReaders<Object>(new File("temp.csv")).resolve());
+            assertThat(ex.getMessage(), is("読込ヘッダの順番が定義されていません。"));
         }
 
     }
 
     public static class CSVWritersTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Rule
         public FileInitailize file = new FileInitailize(CSVReadersTest.class);
 
-        @After
+        @AfterEach
         public void teardown() {
             file.delete();
         }
 
         @Test
         public void OPENしていなければ書き込みできない() {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("ストリームがオープンされていない状態での書込操作は許可されていません。");
-            CSVs.writers().write(new String[] {
-                "テスト1", "テスト2"
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                CSVs.writers().write(new String[] {
+                    "テスト1", "テスト2"
+                });
             });
+            assertThat(ex.getMessage(), is("ストリームがオープンされていない状態での書込操作は許可されていません。"));
         }
 
         @Test
@@ -734,46 +727,50 @@ public class CSVsTest {
 
         @Test
         public void CSVWriterをクローズ中に例外が発生した場合は例外が変換される() throws Exception {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("ストリームをクローズ中にIO例外が発生しました。");
-            CSVWriter m = mock(CSVWriter.class);
-            doThrow(new IOException()).when(m).close();
-            CSVWriters writer = CSVs.writers();
-            writer.csv = m;
-            writer.close();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                CSVWriter m = mock(CSVWriter.class);
+                doThrow(new IOException()).when(m).close();
+                CSVWriters writer = CSVs.writers();
+                writer.csv = m;
+                writer.close();
+            });
+            assertThat(ex.getMessage(), is("ストリームをクローズ中にIO例外が発生しました。"));
         }
 
         @Test
         public void Writerをクローズ中に例外が発生した場合は例外が変換される() throws Exception {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("ストリームをクローズ中にIO例外が発生しました。");
-            Writer m = mock(Writer.class);
-            doThrow(new IOException()).when(m).close();
-            CSVWriters writer = CSVs.writers();
-            writer.writer = m;
-            writer.close();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                Writer m = mock(Writer.class);
+                doThrow(new IOException()).when(m).close();
+                CSVWriters writer = CSVs.writers();
+                writer.writer = m;
+                writer.close();
+            });
+            assertThat(ex.getMessage(), is("ストリームをクローズ中にIO例外が発生しました。"));
         }
 
         @Test
         public void OutputStreamWriterをクローズ中に例外が発生した場合は例外が変換される() throws Exception {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("ストリームをクローズ中にIO例外が発生しました。");
-            OutputStreamWriter m = mock(OutputStreamWriter.class);
-            doThrow(new IOException()).when(m).close();
-            CSVWriters writer = CSVs.writers();
-            writer.osw = m;
-            writer.close();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                OutputStreamWriter m = mock(OutputStreamWriter.class);
+                doThrow(new IOException()).when(m).close();
+                CSVWriters writer = CSVs.writers();
+                writer.osw = m;
+                writer.close();
+            });
+            assertThat(ex.getMessage(), is("ストリームをクローズ中にIO例外が発生しました。"));
         }
 
         @Test
         public void FileOutputStreamをクローズ中に例外が発生した場合は例外が変換される() throws Exception {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage("ストリームをクローズ中にIO例外が発生しました。");
-            FileOutputStream m = mock(FileOutputStream.class);
-            doThrow(new IOException()).when(m).close();
-            CSVWriters writer = CSVs.writers();
-            writer.fos = m;
-            writer.close();
+            InternalException ex = assertThrows(InternalException.class, () -> {
+                FileOutputStream m = mock(FileOutputStream.class);
+                doThrow(new IOException()).when(m).close();
+                CSVWriters writer = CSVs.writers();
+                writer.fos = m;
+                writer.close();
+            });
+            assertThat(ex.getMessage(), is("ストリームをクローズ中にIO例外が発生しました。"));
         }
 
     }

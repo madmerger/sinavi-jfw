@@ -16,7 +16,7 @@
 
 package jp.co.ctc_g.jse.core.csv;
 
-import javax.validation.Validator;
+import jakarta.validation.Validator;
 
 import jp.co.ctc_g.jfw.core.internal.Config;
 import jp.co.ctc_g.jfw.core.internal.InternalException;

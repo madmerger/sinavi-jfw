@@ -18,13 +18,13 @@ package jp.co.ctc_g.jfw.core.resource;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Locale;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
@@ -32,12 +32,12 @@ public class MessageSourceLocatorTest {
 
     private ReloadableResourceBundleMessageSource messageSource;
     
-    @Before
+    @BeforeEach
     public void setup() {
         messageSource = new ReloadableResourceBundleMessageSource();
     }
 
-    @After
+    @AfterEach
     public void teardown() {
         messageSource = null;
     }

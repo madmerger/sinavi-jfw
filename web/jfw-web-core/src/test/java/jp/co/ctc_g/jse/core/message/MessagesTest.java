@@ -17,7 +17,8 @@
 package jp.co.ctc_g.jse.core.message;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
@@ -25,13 +26,13 @@ import jp.co.ctc_g.jfw.core.resource.MessageSourceLocator;
 import jp.co.ctc_g.jfw.core.util.Lists;
 import jp.co.ctc_g.jse.core.message.Messages.MessageType;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 
 public class MessagesTest {
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:/jp/co/ctc_g/jse/core/message/MessageContextTest");

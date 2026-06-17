@@ -21,8 +21,8 @@ import jp.co.ctc_g.jfw.core.util.Args;
 import jp.co.ctc_g.jse.core.rest.entity.ErrorMessage;
 import jp.co.ctc_g.jse.core.rest.entity.ValidationMessage;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.Response.Status;
 
 import java.util.LinkedList;
 import java.util.List;

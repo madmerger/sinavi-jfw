@@ -17,6 +17,7 @@
 package jp.co.ctc_g.jse.core.rest.springmvc.server.handler;
 
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.MatcherAssert.*;
 
 import java.util.Arrays;
@@ -24,9 +25,9 @@ import java.util.Locale;
 
 import jp.co.ctc_g.jse.core.rest.entity.ErrorMessage;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
@@ -48,25 +49,25 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 public class RestDefaultExceptionHandlerTest {
 
     private RestDefaultExceptionHandler exceptionHandlerSupport;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupDefaultLocale() {
         Locale.setDefault(new Locale("ja", "JP"));
     }
 
-    @Before
+    @BeforeEach
     public void setup() {
         this.exceptionHandlerSupport = new RestDefaultExceptionHandler();
     }
 
     @Test
-    public void NoSuchRequestHandlingMethodExceptionをハンドリングできる() {
-        NoSuchRequestHandlingMethodException ex = new NoSuchRequestHandlingMethodException("", "", null);
+    public void NoHandlerFoundExceptionをハンドリングできる() {
+        NoHandlerFoundException ex = new NoHandlerFoundException("GET", "/test", null);
         ErrorMessage message = this.exceptionHandlerSupport.handle(ex);
         assertThat(message, notNullValue());
         assertThat(message.getStatus(), is(404));

@@ -18,18 +18,19 @@ package jp.co.ctc_g.jfw.core.jdbc.mybatis;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
 import org.apache.ibatis.mapping.StatementType;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class QueryBuilderFactoryTest {
 
     private static QueryBuilderFactory queryBuilderFactory;
 
-    @BeforeClass
+    @BeforeAll
     public static void setup() {
         queryBuilderFactory = new QueryBuilderFactory(true);
     }
@@ -52,8 +53,10 @@ public class QueryBuilderFactoryTest {
         assertThat(builder, is(instanceOf(CallableQueryBuilder.class)));
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void 引数がNULLであることを表明() throws Exception {
-        queryBuilderFactory.getBuilder(null);
+        assertThrows(InternalException.class, () -> {
+            queryBuilderFactory.getBuilder(null);
+        });
     }
 }

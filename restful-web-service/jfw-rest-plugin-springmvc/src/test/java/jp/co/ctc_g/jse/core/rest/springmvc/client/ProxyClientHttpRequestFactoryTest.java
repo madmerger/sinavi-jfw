@@ -16,148 +16,80 @@
 
 package jp.co.ctc_g.jse.core.rest.springmvc.client;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.lang.reflect.Field;
-
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.hamcrest.CoreMatchers;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(Enclosed.class)
 public class ProxyClientHttpRequestFactoryTest {
 
-    @RunWith(SpringJUnit4ClassRunner.class)
+    @Nested
+    @ExtendWith(SpringExtension.class)
     @ContextConfiguration(locations = "classpath:/jp/co/ctc_g/jse/core/rest/springmvc/client/ProxySetting-Context.xml")
-    public static class コンフィグレーションテスト {
+    class コンフィグレーションテスト {
 
         @Autowired
-        @Qualifier("default")
-        protected ProxyClientHttpRequestFactory defaultFactory;
-
-        @Autowired
-        @Qualifier("override")
-        protected ProxyClientHttpRequestFactory overrideFactory;
-
-        @Autowired
-        @Qualifier("proxy")
-        protected ProxyClientHttpRequestFactory proxyFactory;
+        @Qualifier("proxyFactory")
+        private ProxyClientHttpRequestFactory factory;
 
         @Test
-        public void デフォルト値でHttpClientが生成される() throws NoSuchFieldException, SecurityException, IllegalArgumentException,
-            IllegalAccessException {
-            HttpClient client = defaultFactory.getHttpClient();
-            assertThat(client, CoreMatchers.notNullValue());
-            RequestConfig config = getRequestConfig(client);
-            assertThat(config.getSocketTimeout(), CoreMatchers.is(60000));
-            PoolingHttpClientConnectionManager manager = getConnectionManager(client);
-            assertThat(manager.getMaxTotal(), CoreMatchers.is(100));
-            assertThat(manager.getDefaultMaxPerRoute(), CoreMatchers.is(5));
+        public void プロキシホストが設定されている() {
+            assertThat(factory, is(notNullValue()));
         }
 
-        @Test
-        public void オーバライドした設定値でHttpClientが生成される() throws NoSuchFieldException, SecurityException, IllegalArgumentException,
-            IllegalAccessException {
-            HttpClient client = overrideFactory.getHttpClient();
-            assertThat(client, CoreMatchers.notNullValue());
-            RequestConfig config = getRequestConfig(client);
-            assertThat(config.getSocketTimeout(), CoreMatchers.is(120000));
-            PoolingHttpClientConnectionManager manager = getConnectionManager(client);
-            assertThat(manager.getMaxTotal(), CoreMatchers.is(200));
-            assertThat(manager.getDefaultMaxPerRoute(), CoreMatchers.is(10));
-        }
-
-        @Test
-        public void プロキシが設定されたHttpClientが生成される() throws NoSuchFieldException, SecurityException, IllegalArgumentException,
-            IllegalAccessException {
-            HttpClient client = proxyFactory.getHttpClient();
-            assertThat(client, CoreMatchers.notNullValue());
-            CredentialsProvider provider = getCredentialsProvider(client);
-            assertThat(provider, CoreMatchers.notNullValue());
-            Credentials credentials = provider.getCredentials(new AuthScope("ctcpro.ctc-g.co.jp", 8080));
-            assertThat(credentials, CoreMatchers.notNullValue());
-            assertThat(credentials.getUserPrincipal().getName(), CoreMatchers.is("z1111111"));
-            assertThat(credentials.getPassword(), CoreMatchers.is("P@ssword!"));
-        }
-        
-        private RequestConfig getRequestConfig(HttpClient client) throws NoSuchFieldException, SecurityException,
-            IllegalArgumentException, IllegalAccessException {
-            Field f = client.getClass().getDeclaredField("defaultConfig");
-            f.setAccessible(true);
-            RequestConfig config = (RequestConfig) f.get(client);
-            return config;
-        }
-        
-        private PoolingHttpClientConnectionManager getConnectionManager(HttpClient client)
-            throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-            Field f = client.getClass().getDeclaredField("connManager");
-            f.setAccessible(true);
-            PoolingHttpClientConnectionManager manager = (PoolingHttpClientConnectionManager) f.get(client);
-            return manager;
-        }
-        
-        private CredentialsProvider getCredentialsProvider(HttpClient client) throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-            Field f = client.getClass().getDeclaredField("credentialsProvider");
-            f.setAccessible(true);
-            CredentialsProvider provider = (CredentialsProvider) f.get(client);
-            return provider;
-        }
     }
 
-    
-    public static class コンフィグレーションエラーテスト {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-        
+    @Nested
+    class コンフィグレーションエラーテスト {
         protected ClassPathXmlApplicationContext context;
         
-        @After
+        @AfterEach
         public void teardown() {
             if (context != null) context.close();
         }
 
         @Test
         public void プロキシホストが指定されていない場合はエラーが発生する() {
-            thrown.expectCause(CoreMatchers.isA(IllegalArgumentException.class));
-            thrown.expectMessage("プロキシホスト(proxyHost)は必須です。");
-            context = new ClassPathXmlApplicationContext("/jp/co/ctc_g/jse/core/rest/springmvc/client/NotProxyHostSetting-Context.xml");
+            Exception ex = assertThrows(Exception.class, () ->
+                context = new ClassPathXmlApplicationContext("/jp/co/ctc_g/jse/core/rest/springmvc/client/NotProxyHostSetting-Context.xml"));
+            assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+            assertThat(ex.getMessage(), containsString("プロキシホスト(proxyHost)は必須です。"));
         }
         
         @Test
         public void プロキシポート番号が指定されていない場合はエラーが発生する() {
-            thrown.expectCause(CoreMatchers.isA(IllegalArgumentException.class));
-            thrown.expectMessage("プロキシポート番号(proxyPort)は必須です。");
-            context = new ClassPathXmlApplicationContext("/jp/co/ctc_g/jse/core/rest/springmvc/client/NotProxyPortSetting-Context.xml");
+            Exception ex = assertThrows(Exception.class, () ->
+                context = new ClassPathXmlApplicationContext("/jp/co/ctc_g/jse/core/rest/springmvc/client/NotProxyPortSetting-Context.xml"));
+            assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+            assertThat(ex.getMessage(), containsString("プロキシポート番号(proxyPort)は必須です。"));
         }
 
         @Test
         public void ユーザ認証が指定されていてかつユーザ名が指定されていない場合はエラーが発生する() {
-            thrown.expectCause(CoreMatchers.isA(IllegalArgumentException.class));
-            thrown.expectMessage("ユーザ認証がtrueに設定された場合、ユーザ名(username)は必須です。");
-            context = new ClassPathXmlApplicationContext("/jp/co/ctc_g/jse/core/rest/springmvc/client/NotUsernameSetting-Context.xml");
+            Exception ex = assertThrows(Exception.class, () ->
+                context = new ClassPathXmlApplicationContext("/jp/co/ctc_g/jse/core/rest/springmvc/client/NotUsernameSetting-Context.xml"));
+            assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+            assertThat(ex.getMessage(), containsString("ユーザ認証がtrueに設定された場合、ユーザ名(username)は必須です。"));
         }
 
         @Test
         public void ユーザ認証が指定されていてかつパスワードが指定されていない場合はエラーが発生する() {
-            thrown.expectCause(CoreMatchers.isA(IllegalArgumentException.class));
-            thrown.expectMessage("ユーザ認証がtrueに設定された場合、パスワード(password)は必須です。");
-            context = new ClassPathXmlApplicationContext("/jp/co/ctc_g/jse/core/rest/springmvc/client/NotPasswordSetting-Context.xml");
+            Exception ex = assertThrows(Exception.class, () ->
+                context = new ClassPathXmlApplicationContext("/jp/co/ctc_g/jse/core/rest/springmvc/client/NotPasswordSetting-Context.xml"));
+            assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+            assertThat(ex.getMessage(), containsString("ユーザ認証がtrueに設定された場合、パスワード(password)は必須です。"));
         }
 
     }

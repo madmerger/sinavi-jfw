@@ -56,7 +56,7 @@ public abstract class AbstractAmqpErrorHandler implements ErrorHandler {
     /**
      * メッセージ受信側で発生した例外をハンドリングし、
      * リトライ可能な対象の例外のときは警告ログ出力を、その他の例外のときはエラーログ出力を実行します。
-     * @param throwable 発生した例外(Amqpを利用すると{@link org.springframework.amqp.rabbit.listener.ListenerExecutionFailedException}にラップされます。)
+     * @param throwable 発生した例外(Amqpを利用すると{@link org.springframework.amqp.rabbit.support.ListenerExecutionFailedException}にラップされます。)
      */
     @Override
     public void handleError(Throwable throwable) {

@@ -16,12 +16,12 @@
 
 package jp.co.ctc_g.jse.core.rest.springmvc.server.filter;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.mock.web.MockFilterConfig;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -37,7 +37,7 @@ public class GZipFilterTest {
 
     private MockFilterChain chain;
 
-    @Before
+    @BeforeEach
     public void setup() {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
@@ -48,7 +48,7 @@ public class GZipFilterTest {
     public void ヘッダーにaccept_encodingが設定されていないときはHttpServletResponseがくる() throws Exception {
         chain = new MockFilterChain() {
 
-            public void doFilter(javax.servlet.ServletRequest req, javax.servlet.ServletResponse res) {
+            public void doFilter(jakarta.servlet.ServletRequest req, jakarta.servlet.ServletResponse res) {
                 assertTrue(res instanceof HttpServletResponse);
             };
         };
@@ -63,7 +63,7 @@ public class GZipFilterTest {
         request.addHeader("accept-encoding", "gzip");
         chain = new MockFilterChain() {
 
-            public void doFilter(javax.servlet.ServletRequest req, javax.servlet.ServletResponse res) {
+            public void doFilter(jakarta.servlet.ServletRequest req, jakarta.servlet.ServletResponse res) {
                 assertTrue(res instanceof GZipResponseWrapper);
             };
         };

@@ -20,7 +20,8 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
@@ -29,9 +30,9 @@ import jp.co.ctc_g.jfw.core.resource.MessageSourceLocator;
 import jp.co.ctc_g.jfw.core.util.Maps;
 import jp.co.ctc_g.jse.core.message.MessageContext.Scope;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
@@ -43,14 +44,14 @@ public class MessageContextTest {
 
     private MockHttpServletRequest request;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpClass() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:/jp/co/ctc_g/jse/core/message/MessageContextTest");
         MessageSourceLocator.set(messageSource);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MockServletContext sc = new MockServletContext();
         request = new MockHttpServletRequest(sc);
@@ -111,9 +112,11 @@ public class MessageContextTest {
         assertThat(result, hasItem("これはバリデーションエラー複数件をテストするダミーメッセージです。"));
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void バリデーションメッセージをセッションスコープに保存するとエラーが発生する() {
-        new MessageContext(request).saveValidationMessage("V-MESSAGE_CONTEXT_TEST#001", "property", "constraintName", "modelName", Scope.SESSION);
+        assertThrows(InternalException.class, () -> {
+            new MessageContext(request).saveValidationMessage("V-MESSAGE_CONTEXT_TEST#001", "property", "constraintName", "modelName", Scope.SESSION);
+        });
     }
 
     @Test

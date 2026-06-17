@@ -17,26 +17,29 @@
 package jp.co.ctc_g.jfw.profill;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.util.Arrays;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.BeansException;
 
 public class ProfillFactoryBeanTest {
 
     private ProfillFactoryBean factory;
     
-    @Before
+    @BeforeEach
     public void instantiate() {
         factory = new ProfillFactoryBean();
     }
     
-    @Test(expected = InternalException.class)
+    @Test
     public void BeanFactoryが設定されていない場合はafterPrpertiesSetを実行できない() throws Exception {
-        factory.afterPropertiesSet();
+        assertThrows(InternalException.class, () -> {
+            factory.afterPropertiesSet();
+        });
     }
     
     @Test

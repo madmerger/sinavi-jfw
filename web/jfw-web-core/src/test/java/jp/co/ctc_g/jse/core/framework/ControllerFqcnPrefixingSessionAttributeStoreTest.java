@@ -17,12 +17,12 @@
 package jp.co.ctc_g.jse.core.framework;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.stereotype.Controller;
@@ -37,7 +37,7 @@ public class ControllerFqcnPrefixingSessionAttributeStoreTest {
     private MockHttpServletRequest request;
     private WebRequest webRequest;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         MockServletContext sc = new MockServletContext();
         request = new MockHttpServletRequest(sc);

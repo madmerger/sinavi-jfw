@@ -16,12 +16,12 @@
 
 package jp.co.ctc_g.jfw.core.util.typeconverter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TimestampConverterTest {
 

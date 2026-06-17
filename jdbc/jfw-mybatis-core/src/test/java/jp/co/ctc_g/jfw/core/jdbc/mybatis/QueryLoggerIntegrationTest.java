@@ -15,10 +15,12 @@
  */
 
 package jp.co.ctc_g.jfw.core.jdbc.mybatis;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -27,16 +29,16 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import jp.co.ctc_g.jfw.test.unit.DatabaseInitialize;
-import jp.co.ctc_g.jfw.test.unit.J2Unit4ClassRunner;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+// RunWith removed - use @ExtendWith or @Nested;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-@RunWith(J2Unit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/jp/co/ctc_g/jfw/core/jdbc/mybatis/QueryLoggerIntegrationTestContext.xml")
 public class QueryLoggerIntegrationTest {
 
@@ -47,13 +49,13 @@ public class QueryLoggerIntegrationTest {
 
     private PrintStream original;
 
-    @Before
+    @BeforeEach
     public void readyBuffer() {
         original = System.out;
         System.setOut(new PrintStream(buffer));
     }
 
-    @After
+    @AfterEach
     public void resetBuffer() {
         buffer.reset();
         System.setOut(original);

@@ -15,11 +15,13 @@
  */
 
 package jp.co.ctc_g.jse.vid;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,10 +30,10 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.servlet.jsp.JspWriter;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.jsp.JspWriter;
 
 import jp.co.ctc_g.jfw.core.util.Maps;
 import jp.co.ctc_g.jfw.core.util.Strings;
@@ -41,16 +43,16 @@ import jp.co.ctc_g.jse.vid.adaptor.HttpSessionAdaptor;
 import jp.co.ctc_g.jse.vid.adaptor.JspWriterAdaptor;
 import jp.co.ctc_g.jse.vid.adaptor.PageContextAdaptor;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+// RunWith removed - use @ExtendWith or @Nested;
+
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockPageContext;
 import org.springframework.mock.web.MockServletContext;
 
-@RunWith(BlockJUnit4ClassRunner.class)
+
 public class PankuzuTagTest {
 
     private MockPageContext context;
@@ -59,7 +61,7 @@ public class PankuzuTagTest {
 
     private MockHttpServletRequest req;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         MockServletContext sc = new MockServletContext();

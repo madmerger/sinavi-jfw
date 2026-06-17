@@ -18,38 +18,34 @@ package jp.co.ctc_g.jse.core.amqp.retry;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.isA;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jse.core.amqp.exception.AmqpApplicationRecoverableException;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-@RunWith(Enclosed.class)
 public class ExceptionMessageExchangerTest {
 
-    @RunWith(MockitoJUnitRunner.class)
-    public static class ExceptionMessageExchangerRecovererTest {
+    @Nested
+    @ExtendWith(MockitoExtension.class)
+    class ExceptionMessageExchangerRecovererTest {
 
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-        
         private Message message = new Message("".getBytes(), new MessageProperties());
         private Throwable t = new Exception("Exception.");
 
@@ -59,7 +55,7 @@ public class ExceptionMessageExchangerTest {
         @InjectMocks
         private ExceptionMessageExchanger exchanger = new ExceptionMessageExchanger(); 
 
-        @Before
+        @BeforeEach
         public void setup() {
             exchanger.setExchange("error.exchange");
             message.getMessageProperties().setReceivedRoutingKey("the.original.routing-key");
@@ -83,10 +79,9 @@ public class ExceptionMessageExchangerTest {
         
         @Test
         public void Exchangeが指定されていない場合は例外が発生する() {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage(containsString("Exchangeキーが設定されていません。"));
             exchanger.setExchange(null);
-            exchanger.recover(message, t);
+            InternalException ex = assertThrows(InternalException.class, () -> exchanger.recover(message, t));
+            assertThat(ex.getMessage(), containsString("Exchangeキーが設定されていません。"));
         }
 
         @Test
@@ -115,33 +110,34 @@ public class ExceptionMessageExchangerTest {
 
     }
 
-    public static class ExceptionMessageExchangerExceptionTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
+    @Nested
+    class ExceptionMessageExchangerExceptionTest {
 
         @Test
         @SuppressWarnings("resource")
         public void AmqpTemplateが設定されていなければ例外が発生する() {
-            thrown.expectCause(isA(IllegalArgumentException.class));
-            thrown.expectMessage("AmqpTemplateのインスタンスが設定されていません。");
-            new ClassPathXmlApplicationContext("classpath:/jp/co/ctc_g/jse/core/amqp/retry/NoInjectionAmqpTemp-Context.xml");
+            Exception ex = assertThrows(Exception.class, () ->
+                new ClassPathXmlApplicationContext("classpath:/jp/co/ctc_g/jse/core/amqp/retry/NoInjectionAmqpTemp-Context.xml"));
+            assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+            assertThat(ex.getMessage(), containsString("AmqpTemplateのインスタンスが設定されていません。"));
         }
 
         @Test
         @SuppressWarnings("resource")
         public void Exchangeが設定されていなければ例外が発生する() {
-            thrown.expectCause(isA(IllegalArgumentException.class));
-            thrown.expectMessage("Exchangeキーが設定されていません。");
-            new ClassPathXmlApplicationContext("classpath:/jp/co/ctc_g/jse/core/amqp/retry/NoInjectionExchange-Context.xml");
+            Exception ex = assertThrows(Exception.class, () ->
+                new ClassPathXmlApplicationContext("classpath:/jp/co/ctc_g/jse/core/amqp/retry/NoInjectionExchange-Context.xml"));
+            assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+            assertThat(ex.getMessage(), containsString("Exchangeキーが設定されていません。"));
         }
 
         @Test
         @SuppressWarnings("resource")
         public void DefaultRoutingKeyが設定されていなければ例外が発生する() {
-            thrown.expectCause(isA(IllegalArgumentException.class));
-            thrown.expectMessage("デフォルトのルーティングキーが設定されていません。");
-            new ClassPathXmlApplicationContext("classpath:/jp/co/ctc_g/jse/core/amqp/retry/NoInjectionDefaultRoutingKey-Context.xml");
+            Exception ex = assertThrows(Exception.class, () ->
+                new ClassPathXmlApplicationContext("classpath:/jp/co/ctc_g/jse/core/amqp/retry/NoInjectionDefaultRoutingKey-Context.xml"));
+            assertInstanceOf(IllegalArgumentException.class, ex.getCause());
+            assertThat(ex.getMessage(), containsString("デフォルトのルーティングキーが設定されていません。"));
         }
 
     }

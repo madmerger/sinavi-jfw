@@ -17,10 +17,11 @@
 package jp.co.ctc_g.jfw.paginate;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PaginatesTest {
 
@@ -99,14 +100,18 @@ public class PaginatesTest {
         }
     }
     
-    @Test(expected = InternalException.class)
+    @Test
     public void オフセットのページ番号に不正な値が指定されたら例外が発生する() {
-        Paginates.getOffset(0, 10);
+        assertThrows(InternalException.class, () -> {
+            Paginates.getOffset(0, 10);
+        });
     }
     
-    @Test(expected = InternalException.class)
+    @Test
     public void オフセットの表示件数に不正な値が指定されたら例外が発生する() {
-        Paginates.getOffset(1, 0);
+        assertThrows(InternalException.class, () -> {
+            Paginates.getOffset(1, 0);
+        });
     }
     
     @Test
@@ -121,14 +126,18 @@ public class PaginatesTest {
         }
     }
     
-    @Test(expected = InternalException.class)
+    @Test
     public void テイルのページ番号に不正な値が指定されたら例外が発生する() {
-        Paginates.getTail(0, 10);
+        assertThrows(InternalException.class, () -> {
+            Paginates.getTail(0, 10);
+        });
     }
     
-    @Test(expected = InternalException.class)
+    @Test
     public void テイルの表示件数に不正な値が指定されたら例外が発生する() {
-        Paginates.getTail(1, 0);
+        assertThrows(InternalException.class, () -> {
+            Paginates.getTail(1, 0);
+        });
     }
     
     @Test

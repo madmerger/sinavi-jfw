@@ -17,12 +17,12 @@
 package jp.co.ctc_g.jse.core.message;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import jp.co.ctc_g.jfw.core.resource.MessageSourceLocator;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -38,14 +38,14 @@ public class JseInformationsTagTest {
     private MockHttpServletResponse response;
     private MockHttpServletRequest request;
 
-    @BeforeClass
+    @BeforeAll
     public static void setupClass() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:/jp/co/ctc_g/jse/core/message/JseMessagesTagTest");
         MessageSourceLocator.set(messageSource);
     }
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
 
         MockServletContext sc = new MockServletContext();

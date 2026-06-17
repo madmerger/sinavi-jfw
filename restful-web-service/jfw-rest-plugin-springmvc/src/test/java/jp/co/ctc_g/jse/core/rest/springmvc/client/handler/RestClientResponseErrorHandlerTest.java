@@ -18,6 +18,9 @@ package jp.co.ctc_g.jse.core.rest.springmvc.client.handler;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -34,12 +37,12 @@ import jp.co.ctc_g.jse.core.rest.springmvc.client.exception.UnauthorizedExceptio
 import jp.co.ctc_g.jse.core.rest.springmvc.client.exception.UnprocessableEntityException;
 import jp.co.ctc_g.jse.core.rest.springmvc.client.exception.UnsupportedMediaTypeException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
+// Enclosed removed - use @Nested;
+// ExpectedException removed - use assertThrows;
+// RunWith removed - use @ExtendWith or @Nested;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
@@ -47,7 +50,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 
-@RunWith(Enclosed.class)
+// @Nested classes used instead of Enclosed
 public class RestClientResponseErrorHandlerTest {
 
     
@@ -55,11 +58,7 @@ public class RestClientResponseErrorHandlerTest {
 
         private RestClientResponseErrorHandler handler;
         private ClientHttpResponse response;
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() throws IOException {
             handler = new RestClientResponseErrorHandler();
             response = mock(ClientHttpResponse.class);
@@ -71,83 +70,93 @@ public class RestClientResponseErrorHandlerTest {
 
         @Test
         public void BadRequestExceptionがスローされる() throws IOException {
-            thrown.expect(BadRequestException.class);
-            thrown.expectMessage("400 BAD_REQUEST");
-            when(response.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
-            handler.handleError(response);
+            BadRequestException ex = assertThrows(BadRequestException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("400 BAD_REQUEST"));
         }
 
         @Test
         public void UnauthorizedExceptionがスローされる() throws IOException {
-            thrown.expect(UnauthorizedException.class);
-            thrown.expectMessage("401 UNAUTHORIZED");
-            when(response.getStatusCode()).thenReturn(HttpStatus.UNAUTHORIZED);
-            handler.handleError(response);
+            UnauthorizedException ex = assertThrows(UnauthorizedException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.UNAUTHORIZED);
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("401 UNAUTHORIZED"));
         }
 
         @Test
         public void ForbiddenExceptionがスローされる() throws IOException {
-            thrown.expect(ForbiddenException.class);
-            thrown.expectMessage("403 FORBIDDEN");
-            when(response.getStatusCode()).thenReturn(HttpStatus.FORBIDDEN);
-            handler.handleError(response);
+            ForbiddenException ex = assertThrows(ForbiddenException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.FORBIDDEN);
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("403 FORBIDDEN"));
         }
 
         @Test
         public void NotAcceptableExceptionがスローされる() throws IOException {
-            thrown.expect(NotAcceptableException.class);
-            thrown.expectMessage("406 NOT_ACCEPTABLE");
-            when(response.getStatusCode()).thenReturn(HttpStatus.NOT_ACCEPTABLE);
-            handler.handleError(response);
+            NotAcceptableException ex = assertThrows(NotAcceptableException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.NOT_ACCEPTABLE);
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("406 NOT_ACCEPTABLE"));
         }
 
         @Test
         public void NotFoundExceptionがスローされる() throws IOException {
-            thrown.expect(NotFoundException.class);
-            thrown.expectMessage("404 NOT_FOUND");
-            when(response.getStatusCode()).thenReturn(HttpStatus.NOT_FOUND);
-            handler.handleError(response);
+            NotFoundException ex = assertThrows(NotFoundException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.NOT_FOUND);
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("404 NOT_FOUND"));
         }
 
         @Test
         public void ProxyAuthenticationRequiredExceptionがスローされる() throws IOException {
-            thrown.expect(ProxyAuthenticationRequiredException.class);
-            thrown.expectMessage("407 PROXY_AUTHENTICATION_REQUIRED");
-            when(response.getStatusCode()).thenReturn(HttpStatus.PROXY_AUTHENTICATION_REQUIRED);
-            handler.handleError(response);
+            ProxyAuthenticationRequiredException ex = assertThrows(ProxyAuthenticationRequiredException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.PROXY_AUTHENTICATION_REQUIRED);
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("407 PROXY_AUTHENTICATION_REQUIRED"));
         }
 
         @Test
         public void RequestTimeoutExceptionがスローされる() throws IOException {
-            thrown.expect(RequestTimeoutException.class);
-            thrown.expectMessage("408 REQUEST_TIMEOUT");
-            when(response.getStatusCode()).thenReturn(HttpStatus.REQUEST_TIMEOUT);
-            handler.handleError(response);
+            RequestTimeoutException ex = assertThrows(RequestTimeoutException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.REQUEST_TIMEOUT);
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("408 REQUEST_TIMEOUT"));
         }
 
         @Test
         public void UnsupportedMediaTypeExceptionがスローされる() throws IOException {
-            thrown.expect(UnsupportedMediaTypeException.class);
-            thrown.expectMessage("415 UNSUPPORTED_MEDIA_TYPE");
-            when(response.getStatusCode()).thenReturn(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-            handler.handleError(response);
+            UnsupportedMediaTypeException ex = assertThrows(UnsupportedMediaTypeException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("415 UNSUPPORTED_MEDIA_TYPE"));
         }
 
         @Test
         public void UnproccesableEntityExceptionがスローされる() throws IOException {
-            thrown.expect(UnprocessableEntityException.class);
-            thrown.expectMessage("422 UNPROCESSABLE_ENTITY");
-            when(response.getStatusCode()).thenReturn(HttpStatus.UNPROCESSABLE_ENTITY);
-            handler.handleError(response);
+            UnprocessableEntityException ex = assertThrows(UnprocessableEntityException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.UNPROCESSABLE_ENTITY);
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("422 UNPROCESSABLE_ENTITY"));
         }
 
         @Test
         public void HttpClientErrorExceptionがスローされる() throws IOException {
-            thrown.expect(HttpClientErrorException.class);
-            thrown.expectMessage("402 PAYMENT_REQUIRED");
-            when(response.getStatusCode()).thenReturn(HttpStatus.PAYMENT_REQUIRED);
-            when(response.getStatusText()).thenReturn(HttpStatus.PAYMENT_REQUIRED.name());
-            handler.handleError(response);
+            HttpClientErrorException ex = assertThrows(HttpClientErrorException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.PAYMENT_REQUIRED);
+                when(response.getStatusText()).thenReturn(HttpStatus.PAYMENT_REQUIRED.name());
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("402 PAYMENT_REQUIRED"));
         }
     }
 
@@ -156,11 +165,7 @@ public class RestClientResponseErrorHandlerTest {
 
         private RestClientResponseErrorHandler handler;
         private ClientHttpResponse response;
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() throws IOException {
             handler = new RestClientResponseErrorHandler();
             response = mock(ClientHttpResponse.class);
@@ -172,27 +177,30 @@ public class RestClientResponseErrorHandlerTest {
 
         @Test
         public void InternalServerErrorExceptionがスローされる() throws IOException {
-            thrown.expect(InternalServerErrorException.class);
-            thrown.expectMessage("500 INTERNAL_SERVER_ERROR");
-            when(response.getStatusCode()).thenReturn(HttpStatus.INTERNAL_SERVER_ERROR);
-            handler.handleError(response);
+            InternalServerErrorException ex = assertThrows(InternalServerErrorException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.INTERNAL_SERVER_ERROR);
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("500 INTERNAL_SERVER_ERROR"));
         }
 
         @Test
         public void ServiceUnavailableExceptionがスローされる() throws IOException {
-            thrown.expect(ServiceUnavailableException.class);
-            thrown.expectMessage("503 SERVICE_UNAVAILABLE");
-            when(response.getStatusCode()).thenReturn(HttpStatus.SERVICE_UNAVAILABLE);
-            handler.handleError(response);
+            ServiceUnavailableException ex = assertThrows(ServiceUnavailableException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.SERVICE_UNAVAILABLE);
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("503 SERVICE_UNAVAILABLE"));
         }
 
         @Test
         public void HttpServerErrorExceptionがスローされる() throws IOException {
-            thrown.expect(HttpServerErrorException.class);
-            thrown.expectMessage("502 BAD_GATEWAY");
-            when(response.getStatusCode()).thenReturn(HttpStatus.BAD_GATEWAY);
-            when(response.getStatusText()).thenReturn(HttpStatus.BAD_GATEWAY.name());
-            handler.handleError(response);
+            HttpServerErrorException ex = assertThrows(HttpServerErrorException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.BAD_GATEWAY);
+                when(response.getStatusText()).thenReturn(HttpStatus.BAD_GATEWAY.name());
+                handler.handleError(response);
+            });
+            assertThat(ex.getMessage(), is("502 BAD_GATEWAY"));
         }
     }
 
@@ -201,11 +209,7 @@ public class RestClientResponseErrorHandlerTest {
 
         private RestClientResponseErrorHandler handler;
         private ClientHttpResponse response;
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
-        @Before
+        @BeforeEach
         public void setup() {
             handler = new RestClientResponseErrorHandler();
             response = mock(ClientHttpResponse.class);
@@ -216,9 +220,10 @@ public class RestClientResponseErrorHandlerTest {
 
         @Test
         public void 変換対象外のステータスコードの場合はRestClientExceptionがスローされる() throws IOException {
-            thrown.expect(RestClientException.class);
-            when(response.getStatusCode()).thenReturn(HttpStatus.UPGRADE_REQUIRED);
-            handler.handleError(response);
+            assertThrows(RestClientException.class, () -> {
+                when(response.getStatusCode()).thenReturn(HttpStatus.UPGRADE_REQUIRED);
+                handler.handleError(response);
+            });
         }
     }
 }

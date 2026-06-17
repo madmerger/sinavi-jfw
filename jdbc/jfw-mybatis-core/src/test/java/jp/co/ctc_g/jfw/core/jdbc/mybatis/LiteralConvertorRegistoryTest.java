@@ -18,7 +18,7 @@ package jp.co.ctc_g.jfw.core.jdbc.mybatis;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -26,14 +26,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class LiteralConvertorRegistoryTest {
 
     private LiteralConvertorRegistory registory;
 
-    @Before
+    @BeforeEach
     public void instantiate() {
         registory = LiteralConvertorRegistory.getInstance();
     }

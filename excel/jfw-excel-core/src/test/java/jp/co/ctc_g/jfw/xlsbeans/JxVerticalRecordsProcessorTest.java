@@ -18,7 +18,8 @@ package jp.co.ctc_g.jfw.xlsbeans;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.InputStream;
 
@@ -34,37 +35,43 @@ import jp.co.ctc_g.jse.core.excel.JxXLSBeans;
 import net.java.amateras.xlsbeans.XLSBeansException;
 import net.java.amateras.xlsbeans.xssfconverter.WorkbookFinder;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class JxVerticalRecordsProcessorTest {
 
     protected InputStream in = null;
 
-    @Before
+    @BeforeEach
     public void setup() {
         in = JxVerticalRecordsProcessorTest.class.getResourceAsStream("mapping.xls");
     }
 
-    @After
+    @AfterEach
     public void teardown() throws Exception {
         in.close();
     }
 
-    @Test(expected = XLSBeansException.class)
+    @Test
     public void setterメソッドの引数が1以上の場合にエラーが発生するかどうか() throws Exception {
-        new JxXLSBeans().loadMultiple(in, BadArgmentTestBean.class, WorkbookFinder.TYPE_HSSF);
+        assertThrows(XLSBeansException.class, () -> {
+            new JxXLSBeans().loadMultiple(in, BadArgmentTestBean.class, WorkbookFinder.TYPE_HSSF);
+        });
     }
 
-    @Test(expected = XLSBeansException.class)
+    @Test
     public void setterメソッドの型がListや配列以外の場合に例外が発生するかどうか() throws Exception {
-        new JxXLSBeans().loadMultiple(in, BadTypeTestBean.class, WorkbookFinder.TYPE_HSSF);
+        assertThrows(XLSBeansException.class, () -> {
+            new JxXLSBeans().loadMultiple(in, BadTypeTestBean.class, WorkbookFinder.TYPE_HSSF);
+        });
     }
 
-    @Test(expected = XLSBeansException.class)
+    @Test
     public void publicプロパティの型がListや配列以外の場合に例外が発生するかどうか() throws Exception {
-        new JxXLSBeans().loadMultiple(in, BadFieldTypeTestBean.class, WorkbookFinder.TYPE_HSSF);
+        assertThrows(XLSBeansException.class, () -> {
+            new JxXLSBeans().loadMultiple(in, BadFieldTypeTestBean.class, WorkbookFinder.TYPE_HSSF);
+        });
     }
 
     @Test
@@ -167,9 +174,11 @@ public class JxVerticalRecordsProcessorTest {
         assertThat(result.getRecords().get(4).getMapping().get("5"), is("e5"));
     }
 
-    @Test(expected = XLSBeansException.class)
+    @Test
     public void VerticalRecordsにColumnアノテーションがない場合に例外が発生するかどうか() throws Exception {
-        new JxXLSBeans().load(in, VerticalNotFoundColumnsTestBean.class, WorkbookFinder.TYPE_HSSF);
+        assertThrows(XLSBeansException.class, () -> {
+            new JxXLSBeans().load(in, VerticalNotFoundColumnsTestBean.class, WorkbookFinder.TYPE_HSSF);
+        });
     }
 
 }

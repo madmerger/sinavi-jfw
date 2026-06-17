@@ -18,11 +18,12 @@ package jp.co.ctc_g.jse.vid;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockPageContext;
@@ -34,7 +35,7 @@ public class ViewIdDefinitionTagTest {
     private MockHttpServletResponse res;
     private MockHttpServletRequest req;
 
-    @Before
+    @BeforeEach
     public void setup() {
 
         MockServletContext sc = new MockServletContext();
@@ -278,11 +279,13 @@ public class ViewIdDefinitionTagTest {
         assertThat(id.getParams().get("key4")[0], is("value4"));
     }
 
-    @Test(expected = InternalException.class)
+    @Test
     public void Requestスコープを指定したときに例外が発生するかどうか() throws Exception {
-
-        ViewIdDefinitionTag tag = new ViewIdDefinitionTag();
-        tag.setScope("request");
+        assertThrows(InternalException.class, () -> {
+    
+            ViewIdDefinitionTag tag = new ViewIdDefinitionTag();
+            tag.setScope("request");
+        });
     }
 
     @Test

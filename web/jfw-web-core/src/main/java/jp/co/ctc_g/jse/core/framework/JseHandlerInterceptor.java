@@ -16,8 +16,8 @@
 
 package jp.co.ctc_g.jse.core.framework;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import jp.co.ctc_g.jfw.core.util.Arrays;
 
@@ -26,20 +26,19 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 /**
  * <p>
- * {@link HandlerInterceptorAdapter}インタフェースの実装です。
+ * {@link HandlerInterceptor}インタフェースの実装です。
  * {@code Spring MVC} のコントローラにおけるフレームワーク拡張機能の事前処理・事後処理を行います。<br/>
  * 従って、このインターセプタはどのインターセプタよりも先に実行される必要があります。<br/>
  * </p>
- * @see HandlerInterceptorAdapter
+ * @see HandlerInterceptor
  * @author ITOCHU Techno-Solutions Corporation.
- * @see HandlerInterceptorAdapter
  */
-public class JseHandlerInterceptor extends HandlerInterceptorAdapter {
+public class JseHandlerInterceptor implements HandlerInterceptor {
 
     private final ControllerFqcnPrefixingSessionAttributeStore sessionAttributeStore = new ControllerFqcnPrefixingSessionAttributeStore();
 
@@ -58,7 +57,7 @@ public class JseHandlerInterceptor extends HandlerInterceptorAdapter {
             PostBackManager.begin(request, (HandlerMethod)handler);
         }
         
-        return super.preHandle(request, response, handler);
+        return true;
     }
 
     /**
@@ -79,7 +78,7 @@ public class JseHandlerInterceptor extends HandlerInterceptorAdapter {
                 modelAndView.addObject(BindingResult.MODEL_KEY_PREFIX + postBack.getModelName(), postBack.getBindingResult());
         }
         
-        super.postHandle(request, response, handler, modelAndView);
+
     }
 
     /**
@@ -100,7 +99,7 @@ public class JseHandlerInterceptor extends HandlerInterceptorAdapter {
             clearSessionAttributes(new ServletWebRequest(request, response), (HandlerMethod)handler);
         }
         
-        super.afterCompletion(request, response, handler, ex);
+
     }
 
     private void clearSessionAttributes(ServletWebRequest request, HandlerMethod handler) {

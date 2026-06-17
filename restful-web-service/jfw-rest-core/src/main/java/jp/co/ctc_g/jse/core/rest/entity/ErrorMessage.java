@@ -19,9 +19,9 @@ package jp.co.ctc_g.jse.core.rest.entity;
 import java.io.Serializable;
 import java.util.List;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * <p>

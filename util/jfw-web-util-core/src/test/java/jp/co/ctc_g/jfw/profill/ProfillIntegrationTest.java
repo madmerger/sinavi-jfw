@@ -16,11 +16,11 @@
 
 package jp.co.ctc_g.jfw.profill;
 
-import static org.hamcrest.CoreMatchers.everyItem;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
@@ -29,14 +29,14 @@ import jp.co.ctc_g.jfw.core.util.Lists;
 import jp.co.ctc_g.jfw.profill.ProfillIntegrationTestBean.ChildBean;
 import jp.co.ctc_g.jfw.profill.ProfillIntegrationTestBean.ParentBean;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ProfillIntegrationTest {
 
     private Profill profill;
     
-    @Before
+    @BeforeEach
     public void instantiate() {
         profill = new Profill();
     }

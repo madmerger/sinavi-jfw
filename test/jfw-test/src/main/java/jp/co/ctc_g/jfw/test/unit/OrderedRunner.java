@@ -16,51 +16,41 @@
 
 package jp.co.ctc_g.jfw.test.unit;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.MethodOrdererContext;
 
-import org.junit.runners.BlockJUnit4ClassRunner;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.InitializationError;
+import java.util.Comparator;
 
 /**
  * <p>
- * このクラスは、テストの実行順に依存したテストを行うために必要なテストランナーです。
- * 以下の場合、このクラスをランナーとして指定する必要があります。
+ * このクラスは、テストの実行順に依存したテストを行うために必要なJUnit 5メソッドオーダーです。
+ * {@link Order}アノテーションに基づいてテストメソッドの実行順序を制御します。
  * </p>
- * <ul>
- *  <li>FrameworkResourceでフレームワーク内部の挙動を変更したいとき</li>
- * </ul>
+ * <p>
+ * 使用方法:
+ * <pre class="brush:java">
+ * &#064;TestMethodOrder(OrderedRunner.class)
+ * public class FooTest {
+ *     &#064;Test
+ *     &#064;Order(order = 1)
+ *     public void firstTest() { ... }
+ * }
+ * </pre>
+ * </p>
  * @author ITOCHU Techno-Solutions Corporation.
  */
-public class OrderedRunner extends BlockJUnit4ClassRunner {
+public class OrderedRunner implements MethodOrderer {
 
     /**
-     * コンストラクタです。
-     * @param clazz テスト対象クラス
-     * @throws InitializationError 初期処理時のエラー
+     * デフォルトコンストラクタです。
      */
-    public OrderedRunner(Class<?> clazz) throws InitializationError {
-        super(clazz);
-    }
+    public OrderedRunner() {}
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    protected List<FrameworkMethod> computeTestMethods() {
-        List<FrameworkMethod> list = super.computeTestMethods();
-        Collections.sort(list, new Comparator<FrameworkMethod>() {
-            @Override
-            public int compare(FrameworkMethod f1, FrameworkMethod f2) {
-                Order o1 = f1.getAnnotation(Order.class);
-                Order o2 = f2.getAnnotation(Order.class);
-                if (o1 == null || o2 == null) { return -1; }
-                return o1.order() - o2.order();
-            }
-        });
-        return list;
+    public void orderMethods(MethodOrdererContext context) {
+        context.getMethodDescriptors().sort(Comparator.comparingInt(md -> {
+            Order order = md.getMethod().getAnnotation(Order.class);
+            return order != null ? order.order() : Integer.MAX_VALUE;
+        }));
     }
-
 }

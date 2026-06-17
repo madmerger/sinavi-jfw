@@ -15,24 +15,26 @@
  */
 
 package jp.co.ctc_g.jfw.core.jdbc.mybatis.type;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.math.BigInteger;
 
 import jp.co.ctc_g.jfw.test.unit.DatabaseInitialize;
-import jp.co.ctc_g.jfw.test.unit.J2Unit4ClassRunner;
+
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+// RunWith removed - use @ExtendWith or @Nested;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-@RunWith(J2Unit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "/jp/co/ctc_g/jfw/core/jdbc/mybatis/type/BigIntegerTypeHandlerTestContext.xml")
 public class BigIntegerTypeHandlerTest {
 

@@ -16,11 +16,10 @@
 
 package jp.co.ctc_g.jse.core.rest.springmvc.server.util;
 
-import static org.junit.Assert.assertThat;
-import jp.co.ctc_g.jse.core.rest.entity.ErrorMessage;
-
+import static org.hamcrest.MatcherAssert.assertThat;
 import org.hamcrest.CoreMatchers;
-import org.junit.Test;
+import jp.co.ctc_g.jse.core.rest.entity.ErrorMessage;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;

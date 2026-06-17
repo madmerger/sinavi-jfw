@@ -20,51 +20,51 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.util.Dates;
 import jp.co.ctc_g.jfw.test.unit.DatabaseInitialize;
-import jp.co.ctc_g.jfw.test.unit.J2Unit4ClassRunner;
 import jp.co.ctc_g.jse.core.csv.CSVConfigs;
 import jp.co.ctc_g.jse.core.csv.CSVConfigs.CSVConfig;
 import jp.co.ctc_g.jse.core.csv.DownloadFile;
 
 import org.apache.ibatis.session.ResultContext;
 import org.apache.ibatis.session.SqlSession;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(Enclosed.class)
 public class AbstractCSVResultHandlerImplTest {
 
-    @RunWith(J2Unit4ClassRunner.class)
+    @Nested
+    @ExtendWith(SpringExtension.class)
     @ContextConfiguration(locations = "classpath:/jp/co/ctc_g/jse/core/csv/mybatis/AbstractCSVResultHandlerImplTest-Context.xml")
-    public static class SuccessTest {
+    class SuccessTest {
 
         @Autowired
         private SqlSession session;
         public AtomicInteger count;
 
-        @Rule
-        public TemporaryFolder folder = new TemporaryFolder();
+        @TempDir
+        Path folder;
 
         public CSVConfig config;
 
-        @Before
+        @BeforeEach
         public void setup() throws IOException {
             count = new AtomicInteger(0);
-            config = CSVConfigs.config().tempDir(folder.getRoot().getAbsolutePath());
+            config = CSVConfigs.config().tempDir(folder.toFile().getAbsolutePath());
         }
 
         public CSVResultHandler handler = new AbstractCSVResultHandlerImpl() {
@@ -148,13 +148,8 @@ public class AbstractCSVResultHandlerImplTest {
         }
     }
 
-    @RunWith(J2Unit4ClassRunner.class)
-    @ContextConfiguration(locations = "classpath:/jp/co/ctc_g/jse/core/csv/mybatis/AbstractCSVResultHandlerImplTest-Context.xml")
-    public static class ExceptionTest {
-
-        @Rule
-        public ExpectedException thrown = ExpectedException.none();
-
+    @Nested
+    class ExceptionTest {
         public CSVResultHandler handler = new AbstractCSVResultHandlerImpl() {
 
             @Override
@@ -169,23 +164,20 @@ public class AbstractCSVResultHandlerImplTest {
 
         @Test
         public void CSVファイルをオープンしないでヘッダー出力を実行すると例外が発生する() {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage(containsString("CSVストリームがオープンされていません。"));
-            handler.header();
+            InternalException ex = assertThrows(InternalException.class, () -> handler.header());
+            assertThat(ex.getMessage(), containsString("CSVストリームがオープンされていません。"));
         }
 
         @Test
         public void CSVファイルをオープンしないでクローズを実行すると例外が発生する() {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage(containsString("CSVストリームがオープンされていません。"));
-            handler.close();
+            InternalException ex = assertThrows(InternalException.class, () -> handler.close());
+            assertThat(ex.getMessage(), containsString("CSVストリームがオープンされていません。"));
         }
         
         @Test
         public void CSVファイルをオープンしないでドメイン取得を実行すると例外が発生する() {
-            thrown.expect(InternalException.class);
-            thrown.expectMessage(containsString("CSVストリームがオープンされていません。"));
-            handler.get();
+            InternalException ex = assertThrows(InternalException.class, () -> handler.get());
+            assertThat(ex.getMessage(), containsString("CSVストリームがオープンされていません。"));
         }
     }
 }

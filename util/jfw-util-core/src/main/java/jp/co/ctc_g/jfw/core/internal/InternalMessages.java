@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import org.apache.commons.collections.iterators.IteratorEnumeration;
+import org.apache.commons.collections4.iterators.IteratorEnumeration;
 
 /**
  * <p>
