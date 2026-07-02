@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import jp.co.ctc_g.jse.core.excel.JxVerticalRecords;
-import net.java.amateras.xlsbeans.annotation.Sheet;
+import com.github.takezoe.xlsbeans.annotation.Sheet;
 
 @Sheet(name = "vertical")
 public class VerticalTestBean implements Serializable {

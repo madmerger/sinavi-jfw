@@ -22,7 +22,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import net.java.amateras.xlsbeans.annotation.RecordTerminal;
+import com.github.takezoe.xlsbeans.annotation.RecordTerminal;
 
 /**
  * <p>
@@ -35,7 +35,7 @@ import net.java.amateras.xlsbeans.annotation.RecordTerminal;
  * <li>同じ表が複数存在し、かつ、LinkedCellを併用する場合はtableLabel属性にテーブルを識別する文字列を指定してください。</li>
  * </ol>
  * </p>
- * @see net.java.amateras.xlsbeans.annotation.VerticalRecords
+ * @see com.github.takezoe.xlsbeans.annotation.VerticalRecords
  * @author ITOCHU Techno-Solutions Corporation.
  */
 @Target({ElementType.METHOD, ElementType.FIELD})

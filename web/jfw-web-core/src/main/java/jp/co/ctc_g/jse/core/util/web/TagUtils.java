@@ -17,6 +17,9 @@
 package jp.co.ctc_g.jse.core.util.web;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -142,8 +145,9 @@ public final class TagUtils {
 
         String encoding = pageContext.getResponse().getCharacterEncoding();
         StringBuilder qs = new StringBuilder();
-        Set<String> sets = params.keySet();
-        for (String key : sets) {
+        List<String> keys = new ArrayList<String>(params.keySet());
+        keys.sort(Comparator.comparingInt(String::hashCode).reversed().thenComparing(Comparator.naturalOrder()));
+        for (String key : keys) {
             String[] value = params.get(key);
             if (includeQueryStringDelimiter && qs.length() == 0) {
                 qs.append("?");
@@ -187,8 +191,9 @@ public final class TagUtils {
             throws JspException {
 
         String encoding = pageContext.getResponse().getCharacterEncoding();
-        Set<String> sets = params.keySet();
-        for (String key : sets) {
+        List<String> keys = new ArrayList<String>(params.keySet());
+        keys.sort(Comparator.comparingInt(String::hashCode).reversed().thenComparing(Comparator.naturalOrder()));
+        for (String key : keys) {
             String template = URL_TEMPLATE_DELIMITER_PREFIX + key + URL_TEMPLATE_DELIMITER_SUFFIX;
             String[] value = params.get(key);
             if ((value.length == 1) && uri.contains(template)) {

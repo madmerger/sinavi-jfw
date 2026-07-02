@@ -19,7 +19,7 @@ package jp.co.ctc_g.jfw.xlsbeans.bean.setter;
 import java.io.Serializable;
 
 import jp.co.ctc_g.jse.core.excel.JxVerticalRecords;
-import net.java.amateras.xlsbeans.annotation.Sheet;
+import com.github.takezoe.xlsbeans.annotation.Sheet;
 
 @Sheet(name = "vertical_mapping")
 public class VerticalNotFoundColumnsTestBean implements Serializable {

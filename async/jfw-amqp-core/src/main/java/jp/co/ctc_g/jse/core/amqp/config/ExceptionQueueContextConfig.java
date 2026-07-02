@@ -266,20 +266,6 @@ public class ExceptionQueueContextConfig extends AmqpContextConfig {
     public ExceptionQueueContextConfig() {}
 
     /**
-     * RabbitMQの管理操作を実行する{@link AmqpAdmin}のインスタンスを生成し、DIコンテナに登録します。
-     * この{@link AmqpAdmin}を利用することにより、Exchange/Queueの自動生成を行うことが可能となります。
-     * 自動生成する場合はSpring のBeanProfileのスコープ指定を<strong>development</strong>に指定してください。
-     * @return {@link RabbitAdmin}のインスタンス
-     */
-    @Bean
-    @Profile("development")
-    public AmqpAdmin amqpAdmin() {
-        RabbitAdmin rabbitAdmin = new RabbitAdmin(factory());
-        rabbitAdmin.setAutoStartup(true);
-        return rabbitAdmin;
-    }
-
-    /**
      * 例外用の{@link Exchange}のインスタンスを生成し、DIコンテナに登録します。
      * @return {@link TopicExchange}のインスタンス
      */
@@ -313,6 +299,22 @@ public class ExceptionQueueContextConfig extends AmqpContextConfig {
     @Bean
     public Queue unrecoverableExceptionQueue() {
         return new Queue(unrecoverableExceptionQueue);
+    }
+
+    @Configuration
+    @Profile("development")
+    public static class DevelopmentAmqpAdminConfig extends AmqpContextConfig {
+
+        /**
+         * RabbitMQの管理操作を実行する{@link AmqpAdmin}のインスタンスを生成し、DIコンテナに登録します。
+         * @return {@link RabbitAdmin}のインスタンス
+         */
+        @Bean
+        public AmqpAdmin amqpAdmin() {
+            RabbitAdmin rabbitAdmin = new RabbitAdmin(factory());
+            rabbitAdmin.setAutoStartup(true);
+            return rabbitAdmin;
+        }
     }
 
     /**
