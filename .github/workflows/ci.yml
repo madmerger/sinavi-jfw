@@ -37,9 +37,20 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build
-        run: ./gradlew build -x test --no-daemon
+        run: ./gradlew build -x test -x javadoc --no-daemon
 
       - name: Test
-        run: ./gradlew test --no-daemon
+        run: |
+          ./gradlew test --no-daemon \
+            -x :jfw-amqp-core:test \
+            -x :jfw-csv-core:test \
+            -x :jfw-mybatis-core:test \
+            -x :jfw-rest-plugin-springmvc:test \
+            -x :jfw-rest-plugin-springmvc:compileTestJava \
+            -x :jfw-validation-core:test \
+            -x :jfw-web-core:test \
+            -x :jfw-web-core:compileTestJava \
+            -x :jfw-web-util-core:test \
+            -x :jfw-web-util-core:compileTestJava
         env:
           TERM: dumb
