@@ -242,12 +242,10 @@ public class RestClientResponseErrorHandler extends DefaultResponseErrorHandler 
     }
 
     private HttpStatus getHttpStatusCode(ClientHttpResponse response) throws IOException {
-        HttpStatus statusCode;
-        try {
-            statusCode = HttpStatus.resolve(response.getStatusCode().value());
-        } catch (IllegalArgumentException ex) {
+        HttpStatus statusCode = HttpStatus.resolve(response.getStatusCode().value());
+        if (statusCode == null) {
             if (L.isDebugEnabled()) {
-                L.debug(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0014"), ex);
+                L.debug(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0014"));
             }
             throw new UnknownHttpStatusCodeException(response.getStatusCode().value(), response.getStatusText(),
                 response.getHeaders(), readResponseBody(response), readCharset(response));

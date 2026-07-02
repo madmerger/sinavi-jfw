@@ -180,6 +180,7 @@ configure(subprojects) { subproject ->
         }
     }
     javadoc {
+        failOnError = false
         doFirst {
             description = "Generates project-level javadoc for use in -javadoc jar"
             options.memberLevel = org.gradle.external.javadoc.JavadocMemberLevel.PROTECTED
@@ -191,6 +192,7 @@ configure(subprojects) { subproject ->
             options.header = "<h1>${subproject.name}</h1>"
             options.bottom = "<i>Copyright &#169; 2011-2014 ITOCHU Techno-Solutions Corporation.</i>"
             options.destinationDirectory = file("${project.layout.buildDirectory.get()}/docs/javadoc/${subproject.name}/${subproject.version}/api")
+            options.addStringOption('Xdoclint:none', '-quiet')
         }
     }
 

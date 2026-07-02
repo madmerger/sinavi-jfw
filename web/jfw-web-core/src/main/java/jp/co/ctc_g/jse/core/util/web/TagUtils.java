@@ -166,7 +166,7 @@ public final class TagUtils {
                         }
                     }
                 }
-            } catch (RuntimeException ex) {
+            } catch (IllegalArgumentException ex) {
                 throw new JspException(ex);
             }
         }
@@ -194,7 +194,7 @@ public final class TagUtils {
             if ((value.length == 1) && uri.contains(template)) {
                 try {
                     uri = uri.replace(template, Matcher.quoteReplacement(UriUtils.encodePath(value[0], encoding)));
-                } catch (RuntimeException ex) {
+                } catch (IllegalArgumentException ex) {
                     throw new JspException(ex);
                 }
             }

@@ -483,6 +483,9 @@ public abstract class AbstractRestExceptionHandler implements RestExceptionHandl
             L.debug(R.getString("D-SPRINGMVC-REST-HANDLER#0014"), e);
         }
         HttpStatus status = HttpStatus.resolve(e.getStatusCode().value());
+        if (status == null) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
         ErrorMessage error = createServerErrorMessage(status);
         warn(error, e);
         return new ResponseEntity<ErrorMessage>(error, headers, status);
