@@ -31,7 +31,7 @@ import jp.co.ctc_g.jse.core.amqp.exception.AmqpApplicationUnrecoverableException
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.amqp.rabbit.listener.ListenerExecutionFailedException;
+import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 
 public class LoggingErrorHandlerTest {
 

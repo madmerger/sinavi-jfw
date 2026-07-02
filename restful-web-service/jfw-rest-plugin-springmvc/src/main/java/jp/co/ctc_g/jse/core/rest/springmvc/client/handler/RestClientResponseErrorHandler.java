@@ -140,64 +140,64 @@ public class RestClientResponseErrorHandler extends DefaultResponseErrorHandler 
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new BadRequestException(response.getHeaders(), getResponseBody(response), getCharset(response));
+                throw new BadRequestException(response.getHeaders(), readResponseBody(response), readCharset(response));
             case UNAUTHORIZED:
                 if (L.isDebugEnabled()) {
                     L.debug(Strings.substitute(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0002"),
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new UnauthorizedException(response.getHeaders(), getResponseBody(response), getCharset(response));
+                throw new UnauthorizedException(response.getHeaders(), readResponseBody(response), readCharset(response));
             case FORBIDDEN:
                 if (L.isDebugEnabled()) {
                     L.debug(Strings.substitute(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0003"),
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new ForbiddenException(response.getHeaders(), getResponseBody(response), getCharset(response));
+                throw new ForbiddenException(response.getHeaders(), readResponseBody(response), readCharset(response));
             case NOT_FOUND:
                 if (L.isDebugEnabled()) {
                     L.debug(Strings.substitute(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0004"),
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new NotFoundException(response.getHeaders(), getResponseBody(response), getCharset(response));
+                throw new NotFoundException(response.getHeaders(), readResponseBody(response), readCharset(response));
             case NOT_ACCEPTABLE:
                 if (L.isDebugEnabled()) {
                     L.debug(Strings.substitute(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0005"),
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new NotAcceptableException(response.getHeaders(), getResponseBody(response), getCharset(response));
+                throw new NotAcceptableException(response.getHeaders(), readResponseBody(response), readCharset(response));
             case PROXY_AUTHENTICATION_REQUIRED:
                 if (L.isDebugEnabled()) {
                     L.debug(Strings.substitute(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0006"), 
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new ProxyAuthenticationRequiredException(response.getHeaders(), getResponseBody(response),
-                    getCharset(response));
+                throw new ProxyAuthenticationRequiredException(response.getHeaders(), readResponseBody(response),
+                    readCharset(response));
             case REQUEST_TIMEOUT:
                 if (L.isDebugEnabled()) {
                     L.debug(Strings.substitute(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0007"), 
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new RequestTimeoutException(response.getHeaders(), getResponseBody(response), getCharset(response));
+                throw new RequestTimeoutException(response.getHeaders(), readResponseBody(response), readCharset(response));
             case UNSUPPORTED_MEDIA_TYPE:
                 if (L.isDebugEnabled()) {
                     L.debug(Strings.substitute(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0008"),
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new UnsupportedMediaTypeException(response.getHeaders(), getResponseBody(response), getCharset(response));
+                throw new UnsupportedMediaTypeException(response.getHeaders(), readResponseBody(response), readCharset(response));
             case UNPROCESSABLE_ENTITY:
                 if (L.isDebugEnabled()) {
                     L.debug(Strings.substitute(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0009"), 
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new UnprocessableEntityException(response.getHeaders(), getResponseBody(response), getCharset(response));
+                throw new UnprocessableEntityException(response.getHeaders(), readResponseBody(response), readCharset(response));
             default:
                 if (L.isDebugEnabled()) {
                     L.debug(Strings.substitute(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0010"), 
@@ -205,7 +205,7 @@ public class RestClientResponseErrorHandler extends DefaultResponseErrorHandler 
                             .map("message", getResponseBodyAsString(response))));
                 }
                 throw new HttpClientErrorException(statusCode, response.getStatusText(), response.getHeaders(),
-                    getResponseBody(response), getCharset(response));
+                    readResponseBody(response), readCharset(response));
         }
     }
 
@@ -223,39 +223,39 @@ public class RestClientResponseErrorHandler extends DefaultResponseErrorHandler 
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new InternalServerErrorException(response.getHeaders(), getResponseBody(response), getCharset(response));
+                throw new InternalServerErrorException(response.getHeaders(), readResponseBody(response), readCharset(response));
             case SERVICE_UNAVAILABLE:
                 if (L.isDebugEnabled()) {
                     L.debug(Strings.substitute(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0012"), 
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new ServiceUnavailableException(response.getHeaders(), getResponseBody(response), getCharset(response));
+                throw new ServiceUnavailableException(response.getHeaders(), readResponseBody(response), readCharset(response));
             default:
                 if (L.isDebugEnabled()) {
                     L.debug(Strings.substitute(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0013"), 
                         Maps.hash("status", statusCode.toString())
                             .map("message", getResponseBodyAsString(response))));
                 }
-                throw new HttpServerErrorException(statusCode, response.getStatusText(), response.getHeaders(), getResponseBody(response), getCharset(response));
+                throw new HttpServerErrorException(statusCode, response.getStatusText(), response.getHeaders(), readResponseBody(response), readCharset(response));
         }
     }
 
     private HttpStatus getHttpStatusCode(ClientHttpResponse response) throws IOException {
         HttpStatus statusCode;
         try {
-            statusCode = response.getStatusCode();
+            statusCode = HttpStatus.resolve(response.getStatusCode().value());
         } catch (IllegalArgumentException ex) {
             if (L.isDebugEnabled()) {
                 L.debug(R.getString("D-SPRINGMVC-REST-CLIENT-HANDLER#0014"), ex);
             }
-            throw new UnknownHttpStatusCodeException(response.getRawStatusCode(), response.getStatusText(),
-                response.getHeaders(), getResponseBody(response), getCharset(response));
+            throw new UnknownHttpStatusCodeException(response.getStatusCode().value(), response.getStatusText(),
+                response.getHeaders(), readResponseBody(response), readCharset(response));
         }
         return statusCode;
     }
 
-    private byte[] getResponseBody(ClientHttpResponse response) {
+    private byte[] readResponseBody(ClientHttpResponse response) {
         try {
             InputStream responseBody = response.getBody();
             if (responseBody != null) { 
@@ -269,16 +269,16 @@ public class RestClientResponseErrorHandler extends DefaultResponseErrorHandler 
         return new byte[0];
     }
 
-    private Charset getCharset(ClientHttpResponse response) {
+    private Charset readCharset(ClientHttpResponse response) {
         HttpHeaders headers = response.getHeaders();
         MediaType contentType = headers.getContentType();
-        return contentType != null ? contentType.getCharSet() : null;
+        return contentType != null ? contentType.getCharset() : null;
     }
 
     private String getResponseBodyAsString(ClientHttpResponse response) {
         try {
-            Charset charset = getCharset(response);
-            return new String(getResponseBody(response), charset != null ? charset.toString() : DEFAULT_CHARSET);
+            Charset charset = readCharset(response);
+            return new String(readResponseBody(response), charset != null ? charset.toString() : DEFAULT_CHARSET);
         } catch (UnsupportedEncodingException ex) {
             throw new InternalException(RestClientResponseErrorHandler.class, "E-SPRINGMVC-REST-CLIENT-HANDLER#0001");
         }

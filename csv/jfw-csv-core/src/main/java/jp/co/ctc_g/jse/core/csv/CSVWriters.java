@@ -36,11 +36,11 @@ import jp.co.ctc_g.jfw.core.util.Maps;
 import jp.co.ctc_g.jfw.core.util.Strings;
 import jp.co.ctc_g.jse.core.csv.CSVConfigs.CSVConfig;
 
-import org.apache.commons.collections15.Transformer;
+import java.util.function.UnaryOperator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.bytecode.opencsv.CSVWriter;
+import com.opencsv.CSVWriter;
 
 /**
  * <p>
@@ -91,7 +91,7 @@ public class CSVWriters {
     /**
      * {@link Transformer}
      */
-    protected Transformer<String, String> transformer;
+    protected UnaryOperator<String> transformer;
 
     /**
      * コンストラクタです。
@@ -224,7 +224,7 @@ public class CSVWriters {
         } else {
             transformed = new String[line.length];
             for (int i = 0; i < line.length; i++) {
-                transformed[i] = transformer.transform(line[i]);
+                transformed[i] = transformer.apply(line[i]);
             }
         }
         for (int i = 0; i < transformed.length; i++) {

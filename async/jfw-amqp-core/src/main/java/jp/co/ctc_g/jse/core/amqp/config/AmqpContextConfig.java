@@ -21,7 +21,7 @@ import java.util.Collections;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.JsonMessageConverter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -227,11 +227,11 @@ public class AmqpContextConfig {
 
     /**
      * {@link MessageConverter}のインスタンスをDIコンテナに登録します。
-     * @return {@link JsonMessageConverter}のインスタンス
+     * @return {@link Jackson2JsonMessageConverter}のインスタンス
      */
     @Bean
     public MessageConverter converter() {
-        JsonMessageConverter converter = new JsonMessageConverter();
+        Jackson2JsonMessageConverter converter = new Jackson2JsonMessageConverter();
         converter.setCreateMessageIds(true);
         return converter;
     }

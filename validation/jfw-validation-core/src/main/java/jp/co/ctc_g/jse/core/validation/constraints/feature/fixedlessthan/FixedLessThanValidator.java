@@ -18,8 +18,8 @@ package jp.co.ctc_g.jse.core.validation.constraints.feature.fixedlessthan;
 
 import java.math.BigDecimal;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import jp.co.ctc_g.jse.core.validation.constraints.FixedLessThan;
 import jp.co.ctc_g.jse.core.validation.util.Validators;

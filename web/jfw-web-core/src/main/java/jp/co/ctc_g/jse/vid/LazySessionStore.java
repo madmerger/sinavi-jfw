@@ -18,8 +18,8 @@ package jp.co.ctc_g.jse.vid;
 
 import java.util.LinkedList;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import static jp.co.ctc_g.jfw.core.util.Args.checkNotNull;
 

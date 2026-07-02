@@ -46,9 +46,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.CSVWriter;
-import au.com.bytecode.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
 
 @RunWith(Enclosed.class)
 public class CSVsTest {

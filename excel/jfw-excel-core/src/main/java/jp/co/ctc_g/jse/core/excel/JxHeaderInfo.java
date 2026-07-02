@@ -16,17 +16,16 @@
 
 package jp.co.ctc_g.jse.core.excel;
 
-import net.java.amateras.xlsbeans.processor.HeaderInfo;
-
 /**
  * <p>
- * このクラスは、ヘッダ行番号を保持します。
+ * このクラスは、ヘッダ情報を保持します。
  * </p>
- * @see HeaderInfo
  * @author ITOCHU Techno-Solutions Corporation.
  */
-public class JxHeaderInfo extends HeaderInfo {
+public class JxHeaderInfo {
 
+    private String headerLabel;
+    private int headerRange;
     private int rowIndex;
 
     /**
@@ -36,8 +35,25 @@ public class JxHeaderInfo extends HeaderInfo {
      * @param rowIndex ヘッダ行番号です。
      */
     protected JxHeaderInfo(String headerLabel, int headerRange, int rowIndex) {
-        super(headerLabel, headerRange);
+        this.headerLabel = headerLabel;
+        this.headerRange = headerRange;
         this.rowIndex = rowIndex;
+    }
+
+    /**
+     * ヘッダラベルを返します。
+     * @return ヘッダラベル
+     */
+    protected String getHeaderLabel() {
+        return headerLabel;
+    }
+
+    /**
+     * ヘッダの範囲を返します。
+     * @return ヘッダの範囲
+     */
+    protected int getHeaderRange() {
+        return headerRange;
     }
 
     /**

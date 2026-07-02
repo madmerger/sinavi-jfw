@@ -22,20 +22,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import net.java.amateras.xlsbeans.annotation.RecordTerminal;
-
 /**
  * <p>
  * このアノテーションは、垂直方向に連続する列をマッピングするアノテーションです。
  * </p>
- * <p>
- * VerticalRecordsを利用する場合、tableLabel属性の指定に注意してください。
- * <ol>
- * <li>単表の場合はtableLabel属性には先頭カラムの文字列を指定してください。</li>
- * <li>同じ表が複数存在し、かつ、LinkedCellを併用する場合はtableLabel属性にテーブルを識別する文字列を指定してください。</li>
- * </ol>
- * </p>
- * @see net.java.amateras.xlsbeans.annotation.VerticalRecords
  * @author ITOCHU Techno-Solutions Corporation.
  */
 @Target({ElementType.METHOD, ElementType.FIELD})
@@ -45,14 +35,11 @@ public @interface JxVerticalRecords {
 
     /**
      * 例外を発生させるかどうかを指定します。
-     * <code>false</code>:例外を発生させます。
-     * <code>true</code>:例外を発生させずに処理を継続します。
      */
     boolean optional() default false;
 
     /**
-     * <li>単表の場合はtableLabel属性には先頭カラムの文字列を指定してください。</li>
-     * <li>同じ表が複数存在し、かつ、LinkedCellを併用する場合はtableLabel属性にテーブルを識別する文字列を指定してください。</li>
+     * テーブルラベルを指定します。
      */
     String tableLabel() default "";
 
@@ -78,8 +65,6 @@ public @interface JxVerticalRecords {
 
     /**
      * 終了タイプを指定します。
-     * {@link RecordTerminal#Empty}:空のセルがあると終了とみなす。
-     * {@link RecordTerminal#Border}:罫線があると終了とみなす。
      */
     RecordTerminal terminal() default RecordTerminal.Empty;
 

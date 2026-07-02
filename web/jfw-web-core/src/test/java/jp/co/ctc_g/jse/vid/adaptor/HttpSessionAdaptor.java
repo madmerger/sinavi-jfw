@@ -18,9 +18,8 @@ package jp.co.ctc_g.jse.vid.adaptor;
 
 import java.util.Enumeration;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionContext;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpSession;
 
 @SuppressWarnings({ "rawtypes", "deprecation", "unchecked"})
 public class HttpSessionAdaptor implements HttpSession {
@@ -60,10 +59,6 @@ public class HttpSessionAdaptor implements HttpSession {
         return null;
     }
 
-    public HttpSessionContext getSessionContext() {
-
-        return null;
-    }
 
     public Object getValue(String name) {
 

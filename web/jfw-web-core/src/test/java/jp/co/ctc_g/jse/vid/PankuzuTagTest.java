@@ -28,10 +28,10 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.servlet.jsp.JspWriter;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.jsp.JspWriter;
 
 import jp.co.ctc_g.jfw.core.util.Maps;
 import jp.co.ctc_g.jfw.core.util.Strings;

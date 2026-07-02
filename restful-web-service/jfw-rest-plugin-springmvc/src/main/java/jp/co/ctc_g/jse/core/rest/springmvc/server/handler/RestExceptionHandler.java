@@ -36,7 +36,7 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 /**
  * <p>
@@ -60,11 +60,11 @@ public interface RestExceptionHandler<T> {
     T handle(HttpRequestMethodNotSupportedException e);
 
     /**
-     * {@link NoSuchRequestHandlingMethodException}をハンドリングします。
-     * @param e {@link NoSuchRequestHandlingMethodException}
+     * {@link NoHandlerFoundException}をハンドリングします。
+     * @param e {@link NoHandlerFoundException}
      * @return 任意の型
      */
-    T handle(NoSuchRequestHandlingMethodException e);
+    T handle(NoHandlerFoundException e);
 
     /**
      * {@link HttpMediaTypeNotSupportedException}をハンドリングします。

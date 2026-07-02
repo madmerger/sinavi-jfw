@@ -48,7 +48,7 @@ import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
-import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 public class RestDefaultExceptionHandlerTest {
 
@@ -65,8 +65,8 @@ public class RestDefaultExceptionHandlerTest {
     }
 
     @Test
-    public void NoSuchRequestHandlingMethodExceptionをハンドリングできる() {
-        NoSuchRequestHandlingMethodException ex = new NoSuchRequestHandlingMethodException("", "", null);
+    public void NoHandlerFoundExceptionをハンドリングできる() {
+        NoHandlerFoundException ex = new NoHandlerFoundException("", "", null);
         ErrorMessage message = this.exceptionHandlerSupport.handle(ex);
         assertThat(message, notNullValue());
         assertThat(message.getStatus(), is(404));

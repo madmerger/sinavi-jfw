@@ -37,21 +37,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintViolation;
-import javax.validation.Payload;
-import javax.validation.UnexpectedTypeException;
-import javax.validation.Validator;
-import javax.validation.executable.ExecutableType;
-import javax.validation.executable.ExecutableValidator;
-import javax.validation.executable.ValidateOnExecution;
+import jakarta.validation.Constraint;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Payload;
+import jakarta.validation.UnexpectedTypeException;
+import jakarta.validation.Validator;
+import jakarta.validation.executable.ExecutableType;
+import jakarta.validation.executable.ExecutableValidator;
+import jakarta.validation.executable.ValidateOnExecution;
 
 import jp.co.ctc_g.jse.core.validation.constraints.Number;
 import jp.co.ctc_g.jse.core.validation.constraints.NumericFormat;
 import jp.co.ctc_g.jse.core.validation.constraints.NumericFormat.FormatType;
 import jp.co.ctc_g.jse.test.bean.AnnotationTargetTypeBean;
 
-import org.hibernate.validator.internal.util.ReflectionHelper;
+
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -177,7 +177,7 @@ public class AnnotationTargetTypeTest {
         public void validParameterValue(String valid) throws NoSuchMethodException, SecurityException {
             Assume.assumeThat(Arrays.asList(VALIDS), hasItem(valid));
             AnnotationTargetTypeBean target = new AnnotationTargetTypeBean();
-            Method method = ReflectionHelper.getDeclaredMethod(AnnotationTargetTypeBean.class, "setValue", String.class);
+            Method method = AnnotationTargetTypeBean.class.getDeclaredMethod("setValue", String.class);
             Set<ConstraintViolation<AnnotationTargetTypeBean>> errors = EXECUTABLE_VALIDATOR.validateParameters(target, method, new String[] {
                 valid
             });
@@ -189,7 +189,7 @@ public class AnnotationTargetTypeTest {
         public void invalidParameterValue(String invalid) throws NoSuchMethodException, SecurityException {
             Assume.assumeThat(Arrays.asList(INVALIDS), hasItem(invalid));
             AnnotationTargetTypeBean target = new AnnotationTargetTypeBean();
-            Method method = ReflectionHelper.getDeclaredMethod(AnnotationTargetTypeBean.class, "setValue", String.class);
+            Method method = AnnotationTargetTypeBean.class.getDeclaredMethod("setValue", String.class);
             Set<ConstraintViolation<AnnotationTargetTypeBean>> errors = EXECUTABLE_VALIDATOR.validateParameters(target, method, new String[] {
                 invalid
             });
@@ -202,7 +202,7 @@ public class AnnotationTargetTypeTest {
         public void validReturnValue(String valid) throws NoSuchMethodException, SecurityException {
             Assume.assumeThat(Arrays.asList(VALIDS), hasItem(valid));
             AnnotationTargetTypeBean target = new AnnotationTargetTypeBean();
-            Method method = ReflectionHelper.getMethod(AnnotationTargetTypeBean.class, "getValue");
+            Method method = AnnotationTargetTypeBean.class.getMethod("getValue");
             Set<ConstraintViolation<AnnotationTargetTypeBean>> errors = EXECUTABLE_VALIDATOR.validateReturnValue(target, method, valid);
             assertThat(errors, notNullValue());
             assertThat(errors.size(), is(0));

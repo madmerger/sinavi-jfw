@@ -19,10 +19,10 @@ package jp.co.ctc_g.jse.vid;
 import java.io.IOException;
 import java.util.Collection;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.SimpleTagSupport;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.PageContext;
+import jakarta.servlet.jsp.tagext.SimpleTagSupport;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.util.Args;

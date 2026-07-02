@@ -16,51 +16,120 @@
 
 package jp.co.ctc_g.jse.core.excel;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import net.java.amateras.xlsbeans.XLSBeans;
-import net.java.amateras.xlsbeans.XLSBeansException;
-import net.java.amateras.xlsbeans.annotation.IterateTables;
-import net.java.amateras.xlsbeans.processor.FieldProcessorFactory;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * <p>
  * このクラスは、ExcelのデータとJavaのオブジェクトのマッピングを実行するユーティリティです。
+ * Apache POIを用いてExcelファイルを読み込みます。
  * </p>
- * @see XLSBeans
  * @author ITOCHU Techno-Solutions Corporation.
  */
-public class JxXLSBeans extends XLSBeans {
+public class JxXLSBeans {
 
-    static {
-        FieldProcessorFactory.registerProcessor(IterateTables.class, new JxIterateTableProcessor());
-        FieldProcessorFactory.registerProcessor(JxVerticalRecords.class, new JxVerticalRecordsProcessor());
-    }
+    /**
+     * XSSF形式（xlsx）
+     */
+    public static final String TYPE_XSSF = "XSSF";
+
+    /**
+     * HSSF形式（xls）
+     */
+    public static final String TYPE_HSSF = "HSSF";
+
+    private JxVerticalRecordsProcessor verticalRecordsProcessor = new JxVerticalRecordsProcessor();
+    private JxIterateTableProcessor iterateTableProcessor = new JxIterateTableProcessor();
 
     /**
      * デフォルトコンストラクタです。
      */
     public JxXLSBeans() {}
 
-
-
     /**
-     * <p>
-     * 複数のシートかつExcelの読み込みタイプを指定できるメソッドが{@link XLSBeans}になかったため、
-     * 拡張しました。
-     * </p>
-     * <p>
-     * このメソッドによりExcel2003形式、Excel2007以上形式も読み込めるようにしました。
-     * </p>
+     * Excelファイルを読み込み、指定されたクラスにマッピングします。
      * @param <P> ロード対象のオブジェクト
      * @param in インプットストリーム
      * @param clazz マッピング対象のクラス
-     * @param type ファイル形式(WorkbookFinder.TYPE_XSSF:xlsx形式、WorkbookFinder.TYPE_HSSF:xls形式)
      * @return マッピング結果
-     * @throws XLSBeansException マッピング時の例外
+     * @throws IOException 読み込み時の例外
      */
-    public <P> P[] loadMultiple(InputStream in, Class<P> clazz, String type) throws XLSBeansException {
-        return loadMultiple(in, null, clazz, type);
+    public <P> P load(InputStream in, Class<P> clazz) throws IOException {
+        try (Workbook workbook = WorkbookFactory.create(in)) {
+            Sheet sheet = workbook.getSheetAt(0);
+            return mapSheet(sheet, clazz);
+        }
     }
 
+    /**
+     * 複数のシートを読み込み、指定されたクラスにマッピングします。
+     * @param <P> ロード対象のオブジェクト
+     * @param in インプットストリーム
+     * @param clazz マッピング対象のクラス
+     * @param type ファイル形式
+     * @return マッピング結果の配列
+     * @throws IOException 読み込み時の例外
+     */
+    @SuppressWarnings("unchecked")
+    public <P> P[] loadMultiple(InputStream in, Class<P> clazz, String type) throws IOException {
+        try (Workbook workbook = createWorkbook(in, type)) {
+            List<P> results = new ArrayList<>();
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                Sheet sheet = workbook.getSheetAt(i);
+                P result = mapSheet(sheet, clazz);
+                if (result != null) {
+                    results.add(result);
+                }
+            }
+            return results.toArray((P[]) Array.newInstance(clazz, 0));
+        }
+    }
+
+    private Workbook createWorkbook(InputStream in, String type) throws IOException {
+        if (TYPE_HSSF.equals(type)) {
+            return new HSSFWorkbook(in);
+        }
+        return new XSSFWorkbook(in);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <P> P mapSheet(Sheet sheet, Class<P> clazz) {
+        try {
+            P instance = clazz.getDeclaredConstructor().newInstance();
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                JxVerticalRecords annotation = field.getAnnotation(JxVerticalRecords.class);
+                if (annotation != null) {
+                    field.setAccessible(true);
+                    Map<JxHeaderInfo, Object[]> result = verticalRecordsProcessor.process(sheet, annotation);
+                    if (!result.isEmpty()) {
+                        Object[] records = result.values().iterator().next();
+                        if (field.getType().isArray()) {
+                            field.set(instance, records);
+                        } else if (List.class.isAssignableFrom(field.getType())) {
+                            List<Object> list = new ArrayList<>();
+                            for (Object r : records) {
+                                list.add(r);
+                            }
+                            field.set(instance, list);
+                        }
+                    }
+                }
+            }
+            return instance;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

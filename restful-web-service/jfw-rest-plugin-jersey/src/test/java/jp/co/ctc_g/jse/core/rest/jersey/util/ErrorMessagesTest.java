@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
 
 import java.util.Locale;
 
-import javax.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jse.core.rest.entity.ErrorMessage;

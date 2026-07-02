@@ -37,7 +37,10 @@ import jp.co.ctc_g.jse.core.csv.CSVConfigs.CSVConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
 
 /**
  * <p>
@@ -136,8 +139,17 @@ public class CSVReaders {
             if (L.isDebugEnabled()) L.debug(Strings.substitute(R.getString("D-CSV#0002"), Maps.hash("filePath", file.getAbsolutePath())));
             iso = new InputStreamReader(fis, config.encode());
             reader = new BufferedReader(iso);
-            csv = new CSVReader(reader, config.separator(), config.quote(), config.escape(), config.index(), config.strictQuotes(),
-                config.whitespace());
+            CSVParser parser = new CSVParserBuilder()
+                .withSeparator(config.separator())
+                .withQuoteChar(config.quote())
+                .withEscapeChar(config.escape())
+                .withStrictQuotes(config.strictQuotes())
+                .withIgnoreLeadingWhiteSpace(config.whitespace())
+                .build();
+            csv = new CSVReaderBuilder(reader)
+                .withCSVParser(parser)
+                .withSkipLines(config.index())
+                .build();
         } catch (FileNotFoundException e) {
             if (L.isDebugEnabled()) L.debug(R.getString("D-CSV#0003"), e);
             ie = new InternalException(CSVReaders.class, "E-CSV#0001", Maps.hash("filePath", file.getAbsolutePath()), e);
@@ -184,7 +196,7 @@ public class CSVReaders {
                 hasNext = false;
                 return this;
             }
-        } catch (IOException e) {
+        } catch (IOException | com.opencsv.exceptions.CsvValidationException e) {
             ie = new InternalException(CSVReaders.class, "E-CSV#0009", e);
         } finally {
             if (ie != null) {

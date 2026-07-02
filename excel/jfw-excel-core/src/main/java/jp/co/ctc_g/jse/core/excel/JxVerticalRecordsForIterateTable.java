@@ -18,14 +18,9 @@ package jp.co.ctc_g.jse.core.excel;
 
 import java.lang.annotation.Annotation;
 
-import net.java.amateras.xlsbeans.annotation.RecordTerminal;
-
 /**
  * <p>
  * このクラスは、同一の構造の表がシート内で繰り返し出現する場合に垂直方向に連続する列をマッピングします。
- * </p>
- * <p>
- * XLSBeansのIterateTableは水平方向のマッピングのみの対応のため、このクラスを独自に定義しています。
  * </p>
  * @see jp.co.ctc_g.jse.core.excel.JxVerticalRecords
  * @author ITOCHU Techno-Solutions Corporation.
@@ -57,7 +52,6 @@ public class JxVerticalRecordsForIterateTable implements JxVerticalRecords {
     public JxVerticalRecordsForIterateTable(JxVerticalRecords rec, int headerColumn, int headerRow) {
         this.headerColumn = headerColumn;
         this.headerRow = headerRow;
-
         this.optional = rec.optional();
         this.range = rec.range();
         this.recordClass = rec.recordClass();
@@ -68,82 +62,52 @@ public class JxVerticalRecordsForIterateTable implements JxVerticalRecords {
         this.headerCount = rec.headerLimit();
     }
 
-    /**
-     * {@link JxVerticalRecords}の型を取得するメソッドです。
-     * @return {@link JxVerticalRecords}の型
-     */
+    /** {@inheritDoc} */
     public Class<? extends Annotation> annotationType() {
         return annotationType;
     }
 
-    /**
-     * {@link JxVerticalRecords#optional()}で指定されたオプションを取得するメソッドです。
-     * @return {@link JxVerticalRecords#optional()}で指定されたオプション
-     */
+    /** {@inheritDoc} */
     public boolean optional() {
         return optional;
     }
 
-    /**
-     * テーブルのラベルを取得するメソッドです。
-     * @return テーブルのラベル
-     */
+    /** {@inheritDoc} */
     public String tableLabel() {
         return tableLabel;
     }
 
-    /**
-     * {@link JxVerticalRecords#terminateLabel()}で指定された読み込みの終了となるラベルを取得するメソッドです。
-     * @return {@link JxVerticalRecords#terminateLabel()}で指定された読み込みの終了となるラベル
-     */
+    /** {@inheritDoc} */
     public String terminateLabel() {
         return terminateLabel;
     }
 
-    /**
-     * ヘッダの列インデクスを取得するメソッドです。
-     * @return ヘッダの列インデクス
-     */
+    /** {@inheritDoc} */
     public int headerColumn() {
         return headerColumn;
     }
 
-    /**
-     * ヘッダの行インデクスを取得するメソッドです。
-     * @return ヘッダの行インデクス
-     */
+    /** {@inheritDoc} */
     public int headerRow() {
         return headerRow;
     }
 
-    /**
-     * {@link JxVerticalRecords#recordClass()}で指定されたレコードとして読み込む型を取得するメソッドです。
-     * @return {@link JxVerticalRecords#recordClass()}で指定されたレコードとして読み込む型
-     */
+    /** {@inheritDoc} */
     public Class<?> recordClass() {
         return recordClass;
     }
 
-    /**
-     * {@link JxVerticalRecords#terminal()}で指定された終了タイプを取得するメソッドです。
-     * @return {@link net.java.amateras.xlsbeans.annotation.RecordTerminal}
-     */
+    /** {@inheritDoc} */
     public RecordTerminal terminal() {
         return terminal;
     }
 
-    /**
-     * {@link JxVerticalRecords#range()}で指定されたヘッダの範囲を取得するメソッドです。
-     * @return {@link JxVerticalRecords#range()}で指定されたヘッダの範囲
-     */
+    /** {@inheritDoc} */
     public int range() {
         return range;
     }
 
-    /**
-     * {@link JxVerticalRecords#headerLimit()}で指定されたヘッダの範囲を取得するメソッドです。
-     * @return {@link JxVerticalRecords#headerLimit()}で指定されたヘッダの範囲
-     */
+    /** {@inheritDoc} */
     public int headerLimit() {
         return headerCount;
     }

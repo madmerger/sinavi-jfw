@@ -21,11 +21,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.PageContext;
 
 import org.springframework.web.servlet.support.RequestContext;
 import org.springframework.web.servlet.support.RequestDataValueProcessor;
@@ -166,7 +166,7 @@ public final class TagUtils {
                         }
                     }
                 }
-            } catch (UnsupportedEncodingException ex) {
+            } catch (RuntimeException ex) {
                 throw new JspException(ex);
             }
         }
@@ -194,7 +194,7 @@ public final class TagUtils {
             if ((value.length == 1) && uri.contains(template)) {
                 try {
                     uri = uri.replace(template, Matcher.quoteReplacement(UriUtils.encodePath(value[0], encoding)));
-                } catch (UnsupportedEncodingException ex) {
+                } catch (RuntimeException ex) {
                     throw new JspException(ex);
                 }
             }

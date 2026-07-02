@@ -20,6 +20,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RequestCallback;
 import org.springframework.web.client.ResponseExtractor;
@@ -612,6 +613,31 @@ public class RestClientTemplate implements RestClientOperations {
     @Override
     public <T> T execute(URI url, HttpMethod method, RequestCallback requestCallback, ResponseExtractor<T> responseExtractor) throws RestClientException {
         return delegate.execute(url, method, requestCallback, responseExtractor);
+    }
+
+    @Override
+    public <T> ResponseEntity<T> exchange(RequestEntity<?> requestEntity, Class<T> responseType) throws RestClientException {
+        return delegate.exchange(requestEntity, responseType);
+    }
+
+    @Override
+    public <T> ResponseEntity<T> exchange(RequestEntity<?> requestEntity, ParameterizedTypeReference<T> responseType) throws RestClientException {
+        return delegate.exchange(requestEntity, responseType);
+    }
+
+    @Override
+    public <T> T patchForObject(String url, Object request, Class<T> responseType, Object... uriVariables) throws RestClientException {
+        return delegate.patchForObject(url, request, responseType, uriVariables);
+    }
+
+    @Override
+    public <T> T patchForObject(String url, Object request, Class<T> responseType, Map<String, ?> uriVariables) throws RestClientException {
+        return delegate.patchForObject(url, request, responseType, uriVariables);
+    }
+
+    @Override
+    public <T> T patchForObject(URI url, Object request, Class<T> responseType) throws RestClientException {
+        return delegate.patchForObject(url, request, responseType);
     }
 
 }

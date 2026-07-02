@@ -18,8 +18,8 @@ package jp.co.ctc_g.jse.core.validation.constraints.feature.ipv4;
 
 import java.util.regex.Matcher;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 import jp.co.ctc_g.jse.core.validation.constraints.IPv4;
 import jp.co.ctc_g.jse.core.validation.util.Validators;

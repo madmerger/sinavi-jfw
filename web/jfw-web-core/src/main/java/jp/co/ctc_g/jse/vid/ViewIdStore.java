@@ -18,7 +18,7 @@ package jp.co.ctc_g.jse.vid;
 
 import java.util.LinkedList;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * <p>

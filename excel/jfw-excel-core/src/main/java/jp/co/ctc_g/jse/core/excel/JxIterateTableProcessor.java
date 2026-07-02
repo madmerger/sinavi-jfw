@@ -17,29 +17,24 @@
 package jp.co.ctc_g.jse.core.excel;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import net.java.amateras.xlsbeans.NeedPostProcess;
-import net.java.amateras.xlsbeans.Utils;
-import net.java.amateras.xlsbeans.annotation.IterateTables;
-import net.java.amateras.xlsbeans.processor.IterateTablesProcessor;
-import net.java.amateras.xlsbeans.xml.AnnotationReader;
-import net.java.amateras.xlsbeans.xssfconverter.WCell;
-import net.java.amateras.xlsbeans.xssfconverter.WSheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 
 /**
  * <p>
- * このクラスは、同一の構造の表がシート内で繰り返し出現する場合のマッピングを処理を行います。
+ * このクラスは、同一構造の繰り返しテーブルを処理するプロセッサです。
  * </p>
- * <p>
- * XLSBeansではVerticalRecordsに対応していなかったため、VerticalRecordsに対応できるように拡張しました。
- * </p>
- * @see IterateTablesProcessor
  * @author ITOCHU Techno-Solutions Corporation.
  */
-public class JxIterateTableProcessor extends IterateTablesProcessor {
+public class JxIterateTableProcessor {
+
+    private JxVerticalRecordsProcessor verticalRecordsProcessor = new JxVerticalRecordsProcessor();
 
     /**
      * デフォルトコンストラクタです。
@@ -47,71 +42,38 @@ public class JxIterateTableProcessor extends IterateTablesProcessor {
     public JxIterateTableProcessor() {}
 
     /**
-     * VerticalRecordsへの対応のため、オーバーライドしました。
-     * @param sheet シート
-     * @param tables IterateTablesアノテーションの定義
-     * @param reader アノテーションリーダ
-     * @param process プロセッサ
-     * @throws Exception 予期しない例外
+     * 繰り返しテーブルを処理します。
+     * @param sheet Excelシート
+     * @param tableLabel テーブルラベル
+     * @param record レコード定義
+     * @return 読み込み結果のリスト
      */
-    @Override
-    protected List<?> createTables(WSheet sheet, IterateTables tables, AnnotationReader reader, List<NeedPostProcess> process)
-        throws Exception {
-
-        List<Object> resultTableList = new ArrayList<Object>();
-        String label = tables.tableLabel();
-        WCell after = null;
-        WCell currentCell = Utils.getCell(sheet, label, after, false, !tables.optional());
-        while (currentCell != null) {
-            // 1 table object instance
-            Object obj = tables.tableClass().newInstance();
-            // LabeledCellをマッピング
-            processSingleLabelledCell(sheet, obj, currentCell, reader, process);
-            // HorizontalRecordsをマッピング
-            processMultipleTableCell(sheet, obj, currentCell, reader, tables, process);
-            // VerticalRecordsをマッピング
-            processMultipleTableCellForVertical(sheet, obj, currentCell, reader, tables, process);
-            resultTableList.add(obj);
-            after = currentCell;
-            currentCell = Utils.getCell(sheet, label, after, false, false);
+    public List<Map<JxHeaderInfo, Object[]>> process(Sheet sheet, String tableLabel, JxVerticalRecords record) {
+        List<Map<JxHeaderInfo, Object[]>> results = new ArrayList<>();
+        List<int[]> tablePositions = findTablePositions(sheet, tableLabel);
+        for (int[] pos : tablePositions) {
+            JxVerticalRecordsForIterateTable iterRecord = new JxVerticalRecordsForIterateTable(record, pos[1], pos[0]);
+            Map<JxHeaderInfo, Object[]> result = verticalRecordsProcessor.process(sheet, iterRecord);
+            results.add(result);
         }
-        return resultTableList;
+        return results;
     }
 
-    /**
-     * VerticalRecordsのマッピングを行います。
-     * @param sheet シート
-     * @param tableObj オブジェクト
-     * @param headerCell ヘッダセル
-     * @param reader リーダ
-     * @param iterateTables IterateTablesアノテーションの定義
-     * @param needPostProcess プロセッサ
-     * @throws Exception 予期しない例外
-     */
-    protected void processMultipleTableCellForVertical(WSheet sheet, Object tableObj, WCell headerCell,
-        AnnotationReader reader, IterateTables iterateTables, List<NeedPostProcess> needPostProcess) throws Exception {
-        List<Object> properties = Utils.getPropertiesWithAnnotation(tableObj, reader, JxVerticalRecords.class);
-        int headerColumn = headerCell.getColumn();
-        int headerRow = headerCell.getRow();
-        if (iterateTables.bottom() > 0) {
-            headerRow += iterateTables.bottom();
-        }
-        JxVerticalRecordsProcessor processor = new JxVerticalRecordsProcessor();
-        for (Object property : properties) {
-            JxVerticalRecords ann = null;
-            if (property instanceof Method) {
-                ann = reader.getAnnotation(tableObj.getClass(), (Method) property, JxVerticalRecords.class);
-            } else if (property instanceof Field) {
-                ann = reader.getAnnotation(tableObj.getClass(), (Field) property, JxVerticalRecords.class);
-            }
-            if (ann != null && ann.tableLabel().equals(iterateTables.tableLabel())) {
-                JxVerticalRecords records = new JxVerticalRecordsForIterateTable(ann, headerColumn, headerRow);
-                if (property instanceof Method) {
-                    processor.doProcess(sheet, tableObj, (Method) property, records, reader, needPostProcess);
-                } else if (property instanceof Field) {
-                    processor.doProcess(sheet, tableObj, (Field) property, records, reader, needPostProcess);
+    private List<int[]> findTablePositions(Sheet sheet, String tableLabel) {
+        List<int[]> positions = new ArrayList<>();
+        for (int rowIdx = 0; rowIdx <= sheet.getLastRowNum(); rowIdx++) {
+            Row row = sheet.getRow(rowIdx);
+            if (row == null) continue;
+            for (int colIdx = 0; colIdx <= row.getLastCellNum(); colIdx++) {
+                Cell cell = row.getCell(colIdx);
+                if (cell != null && cell.getCellType() == CellType.STRING) {
+                    String value = cell.getStringCellValue();
+                    if (tableLabel.equals(value)) {
+                        positions.add(new int[]{rowIdx, colIdx});
+                    }
                 }
             }
         }
+        return positions;
     }
 }

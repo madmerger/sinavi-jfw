@@ -27,12 +27,12 @@ import jp.co.ctc_g.jfw.core.util.Strings;
 import jp.co.ctc_g.jse.core.amqp.exception.AbstractAmqpException;
 import jp.co.ctc_g.jse.core.amqp.internal.AmqpInternals;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.listener.ListenerExecutionFailedException;
+import org.springframework.amqp.rabbit.support.ListenerExecutionFailedException;
 import org.springframework.amqp.rabbit.retry.MessageRecoverer;
 import org.springframework.beans.factory.InitializingBean;
 

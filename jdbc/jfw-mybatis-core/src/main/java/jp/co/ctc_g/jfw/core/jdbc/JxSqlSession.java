@@ -24,6 +24,7 @@ import jp.co.ctc_g.jfw.core.util.Args;
 import jp.co.ctc_g.jfw.core.util.typeconverter.TypeConverters;
 import jp.co.ctc_g.jfw.paginate.Paginatable;
 
+import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
@@ -391,5 +392,20 @@ public class JxSqlSession implements SqlSession {
      */
     public List<BatchResult> flushStatements() {
         return delegate.flushStatements();
+    }
+
+    @Override
+    public <T> Cursor<T> selectCursor(String statement) {
+        return delegate.selectCursor(statement);
+    }
+
+    @Override
+    public <T> Cursor<T> selectCursor(String statement, Object parameter) {
+        return delegate.selectCursor(statement, parameter);
+    }
+
+    @Override
+    public <T> Cursor<T> selectCursor(String statement, Object parameter, RowBounds rowBounds) {
+        return delegate.selectCursor(statement, parameter, rowBounds);
     }
 }

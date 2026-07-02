@@ -18,8 +18,8 @@ package jp.co.ctc_g.jse.core.message;
 
 import java.io.IOException;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
+import jakarta.servlet.jsp.JspException;
+import jakarta.servlet.jsp.JspWriter;
 
 import jp.co.ctc_g.jse.core.message.MessageContext.Scope;
 

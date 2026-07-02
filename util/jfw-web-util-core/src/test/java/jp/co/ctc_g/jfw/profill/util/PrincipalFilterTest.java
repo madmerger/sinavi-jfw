@@ -57,7 +57,7 @@ public class PrincipalFilterTest {
         request.setUserPrincipal(principal);
         chain = new MockFilterChain() {
 
-            public void doFilter(javax.servlet.ServletRequest req, javax.servlet.ServletResponse res) {
+            public void doFilter(jakarta.servlet.ServletRequest req, jakarta.servlet.ServletResponse res) {
 
                 Principal p = PrincipalKeeper.getPrincipal();
                 assertThat(p, notNullValue());

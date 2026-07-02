@@ -16,7 +16,7 @@
 
 package jp.co.ctc_g.jse.core.token;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * <p>

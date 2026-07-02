@@ -20,7 +20,6 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorSupport;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,22 +32,21 @@ import jp.co.ctc_g.jfw.core.util.Beans;
 import jp.co.ctc_g.jfw.core.util.Strings;
 import jp.co.ctc_g.jfw.core.util.typeconverter.TypeConversionException;
 import jp.co.ctc_g.jfw.core.util.typeconverter.TypeConverters;
-import au.com.bytecode.opencsv.CSVReader;
-import au.com.bytecode.opencsv.bean.CsvToBean;
-import au.com.bytecode.opencsv.bean.MappingStrategy;
+import com.opencsv.CSVReader;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
 
 /**
  * <p>
- * このクラスはOpenCSVの拡張クラスです.
+ * このクラスはCSVデータとJavaBeansのマッピングを行うユーティリティです。
  * </p>
  * <p>
- * OpenCSVでは1行単位のコンバートに対応していないため、拡張しました。
+ * 1行単位のコンバートに対応しています。
  * このクラスは基盤内部でのみ利用可能です。
  * </p>
  * @param <T> マッピング対象の型
  * @author ITOCHU Techno-Solutions Corporation.
  */
-public class CSVToBeanMapping<T> extends CsvToBean<T> {
+public class CSVToBeanMapping<T> {
 
     private static final ResourceBundle R = InternalMessages.getBundle(CSVToBeanMapping.class);
 
@@ -68,50 +66,57 @@ public class CSVToBeanMapping<T> extends CsvToBean<T> {
     /**
      * 1行読み込んだデータを指定されたマッピング情報に従って
      * インスタンスを生成します。
-     * @param mapper {@link MappingStrategy}
+     * @param mapper {@link ColumnPositionMappingStrategy}
      * @param csv CSV読込ユーティリティ
      * @param line 1レコードのデータ配列
      * @return T 読込後のデータ
      */
-    public T parse(MappingStrategy<T> mapper, CSVReader csv, String[] line) {
-        if (line == null || line.length == 0) { 
+    public T parse(ColumnPositionMappingStrategy<T> mapper, CSVReader csv, String[] line) {
+        if (line == null || line.length == 0) {
             return null;
         }
         try {
-            mapper.captureHeader(csv);
             return convert(mapper, line);
         } catch (BindException e) {
             throw e;
-        } catch (IOException e) {
-            throw new InternalException(CSVToBeanMapping.class, "E-CSV#0011", e);
         } catch (Exception e) {
             throw new InternalException(CSVToBeanMapping.class, "E-CSV#0012", e);
         }
     }
 
-    private T convert(MappingStrategy<T> mapper, String[] line) throws IllegalAccessException, InvocationTargetException, InstantiationException, IntrospectionException {
-        T bean = mapper.createBean();
+    @SuppressWarnings("unchecked")
+    private T convert(ColumnPositionMappingStrategy<T> mapper, String[] line)
+            throws IllegalAccessException, InvocationTargetException, InstantiationException, IntrospectionException, NoSuchMethodException {
+        Class<? extends T> type = (Class<? extends T>) mapper.getType();
+        T bean = type.getDeclaredConstructor().newInstance();
         List<BindError> errors = new ArrayList<BindError>();
+        String[] columnMapping = mapper.getColumnMapping();
         for (int col = 0; col < line.length; col++) {
-            PropertyDescriptor prop = mapper.findDescriptor(col);
-            if (prop != null) {
-                Class<?> propertyType = prop.getPropertyType();
-                String propertyName = prop.getName();
-                String value = checkForTrim(line[col], prop);
-                if (Strings.isEmpty(value)) {
-                    continue;
-                }
-                try {
-                    Object obj = convertValue(value, prop);
-                    Object converted = TypeConverters.convert(obj, propertyType);
-                    Beans.writePropertyValueNamed(propertyName, bean, converted);
-                } catch (TargetThrowsException e) {
-                    errors.add(new BindError(bean.getClass().getSimpleName(), propertyName, e.getMessage()));
-                } catch (TypeConversionException e) {
-                    errors.add(new BindError(bean.getClass().getSimpleName(), propertyName, e.getMessage()));
-                } catch (NumberFormatException e) {
-                    errors.add(new BindError(bean.getClass().getSimpleName(), propertyName, e.getMessage()));
-                }
+            if (col >= columnMapping.length || columnMapping[col] == null) {
+                continue;
+            }
+            String propertyName = columnMapping[col];
+            PropertyDescriptor prop;
+            try {
+                prop = new PropertyDescriptor(propertyName, type);
+            } catch (IntrospectionException e) {
+                continue;
+            }
+            Class<?> propertyType = prop.getPropertyType();
+            String value = checkForTrim(line[col], prop);
+            if (Strings.isEmpty(value)) {
+                continue;
+            }
+            try {
+                Object obj = convertValue(value, prop);
+                Object converted = TypeConverters.convert(obj, propertyType);
+                Beans.writePropertyValueNamed(propertyName, bean, converted);
+            } catch (TargetThrowsException e) {
+                errors.add(new BindError(bean.getClass().getSimpleName(), propertyName, e.getMessage()));
+            } catch (TypeConversionException e) {
+                errors.add(new BindError(bean.getClass().getSimpleName(), propertyName, e.getMessage()));
+            } catch (NumberFormatException e) {
+                errors.add(new BindError(bean.getClass().getSimpleName(), propertyName, e.getMessage()));
             }
         }
         if (!errors.isEmpty()) throw new BindException(R.getString("E-CSV#0010"), errors);
@@ -127,9 +132,12 @@ public class CSVToBeanMapping<T> extends CsvToBean<T> {
     }
 
     /**
-     * {@inheritDoc}
+     * プロパティに対応するPropertyEditorを返します。
+     * @param desc プロパティ記述子
+     * @return PropertyEditor
+     * @throws InstantiationException インスタンス生成に失敗した場合
+     * @throws IllegalAccessException アクセスできない場合
      */
-    @Override
     protected PropertyEditor getPropertyEditor(PropertyDescriptor desc) throws InstantiationException, IllegalAccessException {
         if (desc.getPropertyType() == Byte.class) {
             return byteEditor;
@@ -137,21 +145,23 @@ public class CSVToBeanMapping<T> extends CsvToBean<T> {
             return integerEditor;
         } else if (desc.getPropertyType() == Long.class) {
             return longEditor;
-        } else if (desc.getPropertyType() == Short.class) { 
+        } else if (desc.getPropertyType() == Short.class) {
             return shortEditor;
         }
-        return super.getPropertyEditor(desc);
+        return null;
+    }
+
+    private Object convertValue(String value, PropertyDescriptor prop) throws InstantiationException, IllegalAccessException {
+        PropertyEditor editor = getPropertyEditor(prop);
+        if (editor != null) {
+            editor.setAsText(value);
+            return editor.getValue();
+        }
+        return value;
     }
 
     /**
      * OpenCSV内部でのみ使用される、Numberプロパティエディタです。
-     *
-     * <p>
-     * このクラスは、整数型ラッパークラスのデフォルトプロパティエディタが、
-     * 文字列 "08"、"09" を８進数としてデコードしてしまう問題を回避するために
-     * 作成されました。
-     * </p>
-     *
      * @author ITOCHU Techno-Solutions Corporation.
      */
     protected abstract static class NumberEditor extends PropertyEditorSupport {
@@ -168,14 +178,7 @@ public class CSVToBeanMapping<T> extends CsvToBean<T> {
     }
 
     /**
-     * OpenCSV内部でのみ使用される、Byteプロパティエディタです。
-     *
-     * <p>
-     * このクラスは、整数型ラッパークラスのデフォルトプロパティエディタが、
-     * 文字列 "08"、"09" を８進数としてデコードしてしまう問題を回避するために
-     * 作成されました。
-     * </p>
-     *
+     * Byteプロパティエディタです。
      * @author ITOCHU Techno-Solutions Corporation.
      */
     protected static class ByteEditor extends NumberEditor {
@@ -190,8 +193,6 @@ public class CSVToBeanMapping<T> extends CsvToBean<T> {
         }
 
         /**
-         * 10進数としてデコードします。
-         *
          * {@inheritDoc}
          */
         @Override
@@ -201,21 +202,12 @@ public class CSVToBeanMapping<T> extends CsvToBean<T> {
     }
 
     /**
-     * OpenCSV内部でのみ使用される、Integerプロパティエディタです。
-     *
-     * <p>
-     * このクラスは、整数型ラッパークラスのデフォルトプロパティエディタが、
-     * 文字列 "08"、"09" を８進数としてデコードしてしまう問題を回避するために
-     * 作成されました。
-     * </p>
-     *
+     * Integerプロパティエディタです。
      * @author ITOCHU Techno-Solutions Corporation.
      */
     protected static class IntegerEditor extends NumberEditor {
 
         /**
-         * 10進数としてデコードします。
-         *
          * {@inheritDoc}
          */
         @Override
@@ -226,14 +218,7 @@ public class CSVToBeanMapping<T> extends CsvToBean<T> {
     }
 
     /**
-     * OpenCSV内部でのみ使用される、Longプロパティエディタです。
-     *
-     * <p>
-     * このクラスは、整数型ラッパークラスのデフォルトプロパティエディタが、
-     * 文字列 "08"、"09" を８進数としてデコードしてしまう問題を回避するために
-     * 作成されました。
-     * </p>
-     *
+     * Longプロパティエディタです。
      * @author ITOCHU Techno-Solutions Corporation.
      */
     protected static class LongEditor extends NumberEditor {
@@ -248,8 +233,6 @@ public class CSVToBeanMapping<T> extends CsvToBean<T> {
         }
 
         /**
-         * 10進数としてデコードします。
-         *
          * {@inheritDoc}
          */
         @Override
@@ -260,14 +243,7 @@ public class CSVToBeanMapping<T> extends CsvToBean<T> {
     }
 
     /**
-     * OpenCSV内部でのみ使用される、Shortプロパティエディタです。
-     *
-     * <p>
-     * このクラスは、整数型ラッパークラスのデフォルトプロパティエディタが、
-     * 文字列 "08"、"09" を８進数としてデコードしてしまう問題を回避するために
-     * 作成されました。
-     * </p>
-     *
+     * Shortプロパティエディタです。
      * @author ITOCHU Techno-Solutions Corporation.
      */
     protected static class ShortEditor extends NumberEditor {
@@ -282,8 +258,6 @@ public class CSVToBeanMapping<T> extends CsvToBean<T> {
         }
 
         /**
-         * 10進数としてデコードします。
-         *
          * {@inheritDoc}
          */
         @Override

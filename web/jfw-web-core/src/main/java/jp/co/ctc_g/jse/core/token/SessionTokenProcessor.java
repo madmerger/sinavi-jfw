@@ -17,8 +17,8 @@
 package jp.co.ctc_g.jse.core.token;
 
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import jp.co.ctc_g.jfw.core.util.Args;
 import jp.co.ctc_g.jfw.core.util.Strings;

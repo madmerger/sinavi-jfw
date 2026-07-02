@@ -20,7 +20,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.util.Arrays;

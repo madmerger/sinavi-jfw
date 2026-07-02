@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import javax.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolation;
 
 import jp.co.ctc_g.jfw.core.internal.InternalException;
 import jp.co.ctc_g.jfw.core.util.Args;
@@ -32,7 +32,7 @@ import jp.co.ctc_g.jfw.core.util.Maps;
 import jp.co.ctc_g.jfw.core.util.Reflects;
 import jp.co.ctc_g.jfw.core.util.Strings;
 import jp.co.ctc_g.jse.core.csv.CSVConfigs.CSVConfig;
-import au.com.bytecode.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
 
 /**
  * <p>

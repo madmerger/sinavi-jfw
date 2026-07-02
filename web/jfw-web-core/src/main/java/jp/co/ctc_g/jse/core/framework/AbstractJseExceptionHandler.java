@@ -18,8 +18,8 @@ package jp.co.ctc_g.jse.core.framework;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import jp.co.ctc_g.jfw.core.exception.AbstractException;
 import jp.co.ctc_g.jfw.core.internal.Config;

@@ -16,7 +16,7 @@
 
 package jp.co.ctc_g.jse.core.excel;
 
-import java.lang.annotation.Annotation;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -25,26 +25,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.java.amateras.xlsbeans.NeedPostProcess;
-import net.java.amateras.xlsbeans.Utils;
-import net.java.amateras.xlsbeans.XLSBeansException;
-import net.java.amateras.xlsbeans.annotation.Column;
-import net.java.amateras.xlsbeans.annotation.MapColumns;
-import net.java.amateras.xlsbeans.annotation.PostProcess;
-import net.java.amateras.xlsbeans.annotation.RecordTerminal;
-import net.java.amateras.xlsbeans.processor.VerticalRecordsProcessor;
-import net.java.amateras.xlsbeans.xml.AnnotationReader;
-import net.java.amateras.xlsbeans.xssfconverter.WCell;
-import net.java.amateras.xlsbeans.xssfconverter.WSheet;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 
 /**
  * <p>
- * このクラスは、垂直方向に連続する列をマッピングします。
+ * このクラスは、垂直方向に連続するレコードをExcelシートから読み込むプロセッサです。
  * </p>
- * @see VerticalRecordsProcessor
  * @author ITOCHU Techno-Solutions Corporation.
  */
-public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
+public class JxVerticalRecordsProcessor {
 
     /**
      * デフォルトコンストラクタです。
@@ -52,283 +44,132 @@ public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
     public JxVerticalRecordsProcessor() {}
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * このメソッドの処理はオリジナルと同じです。
-     * アノテーションのみ変更しています。
-     * </p>
+     * 垂直方向のレコードをExcelシートから読み込みます。
+     * @param sheet Excelシート
+     * @param record アノテーション定義
+     * @return 読み込み結果のマップ（ヘッダ情報とレコード配列）
      */
-    @Override
-    public void doProcess(WSheet sheet, Object obj, Method setter, Annotation ann, AnnotationReader reader,
-        List<NeedPostProcess> processor) throws Exception {
-        JxVerticalRecords records = (JxVerticalRecords) ann;
-        Class<?>[] clazzes = setter.getParameterTypes();
-        if (clazzes.length != 1) {
-            throw new XLSBeansException("Arguments of '" + setter.toString() + "' is invalid.");
-        } else if (List.class.isAssignableFrom(clazzes[0])) {
-            List<?> value = createRecords(sheet, records, reader, processor);
-            if (value != null) {
-                setter.invoke(obj, new Object[] {
-                    value
-                });
-            }
-        } else if (clazzes[0].isArray()) {
-            List<?> value = createRecords(sheet, records, reader, processor);
-            if (value != null) {
-                Class<?> type = clazzes[0].getComponentType();
-                Object array = Array.newInstance(type, value.size());
-                for (int i = 0; i < value.size(); i++) {
-                    Array.set(array, i, value.get(i));
-                }
-                setter.invoke(obj, new Object[] {
-                    array
-                });
-            }
-        } else {
-            throw new XLSBeansException("Arguments of '" + setter.toString() + "' is invalid.");
+    public Map<JxHeaderInfo, Object[]> process(Sheet sheet, JxVerticalRecords record) {
+        Map<JxHeaderInfo, Object[]> result = new LinkedHashMap<>();
+        int headerColumn = record.headerColumn();
+        int headerRow = record.headerRow();
+        if (headerColumn < 0 || headerRow < 0) {
+            return result;
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * このメソッドの処理はオリジナルと同じです。
-     * アノテーションのみ変更しています。
-     * </p>
-     */
-    @Override
-    public void doProcess(WSheet wSheet, Object obj, Field field, Annotation ann, AnnotationReader reader,
-        List<NeedPostProcess> needPostProcess) throws Exception {
-        JxVerticalRecords records = (JxVerticalRecords) ann;
-        Class<?> clazz = field.getType();
-        if (List.class.isAssignableFrom(clazz)) {
-            List<?> value = createRecords(wSheet, records, reader, needPostProcess);
-            if (value != null) {
-                field.set(obj, value);
-            }
-        } else if (clazz.isArray()) {
-            List<?> value = createRecords(wSheet, records, reader, needPostProcess);
-            if (value != null) {
-                Class<?> type = clazz.getComponentType();
-                Object array = Array.newInstance(type, value.size());
-                for (int i = 0; i < value.size(); i++) {
-                    Array.set(array, i, value.get(i));
-                }
-                field.set(obj, array);
-            }
-        } else {
-            throw new XLSBeansException("Arguments of '" + field.toString() + "' is invalid.");
+        List<JxHeaderInfo> headers = getHeaders(sheet, record);
+        for (JxHeaderInfo header : headers) {
+            Object[] records = readRecords(sheet, record, header);
+            result.put(header, records);
         }
-    }
-
-    /**
-     * レコードとJavaのオブジェクトをマッピングします。
-     */
-    protected List<?> createRecords(WSheet wSheet, JxVerticalRecords records, AnnotationReader reader,
-        List<NeedPostProcess> needPostProcess) throws Exception {
-        List<Object> columnProps = Utils.getColumnProperties(records.recordClass().newInstance(), null, reader);
-        if (columnProps.isEmpty()) throw new XLSBeansException("VerticalRecordsには@Columnは必須です。");
-        List<Object> result = new ArrayList<Object>();
-        List<JxHeaderInfo> headers = new ArrayList<JxHeaderInfo>();
-        // get header
-        int initColumn = -1;
-        int initRow = -1;
-        if (records.tableLabel().equals("")) {
-            initColumn = records.headerColumn();
-            initRow = records.headerRow();
-        } else {
-            try {
-                WCell labelCell = Utils.getCell(wSheet, records.tableLabel(), 0);
-                initColumn = labelCell.getColumn() + 1;
-                initRow = labelCell.getRow();
-            } catch (XLSBeansException ex) {
-                if (records.optional()) {
-                    return null;
-                } else {
-                    throw ex;
-                }
-            }
-        }
-        int hColumn = initColumn;
-        int hRow = initRow;
-        int rangeCount = 1;
-        while (true) {
-            try {
-                WCell cell = wSheet.getCell(hColumn, hRow);
-                while (cell.getContents().equals("") && rangeCount < records.range()) {
-                    cell = wSheet.getCell(hColumn, hRow + rangeCount);
-                    rangeCount++;
-                }
-                if (cell.getContents().equals("")) {
-                    break;
-                } else {
-                    for (int j = hColumn; j > initColumn; j--) {
-                        WCell tmpCell = wSheet.getCell(j, hRow);
-                        if (!tmpCell.getContents().equals("")) {
-                            cell = tmpCell;
-                            break;
-                        }
-                    }
-                }
-                headers.add(new JxHeaderInfo(cell.getContents(), rangeCount - 1, hRow));
-                hRow = hRow + rangeCount;
-                rangeCount = 1;
-            } catch (ArrayIndexOutOfBoundsException ex) {
-                break;
-            }
-            if (records.headerLimit() > 0 && headers.size() >= records.headerLimit()) {
-                break;
-            }
-        }
-
-        // Check for columns
-        checkColumns(records.recordClass(), headers, reader);
-
-        RecordTerminal terminal = records.terminal();
-        if (terminal == null) {
-            terminal = RecordTerminal.Empty;
-        }
-
-        // get records
-        hColumn++;
-        while (hColumn < wSheet.getColumns()) {
-            hRow = initRow;
-            // ここの処理が遅かったので、大幅にリファクタリングしています。
-            Object record = records.recordClass().newInstance();
-            processMapColumns(wSheet, headers, hRow, hColumn, record, reader);
-            boolean retColumn = processColumn(wSheet, headers, hRow, hColumn, record, reader);
-            if (retColumn) {
-                result.add(record);
-                for (Method method : record.getClass().getMethods()) {
-                    PostProcess ann = reader.getAnnotation(record.getClass(), method, PostProcess.class);
-                    if (ann != null) {
-                        needPostProcess.add(new NeedPostProcess(record, method));
-                    }
-                }
-            }
-            hColumn++;
-        }
-
         return result;
     }
 
     /**
-     * <p>
-     * {@link Column}アノテーションが付与されているプロパティを検索し、Excelのデータとマッピングします。
-     * また、マッピングを実施したかどうかを判断し、呼び出し元に返却します。
-     * この2つの対応はパフォーマンス対策です。
-     * </p>
-     * <p>
-     * XLSBeansでは最大カラムの数×HeaderInfoの数を検索し、{@link Column}アノテーションのマッピングを行っていました。
-     * これではデータの件数が増加すればするほど処理時間がかかることから{@link Column}アノテーションが付与されているプロパティを検査し、
-     * そのプロパティとHeaderInfoのラベルが一致するかどうかを調べることで高速に処理するようにしました。
-     * {@link JxHeaderInfo}に行番号を保持するプロパティを定義したのはこのためです。
-     * </p>
-     * <p>
-     * {@link WSheet#getColumns()}は最大のカラム数を返す実装になっています。
-     * 同一の構造の表が2つシート内で繰り返し出現したとき、どちらかが最大のカラム数を繰り返し処理されます。
-     * そのため、空文字列がマッピングされる可能性があります。
-     * これに対応するために内容を確認し、空文字列の場合：false、空文字列以外の場合：trueを返しています。
-     * </p>
+     * ヘッダ情報を取得します。
+     * @param sheet Excelシート
+     * @param record アノテーション定義
+     * @return ヘッダ情報のリスト
      */
-    protected boolean processColumn(WSheet wSheet, List<JxHeaderInfo> headers, int hRow, int hColumn, Object record,
-        AnnotationReader reader) throws Exception {
-
-        List<String> keys = new ArrayList<String>();
-        List<Object> properties = Utils.getColumnProperties(record, null, reader);
-        for (Object property : properties) {
-            Column column = null;
-            if (property instanceof Method) {
-                column = reader.getAnnotation(record.getClass(), (Method) property, Column.class);
-            } else if (property instanceof Field) {
-                column = reader.getAnnotation(record.getClass(), (Field) property, Column.class);
-            }
-            for (JxHeaderInfo info : headers) {
-                if (info.getHeaderLabel().equals(column.columnName())) {
-                    hRow = info.getRowIndex();
-                    break;
-                }
-            }
-            WCell cell = wSheet.getCell(hColumn, hRow);
-            WCell valueCell = cell;
-            if (!valueCell.getContents().equals("")) {
-                String key = "";
-                if (property instanceof Method) {
-                    key = ((Method) property).getName();
-                    Utils.setPosition(hColumn, hRow, record, Utils.toPropertyName(key));
-                    Utils.invokeSetter((Method) property, record, valueCell.getContents());
-                } else if (property instanceof Field) {
-                    key = ((Field) property).getName();
-                    Utils.setPosition(hColumn, hRow, record, key);
-                    Utils.setField((Field) property, record, valueCell.getContents());
-                }
-                keys.add(key);
-            }
+    protected List<JxHeaderInfo> getHeaders(Sheet sheet, JxVerticalRecords record) {
+        List<JxHeaderInfo> headers = new ArrayList<>();
+        int headerRow = record.headerRow();
+        int headerColumn = record.headerColumn();
+        int range = record.range();
+        int limit = record.headerLimit();
+        Row row = sheet.getRow(headerRow);
+        if (row == null) return headers;
+        int count = 0;
+        for (int col = headerColumn; col <= row.getLastCellNum(); col++) {
+            if (limit > 0 && count >= limit) break;
+            Cell cell = row.getCell(col);
+            if (cell == null || cell.getCellType() == CellType.BLANK) break;
+            String label = cell.getStringCellValue();
+            if (label == null || label.isEmpty()) break;
+            headers.add(new JxHeaderInfo(label, range, headerRow));
+            count++;
         }
-        return !keys.isEmpty();
+        return headers;
     }
 
     /**
-     * <p>
-     * {@link Column}アノテーションが付与されているプロパティを検索し、Excelのデータとマッピングします。
-     * </p>
+     * レコードを読み込みます。
+     * @param sheet Excelシート
+     * @param record アノテーション定義
+     * @param header ヘッダ情報
+     * @return 読み込み結果の配列
      */
-    protected void processMapColumns(WSheet sheet, List<JxHeaderInfo> headerInfos, int begin, int column, Object record,
-        AnnotationReader reader) throws Exception {
+    @SuppressWarnings("unchecked")
+    protected Object[] readRecords(Sheet sheet, JxVerticalRecords record, JxHeaderInfo header) {
+        Class<?> recordClass = record.recordClass();
+        List<Object> records = new ArrayList<>();
+        int startRow = header.getRowIndex() + header.getHeaderRange();
+        int headerColumn = record.headerColumn();
+        for (int rowIdx = startRow; rowIdx <= sheet.getLastRowNum(); rowIdx++) {
+            Row row = sheet.getRow(rowIdx);
+            if (row == null) break;
+            Cell cell = row.getCell(headerColumn);
+            if (isTerminal(cell, record.terminal(), record.terminateLabel())) break;
+            try {
+                Object bean = recordClass.getDeclaredConstructor().newInstance();
+                mapRow(bean, row, headerColumn);
+                records.add(bean);
+            } catch (Exception e) {
+                break;
+            }
+        }
+        return records.toArray((Object[]) Array.newInstance(recordClass, 0));
+    }
 
-        List<Object> properties = Utils.getMapColumnProperties(record, reader);
-        for (Object property : properties) {
-            MapColumns ann = null;
-            if (property instanceof Method) {
-                ann = reader.getAnnotation(record.getClass(), (Method) property, MapColumns.class);
-            } else if (property instanceof Field) {
-                ann = reader.getAnnotation(record.getClass(), (Field) property, MapColumns.class);
+    private boolean isTerminal(Cell cell, RecordTerminal terminal, String terminateLabel) {
+        if (cell == null || cell.getCellType() == CellType.BLANK) {
+            return terminal == RecordTerminal.Empty;
+        }
+        if (terminateLabel != null && !terminateLabel.isEmpty()) {
+            String value = cell.getStringCellValue();
+            if (terminateLabel.equals(value)) return true;
+        }
+        return false;
+    }
+
+    private void mapRow(Object bean, Row row, int startCol) {
+        Field[] fields = bean.getClass().getDeclaredFields();
+        int col = startCol;
+        for (Field field : fields) {
+            Cell cell = row.getCell(col);
+            if (cell != null) {
+                setFieldValue(bean, field, cell);
             }
-            boolean flag = false;
-            Map<String, String> map = new LinkedHashMap<String, String>();
-            for (JxHeaderInfo headerInfo : headerInfos) {
-                if (headerInfo.getHeaderLabel().equals(ann.previousColumnName())) {
-                    flag = true;
-                    begin++;
-                    continue;
-                }
-                if (flag) {
-                    WCell cell = sheet.getCell(column, begin + headerInfo.getHeaderRange());
-                    map.put(headerInfo.getHeaderLabel(), cell.getContents());
-                }
-                begin = begin + headerInfo.getHeaderRange() + 1;
-            }
-            if (!map.isEmpty()) {
-                if (property instanceof Method) {
-                    ((Method) property).invoke(record, map);
-                } else if (property instanceof Field) {
-                    ((Field) property).set(record, map);
-                }
-            }
+            col++;
         }
     }
 
-    protected void checkColumns(Class<?> recordClass, List<JxHeaderInfo> headers, AnnotationReader reader) throws Exception {
-
-        for (Object property : Utils.getColumnProperties(recordClass.newInstance(), null, reader)) {
-            Column column = null;
-            if (property instanceof Method) {
-                column = reader.getAnnotation(recordClass, (Method) property, Column.class);
-            } else if (property instanceof Field) {
-                column = reader.getAnnotation(recordClass, (Field) property, Column.class);
+    private void setFieldValue(Object bean, Field field, Cell cell) {
+        try {
+            field.setAccessible(true);
+            Class<?> type = field.getType();
+            if (type == String.class) {
+                field.set(bean, getCellStringValue(cell));
+            } else if (type == int.class || type == Integer.class) {
+                field.set(bean, (int) cell.getNumericCellValue());
+            } else if (type == long.class || type == Long.class) {
+                field.set(bean, (long) cell.getNumericCellValue());
+            } else if (type == double.class || type == Double.class) {
+                field.set(bean, cell.getNumericCellValue());
+            } else if (type == boolean.class || type == Boolean.class) {
+                field.set(bean, cell.getBooleanCellValue());
             }
-            if (column != null && !column.optional()) {
-                String columnName = column.columnName();
-                boolean find = false;
-                for (JxHeaderInfo info : headers) {
-                    if (info.getHeaderLabel().equals(columnName)) {
-                        find = true;
-                        break;
-                    }
-                }
-                if (!find) { throw new XLSBeansException("Column '" + columnName + "' doesn't exist."); }
-            }
+        } catch (Exception e) {
+            // skip field mapping errors
         }
     }
 
+    private String getCellStringValue(Cell cell) {
+        if (cell == null) return null;
+        switch (cell.getCellType()) {
+            case STRING: return cell.getStringCellValue();
+            case NUMERIC: return String.valueOf((long) cell.getNumericCellValue());
+            case BOOLEAN: return String.valueOf(cell.getBooleanCellValue());
+            default: return null;
+        }
+    }
 }
