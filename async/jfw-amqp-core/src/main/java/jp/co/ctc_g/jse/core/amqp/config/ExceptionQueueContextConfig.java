@@ -31,7 +31,9 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.config.StatefulRetryOperationsInterceptorFactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.retry.MessageRecoverer;
@@ -46,131 +48,11 @@ import org.springframework.retry.support.RetryTemplate;
 import org.springframework.util.ErrorHandler;
 
 /**
- * <p>
- * このクラスは、例外用のExchange/Queueの生成、ExchangeとQueueのBindを行う設定を提供します。
- * </p>
- * <p>
- * このクラスを利用した場合はRabbitMQに以下の表に示すExchange/Queueを自動生成します。
- * ただし、ExchangeとQueueの自動生成はSpringのBeanProfileのスコープに<strong>development</strong>が指定されている場合のみです。
- * それ以外のスコープではExchangeとQueueを自動生成しません。
- * また、ExchangeとQueueを生成するタイミングは
- * RabbitMQへアクセスするタイミングとなりますが、
- * {@link jp.co.ctc_g.jse.core.amqp.initializer.RabbitMQInitializer}を利用すると
- * アプリケーション起動時に生成します。
- * <table>
- *  <thead>
- *   <tr>
- *    <td>キー名/キュー名</td>
- *    <td>種別(Exchange/Queue)</td>
- *    <td>概要</td>
- *    <td>備考</td>
- *   </tr>
- *  </thead>
- *  <tbody>
- *   <tr>
- *    <td>error.exchange</td>
- *    <td>Exchange</td>
- *    <td>例外を受け付けるExchangeです。このExchangeを経由し、対象のキューに配送します。</td>
- *    <td>
- *     タイプ：TOPIC
- *     <br/>
- *     Bind：recoverable.exception.messages.queue/unrecoverable.exception.messages.queue
- *     BindigKey：#.excpetion.#
- *    </td>
- *   </tr>
- *   <tr>
- *    <td>exception.exchange</td>
- *    <td>Exchange</td>
- *    <td>回復可能・回復不可能な例外を判断するExchangeです。</td>
- *    <td>
- *     タイプ：TOPIC
- *     <br/>
- *     Bind：exception.exchange
- *     <br/>
- *     BindigKey：#.recoverable.exception.#/#.unrecoverable.exception.#
- *    </td>
- *   </tr>
- *   <tr>
- *    <td>unrecoverable.exception.messages.queue</td>
- *    <td>Queue</td>
- *    <td>
- *    回復不能例外のメッセージを管理するキューです。<br/>
- *    {@link jp.co.ctc_g.jse.core.amqp.exception.AmqpApplicationUnrecoverableException}と
- *    {@link jp.co.ctc_g.jse.core.amqp.exception.AmqpSystemException}より派生した回復不能例外が発生したメッセージが配信されます。
- *    </td>
- *    <td>-</td>
- *   </tr>
- *   <tr>
- *    <td>recoverable.exception.messages.queue</td>
- *    <td>Queue</td>
- *    <td>
- *    回復可能例外のメッセージを管理するキューです。<br/>
- *    {@link jp.co.ctc_g.jse.core.amqp.exception.AmqpApplicationRecoverableException}より派生した回復可能例外が発生したメッセージが配信されます。<br/>
- *    このキューに格納されたメッセージは指定された回数リトライを指定しても回復できなかった場合であり、
- *    例えば、10回リトライしてもAmqpApplicationRecoverableExceptionが発生する場合はこのキューにメッセージが配信されます。
- *    </td>
- *    <td>-</td>
- *   </tr>
- *  </tbody>
- * </table>
- * </p>
- * <p>
- * この設定を有効にする方法は{@link AmqpContextConfig}を参照してください。
- * </p>
- * <p>
- * また、例外用のExchangeやQueue名は次のキーを設定することにより、変更することが可能です。
- * </p>
- * <table>
- *  <thead>
- *   <tr>
- *    <th>キー</th>
- *    <th>概要</th>
- *    <th>デフォルト値</th>
- *   </tr>
- *  </thead>
- *  <tbody>
- *   <tr>
- *    <td>rabbitmq.error.exchange</td>
- *    <td>例外用のExchangeキーを指定します。</td>
- *    <td>error.exchange</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.exception.binding.key</td>
- *    <td>error.exchangeからexception.exchangeへと配信するBindキーを指定します。</td>
- *    <td>#.exception.#</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.exception.exchange</td>
- *    <td>例外のルーティングキーに応じて配信するキューを決定するExchangeキーを指定します。</td>
- *    <td>exception.exchange</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.unrecoverable.exception.binding.key</td>
- *    <td>exception.exchangeから回復不可能例外キューへと配信するBindキーを指定します。</td>
- *    <td>#.unrecoverable.exception.#</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.recoverable.exception.binding.key</td>
- *    <td>exception.exchangeから回復可能例外キューへと配信するBindキーを指定します。</td>
- *    <td>#.recoverable.exception.#</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.recoverable.exception.messages.queue</td>
- *    <td>回復可能例外のキュー名を指定します。</td>
- *    <td>recoverable.exception.messages.queue</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.unrecoverable.exception.messages.queue</td>
- *    <td>回復不可能例外のキュー名を指定します。</td>
- *    <td>unrecoverable.exception.messages.queue</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.unknown.unrecoverable.exception.routing.key</td>
- *    <td>予期しない例外発生時に利用するデフォルトのルーティングキーを指定します。</td>
- *    <td>unknown.unrecoverable.exception.key</td>
- *   </tr>
- *  </tbody>
- * </table>
+ * 例外用のQueueとExchangeを設定し、回復可能/回復不能な例外をそれぞれのキューへルーティングします。
+ * 有効化方法は {@link AmqpContextConfig} を参照してください。
+ * 主なプロパティは {@code rabbitmq.error.exchange}、{@code rabbitmq.exception.binding.key}、
+ * {@code rabbitmq.exception.exchange}、{@code rabbitmq.unrecoverable.exception.binding.key}、
+ * {@code rabbitmq.recoverable.exception.binding.key} です。
  * @author ITOCHU Techno-Solutions Corporation.
  */
 @Configuration
@@ -303,7 +185,10 @@ public class ExceptionQueueContextConfig extends AmqpContextConfig {
 
     @Configuration
     @Profile("development")
-    public static class DevelopmentAmqpAdminConfig extends AmqpContextConfig {
+    public static class DevelopmentAmqpAdminConfig {
+
+        @Autowired
+        private ConnectionFactory connectionFactory;
 
         /**
          * RabbitMQの管理操作を実行する{@link AmqpAdmin}のインスタンスを生成し、DIコンテナに登録します。
@@ -311,7 +196,7 @@ public class ExceptionQueueContextConfig extends AmqpContextConfig {
          */
         @Bean
         public AmqpAdmin amqpAdmin() {
-            RabbitAdmin rabbitAdmin = new RabbitAdmin(factory());
+            RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory);
             rabbitAdmin.setAutoStartup(true);
             return rabbitAdmin;
         }

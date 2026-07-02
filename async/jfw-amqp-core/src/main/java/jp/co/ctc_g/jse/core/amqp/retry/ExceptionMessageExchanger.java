@@ -37,59 +37,8 @@ import org.springframework.amqp.rabbit.retry.MessageRecoverer;
 import org.springframework.beans.factory.InitializingBean;
 
 /**
- * <p>
- * このクラスは、{@link MessageRecoverer}を実装したクラスです。
- * </p>
- * <p>
- * このクラスは、メッセージ受信側で発生した例外情報をメッセージのヘッダに付与し、
- * RabbitMQの例外用のキューへ転送します。
- * </p>
- * <p>
- * メッセージの転送前にメッセージヘッダへ以下の情報を付与し、
- * 指定されたExchange/RoutingKeyで転送します。
- * このメッセージヘッダのキーは変更することが可能です。
- * 変更可能なキーとそのキーでどのような情報を設定するかは以下を参照してください。
- * <table>
- *  <thead>
- *   <tr>
- *    <th>プロパティキー</th>
- *    <th>概要</th>
- *    <th>メッセージヘッダキー</th>
- *   </tr>
- *  </thead>
- *  <tbody>
- *   <tr>
- *     <td>jp.co.ctc_g.jse.core.amqp.retry.ExceptionMessageExchanger.exception_id</td>
- *     <td>例外発生時に設定されるUIDを設定します。これは、{@link AbstractAmqpException}を継承した例外のみ有効になります。</td>
- *     <td>x-exception-id</td>
- *   </tr>
- *   <tr>
- *     <td>jp.co.ctc_g.jse.core.amqp.retry.ExceptionMessageExchanger.exception_message</td>
- *     <td>例外のメッセージを設定します。</td>
- *     <td>x-exception-message</td>
- *   </tr>
- *   <tr>
- *     <td>jp.co.ctc_g.jse.core.amqp.retry.ExceptionMessageExchanger.exception_stacktrace</td>
- *     <td>例外のスタックトレースを設定します。</td>
- *     <td>x-exception-stacktrace</td>
- *   </tr>
- *   <tr>
- *     <td>jp.co.ctc_g.jse.core.amqp.retry.ExceptionMessageExchanger.original_exchange</td>
- *     <td>メッセージ送信側が指定したExchangeを設定します。</td>
- *     <td>x-original-exchange</td>
- *   </tr>
- *   <tr>
- *     <td>jp.co.ctc_g.jse.core.amqp.retry.ExceptionMessageExchanger.original_routing_key</td>
- *     <td>メッセージ送信側が指定したRoutingKeyを設定します。</td>
- *     <td>x-original-exchange</td>
- *   </tr>
- * </table>
- * </p>
- * <p>
- * 転送するRoutingKeyはAMQPの基底クラス{@link AbstractAmqpException}を継承した例外であれば、
- * 例外個別に指定することができます。
- * 例外に応じて配送するQueueを変えたい場合に利用します。
- * </p>
+ * 受信側で発生した例外情報をメッセージヘッダへ付与し、例外用キューへ転送します。
+ * 付与するヘッダは例外ID、例外メッセージ、スタックトレース、元のExchange/RoutingKeyです。
  * @author ITOCHU Techno-Solutions Corporation.
  */
 public class ExceptionMessageExchanger implements MessageRecoverer, InitializingBean {

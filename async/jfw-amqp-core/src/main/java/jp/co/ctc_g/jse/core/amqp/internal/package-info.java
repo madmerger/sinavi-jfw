@@ -15,14 +15,8 @@
  */
 
 /**
- * <p>
- * このパッケージは、J-Framework外部からの利用は想定されていません。
- * 開発者のみなさんが作成したアプリケーションとの互換性については、
- * 他のパッケージほど充分に考慮されることはありません。
- * </p>
- * このパッケージの主要APIは、{@link jp.co.ctc_g.jse.core.amqp.internal.AmqpInternals}より提供されています。
- * このパッケージをよりよく理解するために、当該Javadocを参照してください。
- * <p>
+ * J-Frameworkの内部向けAMQP実装パッケージです。
+ * 外部公開APIとしては想定していません。
  * @author ITOCHU Techno-Solutions Corporation.
  */
 package jp.co.ctc_g.jse.core.amqp.internal;

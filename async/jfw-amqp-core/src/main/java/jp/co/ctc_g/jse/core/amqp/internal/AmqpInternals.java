@@ -27,27 +27,8 @@ import jp.co.ctc_g.jfw.core.util.Args;
 import jp.co.ctc_g.jfw.core.util.Maps;
 
 /**
- * <p>
- * このクラスは、J-Frameworkの内部処理方式に関するユーティリティクラスです。
- * J-Frameworkを利用する開発者のみなさんに とりたてて重要な機能を提供することはありませんが、
- * J-Framework 内部でのコンフィギュレーション管理の方式を理解する手助けにはなります。
- * </p>
- * <p>
- * このクラスが現在管理している内部処理方式は、
- * </p>
- * <ul>
- * <li>コンフィギュレーション管理方式</li>
- * </ul>
- * <p>
- * です。
- * </p>
- * <h4>コンフィギュレーション管理方式</h4>
- * <p>
- * J-Frameworkでは、 フレームワークの各クラス毎のコンフィギュレーションを実現する方法として、
- * <strong>クラスコンフィグオーバライド</strong>という方法を採用しています。 この方法自体についての詳細は、{@link Config}
- * を参照してください。 このクラスは、クラスコンフィグオーバライドを実現する仕組みを提供しています。
- * </p>
- *
+ * J-Frameworkの内部向けAMQPユーティリティです。
+ * 各クラス用の設定を読み込むための {@link Config} 取得処理を提供します。
  * @author ITOCHU Techno-Solutions Corporation.
  */
 public final class AmqpInternals {

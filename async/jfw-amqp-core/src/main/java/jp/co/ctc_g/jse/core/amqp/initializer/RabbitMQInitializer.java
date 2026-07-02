@@ -36,35 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 /**
- * <p>
- * このクラスは、Bean登録されているExchangeとQueueをRabbitMQに作成・削除する処理を提供します。
- * </p>
- * <p>
- * このクラスは、APサーバ起動時にSpringのDIコンテナにBean登録されているExchange・QueueをRabbitMQに作成します。
- * また、APサーバ停止時にSpringのDIコンテナにBean登録されているExchange・QueueをRabbitMQより削除します。
- * 削除機能を有効にする場合は、<code>deleted</code>プロパティに<code>true</code>を設定してください。
- * 以下に設定例を示します。
- * <ul>
- *  <li>削除無効</li>
- *   <ul>
- *    <div>
- * <pre class="brush:java">
- * &lt;bean class="jp.co.ctc_g.jse.core.amqp.initializer.RabbitMQInitializer" /&gt;
- * </pre>
- *    </div>
- *   </ul>
- *  <li>削除有効<li>
- *   <ul>
- *    <div>
- * <pre class="brush:java">
- * &lt;bean class="jp.co.ctc_g.jse.core.amqp.initializer.RabbitMQInitializer"&gt;
- *  &lt;property name="deleted" value="true" /&gt;
- * &lt;/bean&gt;
- * </pre>
- *    </div>
- *   </ul>
- * </ul>
- * </p>
+ * Bean登録されているExchangeとQueueをRabbitMQに作成・削除します。
+ * 起動時に登録済みのExchange/Queue/Bindingを宣言し、`deleted=true` の場合は停止時に削除します。
  * @author ITOCHU Techno-Solutions Corporation.
  */
 public class RabbitMQInitializer implements InitializingBean, DisposableBean {

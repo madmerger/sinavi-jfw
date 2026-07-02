@@ -33,112 +33,11 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
 /**
- * <p>
- * このクラスは、RabbitMQのコネクションファクトリの設定やRabbitTemplateのインスタンス生成などのAMQPに共通して必要な設定を提供します。
- * </p>
- * <p>
- * この設定を有効にする場合は、以下の3通りの方法があります。
- * <ol>
- *   <li>このクラスをコンポーネントスキャンの対象に含める方法</li>
- *   <li>JavaConfigにインポートする方法</li>
- *   <ul>
- *     <div>
- *       <pre class="brush:java">
- *       &#064;Configuration
- *       &#064;Import(AmqpContextConfig.class)
- *       public class AppContextConfig {
- *         // Appのコンフィグ定義
- *       }
- *       </pre>
- *     </div>
- *   </ul>
- *   <li>XMLにインポートする方法</li>
- *   <ul>
- *     <div>
- *       <pre class="brush:java">
- *       &lt;beans&gt;
- *         &lt;bean class="jp.co.ctc_g.jse.core.amqp.config.AmqpContextConfig" /&gt;
- *       &lt;/beans&gt;
- *       </pre>
- *     </div>
- *   </ul>
- * </ol>
- * </p>
- * <p>
- * また、設定のオーバライドは
- * 大幅に挙動を変更する場合はJavaの継承を利用し、
- * 値のみを変更する場合はプロパティ値による指定で
- * オーバライドしてください。
- * なお、デフォルト値を有効にする場合でも以下の設定と
- * 空のプロパティファイルの設置が必要です。
- * プロパティファイルを指定する場合はSpringの{@link org.springframework.context.support.PropertySourcesPlaceholderConfigurer}を利用します。
- * 以下にXMLとJavaConfigのプロパティの指定例を示します。
- * <pre class="brush:java">
- * &lt;context:property-placeholder location="classpath:RabbitMQ.properties" 
- *   ignore-unresolvable="true"
- *   ignore-resource-not-found="true" /&gt;
- * </pre>
- * もしくは
- * <pre class="brush:java">
- * ※この設定はアプリケーション1つに対して1つとなります。
- * 例えば、Jdbc.propertiesも読み込みたい場合はPropertySourceの値にカンマ区切りで複数のプロパティを指定してください。
- * &#064;PropertySource("classpath:/RabbitMQ.properties")
- * public class PropertyPlacehodler {
- *     public PropertyPlacehodler() {}
- *     &#064;Bean
- *     public static PropertySourcesPlaceholderConfigurer placeHolderConfigurer() {
- *         PropertySourcesPlaceholderConfigurer configurer = new PropertySourcesPlaceholderConfigurer();
- *         configurer.setIgnoreResourceNotFound(true);
- *         configurer.setIgnoreUnresolvablePlaceholders(true);
- *         return configurer;
- *     }
- * }
- * </pre>
- * </p>
- * <p>
- * プロパティ値による指定でオーバライド可能な値は以下の通りです。
- * </p>
- * <table>
- *  <thead>
- *   <tr>
- *    <th>キー</th>
- *    <th>概要</th>
- *    <th>デフォルト値</th>
- *   </tr>
- *  </thead>
- *  <tbody>
- *   <tr>
- *    <td>rabbitmq.host</td>
- *    <td>RabbitMQの接続ホストを指定します。カンマで複数設定することも可能です。</td>
- *    <td>127.0.0.1</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.username</td>
- *    <td>接続するためのユーザ名を指定します。</td>
- *    <td>guest</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.password</td>
- *    <td>接続するためのパスワードを指定します。</td>
- *    <td>guest</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.channel-cache-size</td>
- *    <td>接続チャネルのキャッシュサイズを指定します。</td>
- *    <td>10</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.retry.count</td>
- *    <td>リトライの最大回数を指定します。</td>
- *    <td>10</td>
- *   </tr>
- *   <tr>
- *    <td>rabbitmq.retry.back.off.period</td>
- *    <td>リトライを実行する間隔を指定します。</td>
- *    <td>1000</td>
- *   </tr>
- *  </tbody>
- * </table>
+ * RabbitMQのコネクションファクトリとRabbitTemplateを設定します。
+ * 有効化方法はコンポーネントスキャン、JavaConfig の {@code @Import}、XML の bean 定義です。
+ * 値のみを変更する場合はプロパティ値で上書きします。
+ * 主なプロパティは {@code rabbitmq.host}、{@code rabbitmq.username}、{@code rabbitmq.password}、
+ * {@code rabbitmq.channel-cache-size}、{@code rabbitmq.retry.count}、{@code rabbitmq.retry.back.off.period} です。
  * @author ITOCHU Techno-Solutions Corporation.
  */
 @Configuration
