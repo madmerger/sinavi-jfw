@@ -25,7 +25,6 @@ import java.util.Set;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.ClassMapper;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
-import org.springframework.util.ClassUtils;
 
 /**
  * <p>
