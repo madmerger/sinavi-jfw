@@ -85,17 +85,24 @@ public class TrustedClassMapper implements ClassMapper {
      * {@inheritDoc}
      * <p>
      * メッセージの{@code __TypeId__}ヘッダの値を信頼済みパッケージに対して検証してから
-     * クラスをロードします。信頼済みパッケージに属さないクラスが指定された場合は
+     * クラスをロードします。完全修飾クラス名が信頼済みパッケージに属さない場合は
      * {@link SecurityException}をスローし、クラスのロード自体を行いません。
+     * </p>
+     * <p>
+     * エイリアス名（ドットを含まない短縮名）の場合は、{@link DefaultClassMapper}の
+     * 内部マッピングで解決後、解決されたクラスのパッケージを検証します。
+     * {@code __TypeId__}ヘッダが存在しない場合はデフォルト型に安全にフォールバックします。
      * </p>
      */
     @Override
     public Class<?> toClass(MessageProperties properties) {
         String typeId = retrieveTypeId(properties);
-        if (typeId != null) {
+        if (typeId != null && isFullyQualifiedClassName(typeId)) {
             validateTypeId(typeId);
         }
-        return delegate.toClass(properties);
+        Class<?> clazz = delegate.toClass(properties);
+        validateResolvedClass(clazz);
+        return clazz;
     }
 
     /**
@@ -115,6 +122,10 @@ public class TrustedClassMapper implements ClassMapper {
         return typeIdObj != null ? typeIdObj.toString() : null;
     }
 
+    private boolean isFullyQualifiedClassName(String typeId) {
+        return typeId.contains(".");
+    }
+
     private void validateTypeId(String typeId) {
         for (String trustedPackage : trustedPackages) {
             if (typeId.startsWith(trustedPackage + ".")) {
@@ -122,8 +133,18 @@ public class TrustedClassMapper implements ClassMapper {
             }
         }
         throw new SecurityException(
-            "Untrusted deserialization type: " + typeId
-            + ". Allowed packages: " + trustedPackages);
+            "Untrusted deserialization type: " + typeId);
+    }
+
+    private void validateResolvedClass(Class<?> clazz) {
+        String className = clazz.getName();
+        for (String trustedPackage : trustedPackages) {
+            if (className.startsWith(trustedPackage + ".")) {
+                return;
+            }
+        }
+        throw new SecurityException(
+            "Untrusted deserialization type: " + className);
     }
 
     /**
