@@ -19,11 +19,13 @@ package jp.co.ctc_g.jse.core.amqp.config;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.support.converter.ClassMapper;
 import org.springframework.amqp.support.converter.DefaultClassMapper;
+import org.springframework.util.ClassUtils;
 
 /**
  * <p>
@@ -32,6 +34,10 @@ import org.springframework.amqp.support.converter.DefaultClassMapper;
  * <p>
  * AMQPメッセージの{@code __TypeId__}ヘッダに基づいて任意のクラスがインスタンス化されることを防ぎ、
  * 安全でないデシリアライゼーション（CWE-502）を防止します。
+ * </p>
+ * <p>
+ * クラスのロード前に{@code __TypeId__}ヘッダの値を信頼済みパッケージに対して検証するため、
+ * 悪意あるクラスのstatic initializerが実行されることも防止します。
  * </p>
  * <p>
  * デフォルトでは以下のパッケージが信頼済みとして設定されています：
@@ -67,6 +73,11 @@ public class TrustedClassMapper implements ClassMapper {
      */
     public TrustedClassMapper(String... trustedPackages) {
         this.delegate = new DefaultClassMapper();
+        try {
+            this.delegate.afterPropertiesSet();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize DefaultClassMapper", e);
+        }
         this.trustedPackages = Collections.unmodifiableSet(
             new LinkedHashSet<String>(Arrays.asList(trustedPackages)));
     }
@@ -74,15 +85,18 @@ public class TrustedClassMapper implements ClassMapper {
     /**
      * {@inheritDoc}
      * <p>
-     * メッセージの{@code __TypeId__}ヘッダから解決されたクラスが信頼済みパッケージに属しているかを検証します。
-     * 信頼済みパッケージに属さないクラスが指定された場合は{@link SecurityException}をスローします。
+     * メッセージの{@code __TypeId__}ヘッダの値を信頼済みパッケージに対して検証してから
+     * クラスをロードします。信頼済みパッケージに属さないクラスが指定された場合は
+     * {@link SecurityException}をスローし、クラスのロード自体を行いません。
      * </p>
      */
     @Override
     public Class<?> toClass(MessageProperties properties) {
-        Class<?> clazz = delegate.toClass(properties);
-        validateClass(clazz);
-        return clazz;
+        String typeId = retrieveTypeId(properties);
+        if (typeId != null) {
+            validateTypeId(typeId);
+        }
+        return delegate.toClass(properties);
     }
 
     /**
@@ -93,15 +107,23 @@ public class TrustedClassMapper implements ClassMapper {
         delegate.fromClass(clazz, properties);
     }
 
-    private void validateClass(Class<?> clazz) {
-        String className = clazz.getName();
+    private String retrieveTypeId(MessageProperties properties) {
+        Map<String, Object> headers = properties.getHeaders();
+        if (headers == null) {
+            return null;
+        }
+        Object typeIdObj = headers.get(DefaultClassMapper.DEFAULT_CLASSID_FIELD_NAME);
+        return typeIdObj != null ? typeIdObj.toString() : null;
+    }
+
+    private void validateTypeId(String typeId) {
         for (String trustedPackage : trustedPackages) {
-            if (className.startsWith(trustedPackage + ".")) {
+            if (typeId.startsWith(trustedPackage + ".")) {
                 return;
             }
         }
         throw new SecurityException(
-            "Untrusted deserialization type: " + className
+            "Untrusted deserialization type: " + typeId
             + ". Allowed packages: " + trustedPackages);
     }
 
