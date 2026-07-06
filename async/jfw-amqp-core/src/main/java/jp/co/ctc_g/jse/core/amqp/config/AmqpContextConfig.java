@@ -16,7 +16,9 @@
 
 package jp.co.ctc_g.jse.core.amqp.config;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
@@ -227,13 +229,33 @@ public class AmqpContextConfig {
 
     /**
      * {@link MessageConverter}のインスタンスをDIコンテナに登録します。
+     * <p>
+     * セキュリティのため、{@link TrustedClassMapper}を使用して
+     * デシリアライズ対象のクラスを信頼済みパッケージに制限します。
+     * 信頼済みパッケージを追加する場合は{@link #trustedPackages()}をオーバライドしてください。
+     * </p>
      * @return {@link JsonMessageConverter}のインスタンス
      */
     @Bean
     public MessageConverter converter() {
         JsonMessageConverter converter = new JsonMessageConverter();
         converter.setCreateMessageIds(true);
+        List<String> packages = trustedPackages();
+        converter.setClassMapper(
+            new TrustedClassMapper(packages.toArray(new String[packages.size()])));
         return converter;
+    }
+
+    /**
+     * デシリアライズ時に許可する信頼済みパッケージの一覧を返します。
+     * <p>
+     * デフォルトでは{@code jp.co.ctc_g}、{@code java.util}、{@code java.lang}が許可されます。
+     * アプリケーション固有のパッケージを追加する場合はこのメソッドをオーバライドしてください。
+     * </p>
+     * @return 信頼済みパッケージプレフィックスのリスト
+     */
+    protected List<String> trustedPackages() {
+        return Arrays.asList("jp.co.ctc_g", "java.util", "java.lang");
     }
 
     /**
