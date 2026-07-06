@@ -18,6 +18,7 @@ package jp.co.ctc_g.jse.core.amqp.config;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -56,6 +57,13 @@ public class TrustedClassMapper implements ClassMapper {
         "java.lang"
     };
 
+    private static final Set<String> KNOWN_ALIASES;
+    static {
+        Set<String> aliases = new HashSet<String>();
+        aliases.add("Hashtable");
+        KNOWN_ALIASES = Collections.unmodifiableSet(aliases);
+    }
+
     private final DefaultClassMapper delegate;
     private final Set<String> trustedPackages;
 
@@ -84,21 +92,27 @@ public class TrustedClassMapper implements ClassMapper {
     /**
      * {@inheritDoc}
      * <p>
-     * メッセージの{@code __TypeId__}ヘッダの値を信頼済みパッケージに対して検証してから
-     * クラスをロードします。完全修飾クラス名が信頼済みパッケージに属さない場合は
-     * {@link SecurityException}をスローし、クラスのロード自体を行いません。
+     * メッセージの{@code __TypeId__}ヘッダの値をクラスロード前に検証します。
+     * 完全修飾クラス名は信頼済みパッケージに対して検証し、ドットを含まない名前は
+     * 既知のエイリアス（{@code Hashtable}等）のみを許可します。
+     * いずれにも該当しない場合は{@link SecurityException}をスローし、
+     * クラスのロード自体を行いません（static initializer攻撃を防止）。
      * </p>
      * <p>
-     * エイリアス名（ドットを含まない短縮名）の場合は、{@link DefaultClassMapper}の
-     * 内部マッピングで解決後、解決されたクラスのパッケージを検証します。
      * {@code __TypeId__}ヘッダが存在しない場合はデフォルト型に安全にフォールバックします。
+     * 解決後のクラスも信頼済みパッケージに対して二重検証されます。
      * </p>
      */
     @Override
     public Class<?> toClass(MessageProperties properties) {
         String typeId = retrieveTypeId(properties);
-        if (typeId != null && isFullyQualifiedClassName(typeId)) {
-            validateTypeId(typeId);
+        if (typeId != null) {
+            if (isFullyQualifiedClassName(typeId)) {
+                validateTypeId(typeId);
+            } else if (!KNOWN_ALIASES.contains(typeId)) {
+                throw new SecurityException(
+                    "Untrusted deserialization type: " + typeId);
+            }
         }
         Class<?> clazz = delegate.toClass(properties);
         validateResolvedClass(clazz);
@@ -137,7 +151,14 @@ public class TrustedClassMapper implements ClassMapper {
     }
 
     private void validateResolvedClass(Class<?> clazz) {
-        String className = clazz.getName();
+        Class<?> componentType = clazz;
+        while (componentType.isArray()) {
+            componentType = componentType.getComponentType();
+        }
+        if (componentType.isPrimitive()) {
+            return;
+        }
+        String className = componentType.getName();
         for (String trustedPackage : trustedPackages) {
             if (className.startsWith(trustedPackage + ".")) {
                 return;
