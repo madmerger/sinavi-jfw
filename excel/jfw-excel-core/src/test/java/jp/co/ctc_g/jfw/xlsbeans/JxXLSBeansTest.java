@@ -25,8 +25,8 @@ import jp.co.ctc_g.jse.core.excel.JxIterateTableProcessor;
 import jp.co.ctc_g.jse.core.excel.JxVerticalRecords;
 import jp.co.ctc_g.jse.core.excel.JxVerticalRecordsProcessor;
 import jp.co.ctc_g.jse.core.excel.JxXLSBeans;
-import net.java.amateras.xlsbeans.annotation.IterateTables;
-import net.java.amateras.xlsbeans.processor.FieldProcessorFactory;
+import com.github.takezoe.xlsbeans.annotation.IterateTables;
+import com.github.takezoe.xlsbeans.processor.FieldProcessorFactory;
 
 import org.junit.Test;
 

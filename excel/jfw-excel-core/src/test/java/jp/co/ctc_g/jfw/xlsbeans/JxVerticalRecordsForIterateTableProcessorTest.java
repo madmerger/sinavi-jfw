@@ -23,7 +23,7 @@ import java.io.InputStream;
 
 import jp.co.ctc_g.jfw.xlsbeans.bean.IterateTableTestBean;
 import jp.co.ctc_g.jse.core.excel.JxXLSBeans;
-import net.java.amateras.xlsbeans.xssfconverter.WorkbookFinder;
+import com.github.takezoe.xlsbeans.xssfconverter.WorkbookFinder;
 
 import org.junit.After;
 import org.junit.Before;

@@ -18,10 +18,10 @@ package jp.co.ctc_g.jse.core.excel;
 
 import java.io.InputStream;
 
-import net.java.amateras.xlsbeans.XLSBeans;
-import net.java.amateras.xlsbeans.XLSBeansException;
-import net.java.amateras.xlsbeans.annotation.IterateTables;
-import net.java.amateras.xlsbeans.processor.FieldProcessorFactory;
+import com.github.takezoe.xlsbeans.XLSBeans;
+import com.github.takezoe.xlsbeans.XLSBeansException;
+import com.github.takezoe.xlsbeans.annotation.IterateTables;
+import com.github.takezoe.xlsbeans.processor.FieldProcessorFactory;
 
 /**
  * <p>

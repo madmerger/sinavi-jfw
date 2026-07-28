@@ -19,10 +19,10 @@ package jp.co.ctc_g.jfw.xlsbeans.bean;
 import java.io.Serializable;
 import java.util.List;
 
-import net.java.amateras.xlsbeans.annotation.IterateTables;
-import net.java.amateras.xlsbeans.annotation.LabelledCell;
-import net.java.amateras.xlsbeans.annotation.LabelledCellType;
-import net.java.amateras.xlsbeans.annotation.Sheet;
+import com.github.takezoe.xlsbeans.annotation.IterateTables;
+import com.github.takezoe.xlsbeans.annotation.LabelledCell;
+import com.github.takezoe.xlsbeans.annotation.LabelledCellType;
+import com.github.takezoe.xlsbeans.annotation.Sheet;
 
 @Sheet(name = "iterate")
 public class IterateTableTestBean implements Serializable {

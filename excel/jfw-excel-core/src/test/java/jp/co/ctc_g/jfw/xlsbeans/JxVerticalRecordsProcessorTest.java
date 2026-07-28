@@ -31,8 +31,8 @@ import jp.co.ctc_g.jfw.xlsbeans.bean.setter.VerticalNotFoundColumnsTestBean;
 import jp.co.ctc_g.jfw.xlsbeans.bean.setter.VerticalRecordsTestBean;
 import jp.co.ctc_g.jfw.xlsbeans.bean.setter.VerticalTestBean;
 import jp.co.ctc_g.jse.core.excel.JxXLSBeans;
-import net.java.amateras.xlsbeans.XLSBeansException;
-import net.java.amateras.xlsbeans.xssfconverter.WorkbookFinder;
+import com.github.takezoe.xlsbeans.XLSBeansException;
+import com.github.takezoe.xlsbeans.xssfconverter.WorkbookFinder;
 
 import org.junit.After;
 import org.junit.Before;
