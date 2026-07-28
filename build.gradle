@@ -140,6 +140,11 @@ allprojects {
         toolVersion = spotbugsVersion
     }
 
+    // 旧 findbugs 設定はテストクラスを解析対象外にしていたため、その挙動を維持する
+    tasks.named('spotbugsTest') {
+        enabled = false
+    }
+
     jacoco {
         toolVersion = jacocoVersion
     }

@@ -28,14 +28,16 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    # フェーズ1時点では依存ライブラリ (hibernate-validator 5.x / mockito 1.x など) が
-    # JDK 17 で動作しないテストが残るため、結果はレポートのみとしジョブ失敗にはしない。
-    continue-on-error: true
     services:
       mongodb:
         image: mongo:4.4
         ports:
           - 27017:27017
+        options: >-
+          --health-cmd "mongo --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
       rabbitmq:
         image: rabbitmq:3-management
         ports:
@@ -58,7 +60,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      # フェーズ1時点では依存ライブラリ (hibernate-validator 5.x / mockito 1.x など) が
+      # JDK 17 で動作しないテストが残るため、結果はレポートのみとしジョブ失敗にはしない。
       - name: Test
+        continue-on-error: true
         run: ./gradlew test --continue
 
       - name: Upload test reports
