@@ -19,7 +19,7 @@ package jp.co.ctc_g.jfw.xlsbeans.bean.field;
 import java.io.Serializable;
 import java.util.List;
 
-import net.java.amateras.xlsbeans.annotation.Sheet;
+import com.github.takezoe.xlsbeans.annotation.Sheet;
 import jp.co.ctc_g.jse.core.excel.JxVerticalRecords;
 
 @Sheet(name = "vertical")

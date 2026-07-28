@@ -18,7 +18,7 @@ package jp.co.ctc_g.jfw.xlsbeans.bean.setter;
 
 import java.io.Serializable;
 
-import net.java.amateras.xlsbeans.annotation.Column;
+import com.github.takezoe.xlsbeans.annotation.Column;
 
 public class ListDataTestBean implements Serializable {
 

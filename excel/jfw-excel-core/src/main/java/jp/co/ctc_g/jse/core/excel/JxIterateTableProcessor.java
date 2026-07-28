@@ -21,13 +21,14 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.java.amateras.xlsbeans.NeedPostProcess;
-import net.java.amateras.xlsbeans.Utils;
-import net.java.amateras.xlsbeans.annotation.IterateTables;
-import net.java.amateras.xlsbeans.processor.IterateTablesProcessor;
-import net.java.amateras.xlsbeans.xml.AnnotationReader;
-import net.java.amateras.xlsbeans.xssfconverter.WCell;
-import net.java.amateras.xlsbeans.xssfconverter.WSheet;
+import com.github.takezoe.xlsbeans.NeedPostProcess;
+import com.github.takezoe.xlsbeans.Utils;
+import com.github.takezoe.xlsbeans.XLSBeansConfig;
+import com.github.takezoe.xlsbeans.annotation.IterateTables;
+import com.github.takezoe.xlsbeans.processor.IterateTablesProcessor;
+import com.github.takezoe.xlsbeans.xml.AnnotationReader;
+import com.github.takezoe.xlsbeans.xssfconverter.WCell;
+import com.github.takezoe.xlsbeans.xssfconverter.WSheet;
 
 /**
  * <p>
@@ -55,25 +56,25 @@ public class JxIterateTableProcessor extends IterateTablesProcessor {
      * @throws Exception 予期しない例外
      */
     @Override
-    protected List<?> createTables(WSheet sheet, IterateTables tables, AnnotationReader reader, List<NeedPostProcess> process)
-        throws Exception {
+    protected List<?> createTables(WSheet sheet, IterateTables tables, AnnotationReader reader, XLSBeansConfig config,
+        List<NeedPostProcess> process) throws Exception {
 
         List<Object> resultTableList = new ArrayList<Object>();
         String label = tables.tableLabel();
         WCell after = null;
-        WCell currentCell = Utils.getCell(sheet, label, after, false, !tables.optional());
+        WCell currentCell = Utils.getCell(sheet, label, after, false, !tables.optional(), config);
         while (currentCell != null) {
             // 1 table object instance
             Object obj = tables.tableClass().newInstance();
             // LabeledCellをマッピング
-            processSingleLabelledCell(sheet, obj, currentCell, reader, process);
+            processSingleLabelledCell(sheet, obj, currentCell, reader, config, process);
             // HorizontalRecordsをマッピング
-            processMultipleTableCell(sheet, obj, currentCell, reader, tables, process);
+            processMultipleTableCell(sheet, obj, currentCell, reader, tables, config, process);
             // VerticalRecordsをマッピング
-            processMultipleTableCellForVertical(sheet, obj, currentCell, reader, tables, process);
+            processMultipleTableCellForVertical(sheet, obj, currentCell, reader, tables, config, process);
             resultTableList.add(obj);
             after = currentCell;
-            currentCell = Utils.getCell(sheet, label, after, false, false);
+            currentCell = Utils.getCell(sheet, label, after, false, false, config);
         }
         return resultTableList;
     }
@@ -89,7 +90,8 @@ public class JxIterateTableProcessor extends IterateTablesProcessor {
      * @throws Exception 予期しない例外
      */
     protected void processMultipleTableCellForVertical(WSheet sheet, Object tableObj, WCell headerCell,
-        AnnotationReader reader, IterateTables iterateTables, List<NeedPostProcess> needPostProcess) throws Exception {
+        AnnotationReader reader, IterateTables iterateTables, XLSBeansConfig config, List<NeedPostProcess> needPostProcess)
+        throws Exception {
         List<Object> properties = Utils.getPropertiesWithAnnotation(tableObj, reader, JxVerticalRecords.class);
         int headerColumn = headerCell.getColumn();
         int headerRow = headerCell.getRow();
@@ -107,9 +109,9 @@ public class JxIterateTableProcessor extends IterateTablesProcessor {
             if (ann != null && ann.tableLabel().equals(iterateTables.tableLabel())) {
                 JxVerticalRecords records = new JxVerticalRecordsForIterateTable(ann, headerColumn, headerRow);
                 if (property instanceof Method) {
-                    processor.doProcess(sheet, tableObj, (Method) property, records, reader, needPostProcess);
+                    processor.doProcess(sheet, tableObj, (Method) property, records, reader, config, needPostProcess);
                 } else if (property instanceof Field) {
-                    processor.doProcess(sheet, tableObj, (Field) property, records, reader, needPostProcess);
+                    processor.doProcess(sheet, tableObj, (Field) property, records, reader, config, needPostProcess);
                 }
             }
         }

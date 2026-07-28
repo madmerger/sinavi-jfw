@@ -19,8 +19,8 @@ package jp.co.ctc_g.jfw.xlsbeans.bean.setter;
 import java.io.Serializable;
 import java.util.Map;
 
-import net.java.amateras.xlsbeans.annotation.Column;
-import net.java.amateras.xlsbeans.annotation.MapColumns;
+import com.github.takezoe.xlsbeans.annotation.Column;
+import com.github.takezoe.xlsbeans.annotation.MapColumns;
 
 public class VerticalRecordTestBean implements Serializable {
 

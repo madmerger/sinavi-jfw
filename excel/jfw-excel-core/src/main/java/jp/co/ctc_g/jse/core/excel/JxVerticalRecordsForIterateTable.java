@@ -18,7 +18,7 @@ package jp.co.ctc_g.jse.core.excel;
 
 import java.lang.annotation.Annotation;
 
-import net.java.amateras.xlsbeans.annotation.RecordTerminal;
+import com.github.takezoe.xlsbeans.annotation.RecordTerminal;
 
 /**
  * <p>
@@ -126,7 +126,7 @@ public class JxVerticalRecordsForIterateTable implements JxVerticalRecords {
 
     /**
      * {@link JxVerticalRecords#terminal()}で指定された終了タイプを取得するメソッドです。
-     * @return {@link net.java.amateras.xlsbeans.annotation.RecordTerminal}
+     * @return {@link com.github.takezoe.xlsbeans.annotation.RecordTerminal}
      */
     public RecordTerminal terminal() {
         return terminal;

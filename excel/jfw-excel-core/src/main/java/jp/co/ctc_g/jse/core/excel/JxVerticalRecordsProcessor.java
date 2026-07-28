@@ -25,17 +25,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.java.amateras.xlsbeans.NeedPostProcess;
-import net.java.amateras.xlsbeans.Utils;
-import net.java.amateras.xlsbeans.XLSBeansException;
-import net.java.amateras.xlsbeans.annotation.Column;
-import net.java.amateras.xlsbeans.annotation.MapColumns;
-import net.java.amateras.xlsbeans.annotation.PostProcess;
-import net.java.amateras.xlsbeans.annotation.RecordTerminal;
-import net.java.amateras.xlsbeans.processor.VerticalRecordsProcessor;
-import net.java.amateras.xlsbeans.xml.AnnotationReader;
-import net.java.amateras.xlsbeans.xssfconverter.WCell;
-import net.java.amateras.xlsbeans.xssfconverter.WSheet;
+import com.github.takezoe.xlsbeans.NeedPostProcess;
+import com.github.takezoe.xlsbeans.Utils;
+import com.github.takezoe.xlsbeans.XLSBeansConfig;
+import com.github.takezoe.xlsbeans.XLSBeansException;
+import com.github.takezoe.xlsbeans.annotation.Column;
+import com.github.takezoe.xlsbeans.annotation.MapColumns;
+import com.github.takezoe.xlsbeans.annotation.PostProcess;
+import com.github.takezoe.xlsbeans.annotation.RecordTerminal;
+import com.github.takezoe.xlsbeans.processor.VerticalRecordsProcessor;
+import com.github.takezoe.xlsbeans.xml.AnnotationReader;
+import com.github.takezoe.xlsbeans.xssfconverter.WCell;
+import com.github.takezoe.xlsbeans.xssfconverter.WSheet;
 
 /**
  * <p>
@@ -60,20 +61,20 @@ public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
      */
     @Override
     public void doProcess(WSheet sheet, Object obj, Method setter, Annotation ann, AnnotationReader reader,
-        List<NeedPostProcess> processor) throws Exception {
+        XLSBeansConfig config, List<NeedPostProcess> processor) throws Exception {
         JxVerticalRecords records = (JxVerticalRecords) ann;
         Class<?>[] clazzes = setter.getParameterTypes();
         if (clazzes.length != 1) {
             throw new XLSBeansException("Arguments of '" + setter.toString() + "' is invalid.");
         } else if (List.class.isAssignableFrom(clazzes[0])) {
-            List<?> value = createRecords(sheet, records, reader, processor);
+            List<?> value = createRecords(sheet, records, reader, config, processor);
             if (value != null) {
                 setter.invoke(obj, new Object[] {
                     value
                 });
             }
         } else if (clazzes[0].isArray()) {
-            List<?> value = createRecords(sheet, records, reader, processor);
+            List<?> value = createRecords(sheet, records, reader, config, processor);
             if (value != null) {
                 Class<?> type = clazzes[0].getComponentType();
                 Object array = Array.newInstance(type, value.size());
@@ -98,16 +99,16 @@ public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
      */
     @Override
     public void doProcess(WSheet wSheet, Object obj, Field field, Annotation ann, AnnotationReader reader,
-        List<NeedPostProcess> needPostProcess) throws Exception {
+        XLSBeansConfig config, List<NeedPostProcess> needPostProcess) throws Exception {
         JxVerticalRecords records = (JxVerticalRecords) ann;
         Class<?> clazz = field.getType();
         if (List.class.isAssignableFrom(clazz)) {
-            List<?> value = createRecords(wSheet, records, reader, needPostProcess);
+            List<?> value = createRecords(wSheet, records, reader, config, needPostProcess);
             if (value != null) {
                 field.set(obj, value);
             }
         } else if (clazz.isArray()) {
-            List<?> value = createRecords(wSheet, records, reader, needPostProcess);
+            List<?> value = createRecords(wSheet, records, reader, config, needPostProcess);
             if (value != null) {
                 Class<?> type = clazz.getComponentType();
                 Object array = Array.newInstance(type, value.size());
@@ -125,8 +126,8 @@ public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
      * レコードとJavaのオブジェクトをマッピングします。
      */
     protected List<?> createRecords(WSheet wSheet, JxVerticalRecords records, AnnotationReader reader,
-        List<NeedPostProcess> needPostProcess) throws Exception {
-        List<Object> columnProps = Utils.getColumnProperties(records.recordClass().newInstance(), null, reader);
+        XLSBeansConfig config, List<NeedPostProcess> needPostProcess) throws Exception {
+        List<Object> columnProps = Utils.getColumnProperties(records.recordClass().newInstance(), null, reader, config);
         if (columnProps.isEmpty()) throw new XLSBeansException("VerticalRecordsには@Columnは必須です。");
         List<Object> result = new ArrayList<Object>();
         List<JxHeaderInfo> headers = new ArrayList<JxHeaderInfo>();
@@ -138,7 +139,7 @@ public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
             initRow = records.headerRow();
         } else {
             try {
-                WCell labelCell = Utils.getCell(wSheet, records.tableLabel(), 0);
+                WCell labelCell = Utils.getCell(wSheet, records.tableLabel(), 0, config);
                 initColumn = labelCell.getColumn() + 1;
                 initRow = labelCell.getRow();
             } catch (XLSBeansException ex) {
@@ -182,7 +183,7 @@ public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
         }
 
         // Check for columns
-        checkColumns(records.recordClass(), headers, reader);
+        checkColumns(records.recordClass(), headers, reader, config);
 
         RecordTerminal terminal = records.terminal();
         if (terminal == null) {
@@ -195,8 +196,8 @@ public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
             hRow = initRow;
             // ここの処理が遅かったので、大幅にリファクタリングしています。
             Object record = records.recordClass().newInstance();
-            processMapColumns(wSheet, headers, hRow, hColumn, record, reader);
-            boolean retColumn = processColumn(wSheet, headers, hRow, hColumn, record, reader);
+            processMapColumns(wSheet, headers, hRow, hColumn, record, reader, config);
+            boolean retColumn = processColumn(wSheet, headers, hRow, hColumn, record, reader, config);
             if (retColumn) {
                 result.add(record);
                 for (Method method : record.getClass().getMethods()) {
@@ -232,10 +233,10 @@ public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
      * </p>
      */
     protected boolean processColumn(WSheet wSheet, List<JxHeaderInfo> headers, int hRow, int hColumn, Object record,
-        AnnotationReader reader) throws Exception {
+        AnnotationReader reader, XLSBeansConfig config) throws Exception {
 
         List<String> keys = new ArrayList<String>();
-        List<Object> properties = Utils.getColumnProperties(record, null, reader);
+        List<Object> properties = Utils.getColumnProperties(record, null, reader, config);
         for (Object property : properties) {
             Column column = null;
             if (property instanceof Method) {
@@ -256,11 +257,11 @@ public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
                 if (property instanceof Method) {
                     key = ((Method) property).getName();
                     Utils.setPosition(hColumn, hRow, record, Utils.toPropertyName(key));
-                    Utils.invokeSetter((Method) property, record, valueCell.getContents());
+                    Utils.invokeSetter((Method) property, record, valueCell.getContents(), config);
                 } else if (property instanceof Field) {
                     key = ((Field) property).getName();
                     Utils.setPosition(hColumn, hRow, record, key);
-                    Utils.setField((Field) property, record, valueCell.getContents());
+                    Utils.setField((Field) property, record, valueCell.getContents(), config);
                 }
                 keys.add(key);
             }
@@ -274,7 +275,7 @@ public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
      * </p>
      */
     protected void processMapColumns(WSheet sheet, List<JxHeaderInfo> headerInfos, int begin, int column, Object record,
-        AnnotationReader reader) throws Exception {
+        AnnotationReader reader, XLSBeansConfig config) throws Exception {
 
         List<Object> properties = Utils.getMapColumnProperties(record, reader);
         for (Object property : properties) {
@@ -308,9 +309,10 @@ public class JxVerticalRecordsProcessor extends VerticalRecordsProcessor {
         }
     }
 
-    protected void checkColumns(Class<?> recordClass, List<JxHeaderInfo> headers, AnnotationReader reader) throws Exception {
+    protected void checkColumns(Class<?> recordClass, List<JxHeaderInfo> headers, AnnotationReader reader,
+        XLSBeansConfig config) throws Exception {
 
-        for (Object property : Utils.getColumnProperties(recordClass.newInstance(), null, reader)) {
+        for (Object property : Utils.getColumnProperties(recordClass.newInstance(), null, reader, config)) {
             Column column = null;
             if (property instanceof Method) {
                 column = reader.getAnnotation(recordClass, (Method) property, Column.class);

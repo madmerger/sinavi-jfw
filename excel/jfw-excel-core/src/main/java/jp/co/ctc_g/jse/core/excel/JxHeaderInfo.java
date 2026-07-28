@@ -16,7 +16,7 @@
 
 package jp.co.ctc_g.jse.core.excel;
 
-import net.java.amateras.xlsbeans.processor.HeaderInfo;
+import com.github.takezoe.xlsbeans.processor.HeaderInfo;
 
 /**
  * <p>
